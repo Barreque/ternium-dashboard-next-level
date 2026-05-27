@@ -4628,12 +4628,6 @@ const reportes = window.state.filteredReportsPND?.length
         ? window.state.normalizedReportsPND
         : (window.state.rawReportsPND || []));
 
-      if (!reportes.length) {
-    console.warn("REPORTES AUN NO CARGADOS");
-    setTimeout(renderReportesPNDCharts, 500);
-    return;
-}
-
 console.log("REPORTES PND:", reportes.length);
     console.log("REPORTES PND:", reportes.length);
 
