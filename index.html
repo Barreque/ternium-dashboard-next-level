@@ -2250,11 +2250,11 @@
                 </div>
                 <div class="kpi-card">
                     <div class="kpi-card-header">
-                        <span class="kpi-title">Remisiones Únicas</span>
+                        <span class="kpi-title">Borrador</span>
                         <div class="kpi-icon yellow"><i data-lucide="receipt"></i></div>
                     </div>
-                    <div class="kpi-value" id="kpi-r-remisiones">0</div>
-                    <div class="kpi-trend neutral" id="kpi-r-remisiones-sub">Remisiones detectadas</div>
+                    <div class="kpi-value" id="kpi-r-borrador">0</div>
+                    <div class="kpi-trend neutral" id="kpi-r-borrador-sub">Reportes en borrador</div>
                 </div>
             </div>
 
@@ -3130,18 +3130,24 @@ function normalizePlantKey(value) {
                     );
                 }).length;
 
-                const remisiones = new Set(reportes.map(r => getReportField(r, ["Remision", "Remisión"])).filter(Boolean)).size;
+                const borrador = reportes.filter(r => {
+    const estatus = getEstatusReportePND(r);
+    return estatus.includes("BORRADOR");
+}).length;
                 const pctPend = total > 0 ? Math.round((pendientes / total) * 100) : 0;
                 const pctEnv = total > 0 ? Math.round((enviados / total) * 100) : 0;
 
                 animateCounter("kpi-r-total", total);
                 animateCounter("kpi-r-pendientes", pendientes);
                 animateCounter("kpi-r-enviados", enviados);
-                animateCounter("kpi-r-remisiones", remisiones);
+                animateCounter("kpi-r-borrador", borrador);
                 const pendSub = document.getElementById("kpi-r-pendientes-sub");
                 const envSub = document.getElementById("kpi-r-enviados-sub");
                 if (pendSub) pendSub.innerText = `${pctPend}% pendientes / no enviados`;
                 if (envSub) envSub.innerText = `${pctEnv}% reportes enviados`;
+                const borradorSub = document.getElementById("kpi-r-borrador-sub");
+                if (borradorSub) borradorSub.innerText =
+    `${borrador} reportes en borrador`;
             } else {
                 const total = window.state.filteredAlerts.length;
                 const peligro = window.state.filteredAlerts.filter(a => a.severity === 'PELIGRO').length;
