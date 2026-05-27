@@ -2932,7 +2932,9 @@ Array.from(uniquePlants.entries())
                 selectStatus.value = selectedStatus;
             }
         }
-
+function normalizePlantKey(value) {
+    return String(value || "").trim().toUpperCase();
+}
         // --- FILTERING LOGIC ---
         function applyFilters() {
             // Read filter controls
