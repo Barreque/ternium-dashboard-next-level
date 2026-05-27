@@ -11,6 +11,7 @@
     <meta name="apple-mobile-web-app-title" content="Ternium Dash">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23ff6d00'/%3E%3Ctext x='32' y='43' text-anchor='middle' font-size='34' font-family='Arial' fill='white' font-weight='700'%3ET%3C/text%3E%3C/svg%3E">
 
     <title>Ternium - Dashboard de Control de Mantenimiento y Alarmas</title>
     
@@ -2760,6 +2761,14 @@
                 syncBtn.disabled = true;
             }
 
+            // Manual sync: limpia caché local y fuerza lectura fresca desde Sheets/API
+            if (forceSync) {
+                sessionStorage.removeItem("ternium_orders");
+                sessionStorage.removeItem("ternium_alerts");
+                sessionStorage.removeItem("ternium_reportes_pnd");
+                sessionStorage.removeItem("ternium_sync_time");
+            }
+
             // Attempt to load from sessionStorage cache first
             if (!forceSync) {
                 const cachedOrders = sessionStorage.getItem("ternium_orders");
@@ -2791,9 +2800,10 @@
             }
 
             try {
-const urls = [
-                    API_URL + "?action=data&key=" + encodeURIComponent(API_KEY) + "&sheet=Hoja%201",
-                    API_URL + "?action=data&key=" + encodeURIComponent(API_KEY) + "&sheet=avisos%20dashboard"
+                const cacheBust = forceSync ? ("&t=" + Date.now()) : "";
+                const urls = [
+                    API_URL + "?action=data&key=" + encodeURIComponent(API_KEY) + "&sheet=Hoja%201" + cacheBust,
+                    API_URL + "?action=data&key=" + encodeURIComponent(API_KEY) + "&sheet=avisos%20dashboard" + cacheBust
                 ];
 
                 const fetchJson = (url, timeoutMs = 25000) => {
@@ -2821,7 +2831,7 @@ const urls = [
                 // Libro 2 / Reportes PND. No bloquea el dashboard si falla.
                 let resReportes = { success: false, data: [] };
                 try {
-                    resReportes = await fetchJson(MASTER_API_URL + "?action=reportes_pnd", 180000);
+                    resReportes = await fetchJson(MASTER_API_URL + "?action=reportes_pnd" + (forceSync ? ("&t=" + Date.now()) : ""), 180000);
                 } catch (reportesErr) {
                     console.warn("No se pudieron cargar Reportes PND:", reportesErr);
                 }
@@ -2873,8 +2883,8 @@ const urls = [
             }
         }
 
-        function triggerManualSync() {
-            fetchData(true);
+        async function triggerManualSync() {
+            await fetchData(true);
         }
 
         function retryConnection() {
@@ -2887,7 +2897,6 @@ const urls = [
         function initDashboard() {
             populateDropdownOptions();
             initCharts();
-            renderReportesPNDCharts();
             initMap();
             applyFilters();
         }
@@ -3105,10 +3114,23 @@ function normalizePlantKey(value) {
                 renderKpiSparkline("spark-o-pending", "PENDIENTE", window.state.filteredOrders.filter(o => normalizeText(o.status) === 'PENDIENTE'), o => o.dueDate, "yellow");
                 renderKpiSparkline("spark-o-danger", "VENCIDO", window.state.filteredOrders.filter(o => normalizeText(o.status) === 'FUERA DE TERMINO'), o => o.dueDate, "red");
             } else if (window.state.activeTab === 'reportes') {
-                const total = window.state.filteredReportesPND.length;
-                const pendientes = getReportesPendientes(window.state.filteredReportesPND).length;
-                const enviados = window.state.filteredReportesPND.filter(r => getReporteEstadoGeneral(r) === "Enviado").length;
-                const remisiones = new Set(window.state.filteredReportesPND.map(r => getReportField(r, ["Remision", "Remisión"])).filter(Boolean)).size;
+                const reportes = window.state.filteredReportesPND || [];
+                const total = reportes.length;
+
+                // KPIs calculados desde Columna P: Estatus Reporte
+                const enviados = reportes.filter(r => getEstatusReportePND(r) === "ENVIADO").length;
+                const pendientes = reportes.filter(r => {
+                    const estatus = getEstatusReportePND(r);
+                    return (
+                        estatus.includes("NO ENVIADO") ||
+                        estatus.includes("NO ENVIAR") ||
+                        estatus.includes("BORRADOR") ||
+                        estatus.includes("PENDIENTE") ||
+                        !estatus
+                    );
+                }).length;
+
+                const remisiones = new Set(reportes.map(r => getReportField(r, ["Remision", "Remisión"])).filter(Boolean)).size;
                 const pctPend = total > 0 ? Math.round((pendientes / total) * 100) : 0;
                 const pctEnv = total > 0 ? Math.round((enviados / total) * 100) : 0;
 
@@ -3244,7 +3266,7 @@ function normalizePlantKey(value) {
                 renderOrdersPlantBar();
                 renderOrdersTimeline();
             } else if (window.state.activeTab === 'reportes') {
-                return;
+                renderReportesPNDCharts();
             } else {
                 renderAlertsDonut();
                 renderAlertsPlantBar();
@@ -3678,23 +3700,42 @@ function normalizePlantKey(value) {
 
 
         // --- REPORTES PND ANALYTICS HELPERS ---
+        function getEstatusReportePND(r) {
+            return normalizeText(getReportField(r, ["Estatus Reporte", "EstatusReporte", "ESTATUS REPORTE"]));
+        }
+
         function getReporteEstadoGeneral(r) {
+            // Regla principal para Reportes PND: Columna P = Estatus Reporte.
+            // Se usa este campo para KPIs, gráficas y filtros de Reportes PND.
+            const estatusReporte = getEstatusReportePND(r);
             const estadoFormulario = normalizeText(getReportField(r, ["EstadoFormulario", "Estado Formulario", "Estatus"]));
-            const estatusReporte = normalizeText(getReportField(r, ["Estatus Reporte", "EstadoReporte", "EstatusReporte"]));
 
             if (estatusReporte === "ENVIADO") return "Enviado";
-            if (estadoFormulario === "BORRADOR") return "Borrador";
             if (estatusReporte.includes("NO ENVIADO") || estatusReporte.includes("NO ENVIAR")) return "No Enviado";
-            if (estadoFormulario === "COMPLETADO" && estatusReporte !== "ENVIADO") return "No Enviado";
+            if (estatusReporte.includes("BORRADOR")) return "Borrador";
+            if (estatusReporte.includes("PENDIENTE")) return "Pendiente";
+            if (estatusReporte.includes("CANCEL")) return "Cancelado";
+
+            // Fallback visual si la columna P viene vacía.
+            if (estadoFormulario === "BORRADOR") return "Borrador";
             if (estadoFormulario === "CANCELACION" || estadoFormulario === "CANCELADO") return "Cancelado";
-            if (estadoFormulario === "COMPLETADO") return "Completado";
-            return estadoFormulario || estatusReporte || "Sin Estado";
+            if (estadoFormulario === "COMPLETADO") return "No Enviado";
+            return estadoFormulario || "Sin Estado";
         }
 
         function getReportesPendientes(list) {
             return (list || []).filter(r => {
+                const estatusReporte = getEstatusReportePND(r);
                 const estado = getReporteEstadoGeneral(r);
-                return estado === "Borrador" || estado === "No Enviado";
+                return (
+                    estatusReporte.includes("NO ENVIADO") ||
+                    estatusReporte.includes("NO ENVIAR") ||
+                    estatusReporte.includes("BORRADOR") ||
+                    estatusReporte.includes("PENDIENTE") ||
+                    estado === "Borrador" ||
+                    estado === "No Enviado" ||
+                    estado === "Pendiente"
+                );
             });
         }
 
@@ -3741,9 +3782,9 @@ function normalizePlantKey(value) {
                     datasets: [{
                         label: 'Pendientes',
                         data,
-                        backgroundColor: 'rgba(239, 68, 68, 0.75)',
-                        hoverBackgroundColor: '#ef4444',
-                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(255, 109, 0, 0.78)',
+                        hoverBackgroundColor: '#ff8c1a',
+                        borderColor: '#ff6d00',
                         borderWidth: 1,
                         borderRadius: 6
                     }]
@@ -4564,7 +4605,7 @@ function normalizePlantKey(value) {
 
             const total = data.length;
             const pendientes = typeof getReportesPendientes === "function" ? getReportesPendientes(data) : [];
-            const enviados = data.filter(r => normalizeText(getReportField(r, ["Estatus Reporte", "EstatusReporte", "Estatus"])) === "ENVIADO").length;
+            const enviados = data.filter(r => getEstatusReportePND(r) === "ENVIADO").length;
             const pct = total ? Math.round((enviados / total) * 100) : 0;
 
             const byPlant = {};
@@ -4626,156 +4667,14 @@ function renderReportesPNDCharts() {
             ? window.state.normalizedReportesPND
             : (window.state.rawReportesPND || []));
 
-    console.log("REPORTES PND:", reportes.length);
-
-    const pendientesPorPlanta = {};
-    const estados = {};
-
-    reportes.forEach(r => {
-        const planta = normalizePlantKey(getReportField(r, ["Planta"])) || "SIN PLANTA";
-        const estado = String(getReporteEstadoGeneral(r) || "SIN ESTADO").trim();
-        const estadoUpper = estado.toUpperCase();
-
-        estados[estado] = (estados[estado] || 0) + 1;
-
-        if (
-            estadoUpper.includes("BORRADOR") ||
-            estadoUpper.includes("NO ENVIADO") ||
-            estadoUpper.includes("COMPLETADO") ||
-            estadoUpper.includes("PENDIENTE")
-        ) {
-            pendientesPorPlanta[planta] = (pendientesPorPlanta[planta] || 0) + 1;
-        }
-    });
-
-    const chartTextColor = "rgba(226,232,240,0.9)";
-    const chartMutedColor = "rgba(148,163,184,0.7)";
-    const chartGridColor = "rgba(148,163,184,0.07)";
-    const chartBorderColor = "#192135";
-
-    const canvasPlanta = document.getElementById("chart-reportes-pendientes-planta");
-    if (canvasPlanta) {
-        if (window.state.charts["chart-reportes-pendientes-planta"]) {
-            window.state.charts["chart-reportes-pendientes-planta"].destroy();
-        }
-
-        window.state.charts["chart-reportes-pendientes-planta"] = new Chart(canvasPlanta, {
-            type: "bar",
-            data: {
-                labels: Object.keys(pendientesPorPlanta),
-                datasets: [{
-                    label: "Pendientes",
-                    data: Object.values(pendientesPorPlanta),
-                    backgroundColor: "rgba(255,109,0,0.78)",
-                    borderColor: "#ff6d00",
-                    hoverBackgroundColor: "#ff8c1a",
-                    borderWidth: 2,
-                    borderRadius: 8,
-                    maxBarThickness: 46
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        labels: {
-                            color: chartTextColor,
-                            boxWidth: 10,
-                            usePointStyle: true,
-                            pointStyle: "circle"
-                        }
-                    },
-                    tooltip: {
-                        enabled: true,
-                        backgroundColor: "#0f172a",
-                        borderColor: "#334155",
-                        borderWidth: 1,
-                        titleColor: "#ffffff",
-                        bodyColor: "#cbd5e1"
-                    }
-                },
-                scales: {
-                    x: {
-                        ticks: {
-                            color: chartMutedColor,
-                            font: { size: 10 },
-                            maxRotation: 20,
-                            minRotation: 0
-                        },
-                        grid: { color: chartGridColor },
-                        border: { display: false }
-                    },
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            color: chartMutedColor,
-                            font: { size: 10 },
-                            precision: 0
-                        },
-                        grid: { color: chartGridColor },
-                        border: { display: false }
-                    }
-                }
-            }
-        });
+    if (!window.state.filteredReportesPND || !window.state.filteredReportesPND.length) {
+        window.state.filteredReportesPND = reportes;
     }
 
-    const canvasEstado = document.getElementById("chart-reportes-estado-donut");
-    if (canvasEstado) {
-        if (window.state.charts["chart-reportes-estado-donut"]) {
-            window.state.charts["chart-reportes-estado-donut"].destroy();
-        }
-
-        window.state.charts["chart-reportes-estado-donut"] = new Chart(canvasEstado, {
-            type: "doughnut",
-            data: {
-                labels: Object.keys(estados),
-                datasets: [{
-                    data: Object.values(estados),
-                    backgroundColor: [
-                        "#10b981",
-                        "#ef4444",
-                        "#f59e0b",
-                        "#3b82f6",
-                        "#8b5cf6",
-                        "#f97316",
-                        "#14b8a6",
-                        "#ec4899",
-                        "#64748b"
-                    ],
-                    borderColor: chartBorderColor,
-                    borderWidth: 3,
-                    hoverOffset: 10
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: "68%",
-                plugins: {
-                    legend: {
-                        position: "right",
-                        labels: {
-                            color: chartTextColor,
-                            padding: 16,
-                            boxWidth: 10,
-                            usePointStyle: true,
-                            pointStyle: "circle"
-                        }
-                    },
-                    tooltip: {
-                        enabled: true,
-                        backgroundColor: "#0f172a",
-                        borderColor: "#334155",
-                        borderWidth: 1,
-                        titleColor: "#ffffff",
-                        bodyColor: "#cbd5e1"
-                    }
-                }
-            }
-        });
-    }
+    renderReportesPendientesPlanta();
+    renderReportesEstadoDonut();
+    renderReportesPendientesTecnico();
+    renderReportesTendencia();
 }
 </script>
 </body>
