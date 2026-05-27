@@ -4622,7 +4622,16 @@ function normalizePlantKey(value) {
 function renderReportesPNDCharts() {
     console.log("STATE:", window.state);
 
-const reportes = window.state.filteredReportsPND || [];
+const reportes =
+    (window.state.filteredReportsPND &&
+     window.state.filteredReportsPND.length > 0)
+        ? window.state.filteredReportsPND
+        : (window.state.normalizedReportsPND || []);
+        
+        if (!reportes.length) {
+    console.warn("REPORTES AUN NO CARGADOS");
+    return;
+}
 
 console.log("REPORTES PND:", reportes.length);
     console.log("REPORTES PND:", reportes.length);
