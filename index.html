@@ -4620,7 +4620,16 @@ function normalizePlantKey(value) {
             };
         }
 function renderReportesPNDCharts() {
-    const reportes = window.state.normalizedReportsPND || [];
+    console.log("STATE:", window.state);
+
+const reportes =
+    window.state.filteredReportsPND ||
+    window.state.normalizedReportsPND ||
+    window.state.reportesPND ||
+    window.state.reportes ||
+    [];
+
+console.log("REPORTES REALES:", reportes);
     console.log("REPORTES PND:", reportes.length);
 
     const pendientesPorPlanta = {};
