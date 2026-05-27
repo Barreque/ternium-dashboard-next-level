@@ -4535,11 +4535,11 @@ function normalizePlantKey(value) {
             // Usamos Blob para que exporte TODOS los registros, no solo una parte por límite de URL.
             const separator = ";";
             const headers =
-    type === 'orders'
-        ? ["Nº Orden", "Planta", "Descripción", "Vencimiento", "Fecha Inspección", "Estatus", "Ubicación", "Comentarios"]
-        : type === 'reportes'
-            ? ["Fecha", "Planta", "N° Reporte", "Remisión", "Área", "Equipo", "Num Orden", "Usuario", "Técnico", "Auxiliar", "Concepto", "Precio", "Estado Formulario", "Estatus Reporte"]
-            : ["Nº Aviso", "Relación Orden", "Severidad", "Planta", "Descripción", "Días Abierto", "Notas", "Ubicación", "Remonitoreo", "Última Insp."];
+            type === 'orders'
+              ? ["Nº Orden", "Planta", "Descripción", "Vencimiento", "Fecha Inspección", "Estatus", "Ubicación", "Comentarios"]
+              : type === 'reportes'
+                  ? ["Fecha", "Planta", "N° Reporte", "Remisión", "Área", "Equipo", "Num Orden", "Usuario", "Técnico", "Auxiliar", "Concepto", "Precio", "Estado Formulario", "Estatus Reporte"]
+                  : ["Nº Aviso", "Relación Orden", "Severidad", "Planta", "Descripción", "Días Abierto", "Notas", "Ubicación", "Remonitoreo", "Última Insp."];
 
             const cleanValue = (value) => {
                 if (value === null || value === undefined) return '';
