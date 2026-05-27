@@ -3006,6 +3006,11 @@ function normalizePlantKey(value) {
 
                 return true;
             });
+            if (window.state.activeTab === "reportes") {
+    renderKPIs();
+    renderReportesPNDCharts();
+    renderReportesTable();
+}
 
             // Filter Alerts
             window.state.filteredAlerts = window.state.normalizedAlerts.filter(alert => {
