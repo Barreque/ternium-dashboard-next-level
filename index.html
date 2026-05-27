@@ -3028,7 +3028,7 @@ function normalizePlantKey(value) {
             window.state.filteredReportesPND = window.state.normalizedReportesPND.filter(r => {
                 const planta = normalizePlantKey(getReportField(r, ["Planta"]));   
                 const fechaRaw = getReportField(r, ["Fecha"]);
-                const estado = getReporteEstadoGeneral(r);
+                const estado = getEstatusReportePND(r);
                 const fecha = fechaRaw ? new Date(fechaRaw) : null;
 
                 if (
@@ -3114,7 +3114,12 @@ function normalizePlantKey(value) {
                 renderKpiSparkline("spark-o-pending", "PENDIENTE", window.state.filteredOrders.filter(o => normalizeText(o.status) === 'PENDIENTE'), o => o.dueDate, "yellow");
                 renderKpiSparkline("spark-o-danger", "VENCIDO", window.state.filteredOrders.filter(o => normalizeText(o.status) === 'FUERA DE TERMINO'), o => o.dueDate, "red");
             } else if (window.state.activeTab === 'reportes') {
-                const reportes = window.state.filteredReportesPND || [];
+                const reportes =
+    window.state.filteredReportesPND?.length
+        ? window.state.filteredReportesPND
+        : (window.state.normalizedReportesPND?.length
+            ? window.state.normalizedReportesPND
+            : (window.state.rawReportesPND || []));
                 const total = reportes.length;
 
                 // KPIs calculados desde Columna P: Estatus Reporte
