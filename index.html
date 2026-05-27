@@ -2983,21 +2983,22 @@ function normalizePlantKey(value) {
 
             if (window.state.activeTab === 'orders' || window.state.activeTab === 'reportes') {
                 window.state.filters.status = document.getElementById("filter-status").value;
+            } else {
+                window.state.filters.status = 'ALL';
             }
+
+            // Reset pagination pages before repainting
+            window.state.pagination.orders.page = 1;
+            window.state.pagination.alerts.page = 1;
+            window.state.pagination.reportes.page = 1;
 
             // Filter Orders
             window.state.filteredOrders = window.state.normalizedOrders.filter(order => {
-                // Plant Filter
                 if (window.state.filters.plant !== 'ALL' && order.plant !== window.state.filters.plant) return false;
-                
-                // Status Filter
-                if (window.state.filters.status !== 'ALL' && order.status !== window.state.filters.status) return false;
-                
-                // Date filter (Vencimiento)
+                if ((window.state.activeTab === 'orders') && window.state.filters.status !== 'ALL' && order.status !== window.state.filters.status) return false;
                 if (window.state.filters.startDate && order.dueDate && order.dueDate < new Date(window.state.filters.startDate)) return false;
                 if (window.state.filters.endDate && order.dueDate && order.dueDate > new Date(window.state.filters.endDate)) return false;
 
-                // Search Filter (Full-text)
                 if (window.state.filters.search) {
                     const searchStr = `${order.id} ${order.description} ${order.locationCode} ${order.comments}`.toLowerCase();
                     if (!searchStr.includes(window.state.filters.search)) return false;
@@ -3008,14 +3009,10 @@ function normalizePlantKey(value) {
 
             // Filter Alerts
             window.state.filteredAlerts = window.state.normalizedAlerts.filter(alert => {
-                // Plant Filter
                 if (window.state.filters.plant !== 'ALL' && alert.plant !== window.state.filters.plant) return false;
-                
-                // Date filter (Creado el)
                 if (window.state.filters.startDate && alert.createdDate && alert.createdDate < new Date(window.state.filters.startDate)) return false;
                 if (window.state.filters.endDate && alert.createdDate && alert.createdDate > new Date(window.state.filters.endDate)) return false;
 
-                // Search Filter (Full-text)
                 if (window.state.filters.search) {
                     const searchStr = `${alert.id} ${alert.orderId} ${alert.description} ${alert.location} ${alert.notes}`.toLowerCase();
                     if (!searchStr.includes(window.state.filters.search)) return false;
@@ -3024,18 +3021,27 @@ function normalizePlantKey(value) {
                 return true;
             });
 
-            // Filter Reportes PND
-            window.state.filteredReportesPND = window.state.normalizedReportesPND.filter(r => {
-                const planta = normalizePlantKey(getReportField(r, ["Planta"]));   
+            // Filter Reportes PND usando Columna P / Estatus Reporte
+            window.state.filteredReportesPND = (window.state.normalizedReportesPND || []).filter(r => {
+                const planta = normalizePlantKey(getReportField(r, ["Planta"]));
                 const fechaRaw = getReportField(r, ["Fecha"]);
-                const estado = getEstatusReportePND(r);
+                const estadoVisual = getReporteEstadoGeneral(r);     // Ej. Borrador, Enviado, No Enviado
+                const estadoNorm = getEstatusReportePND(r);           // Ej. BORRADOR, ENVIADO, NO ENVIADO
+                const filtroStatus = normalizeText(window.state.filters.status);
                 const fecha = fechaRaw ? new Date(fechaRaw) : null;
 
                 if (
-  window.state.filters.plant !== 'ALL' &&
-  normalizePlantKey(planta) !== normalizePlantKey(window.state.filters.plant)
-) return false;
-                if (window.state.filters.status !== 'ALL' && estado !== window.state.filters.status) return false;
+                    window.state.filters.plant !== 'ALL' &&
+                    normalizePlantKey(planta) !== normalizePlantKey(window.state.filters.plant)
+                ) return false;
+
+                if (
+                    window.state.activeTab === 'reportes' &&
+                    window.state.filters.status !== 'ALL' &&
+                    normalizeText(estadoVisual) !== filtroStatus &&
+                    estadoNorm !== filtroStatus
+                ) return false;
+
                 if (window.state.filters.startDate && fecha && fecha < new Date(window.state.filters.startDate)) return false;
                 if (window.state.filters.endDate && fecha && fecha > new Date(window.state.filters.endDate)) return false;
 
@@ -3049,22 +3055,14 @@ function normalizePlantKey(value) {
                         getReportField(r, ["Usuario"]),
                         getReportField(r, ["Tecnico", "Técnico"]),
                         getReportField(r, ["Auxiliar Tecnico", "Auxiliar Técnico"]),
-                        getReportField(r, ["Concepto"])
+                        getReportField(r, ["Concepto"]),
+                        getReportField(r, ["Estatus Reporte", "EstatusReporte", "ESTATUS REPORTE"])
                     ].join(" ").toLowerCase();
                     if (!searchStr.includes(window.state.filters.search)) return false;
                 }
+
                 return true;
             });
-            if (window.state.activeTab === "reportes") {
-    renderKPIs();
-    renderReportesPNDCharts();
-    renderReportesTable();
-}
-
-            // Reset pagination pages
-            window.state.pagination.orders.page = 1;
-            window.state.pagination.alerts.page = 1;
-            window.state.pagination.reportes.page = 1;
 
             // Trigger complete repaints
             renderKPIs();
@@ -3119,12 +3117,9 @@ function normalizePlantKey(value) {
                 renderKpiSparkline("spark-o-pending", "PENDIENTE", window.state.filteredOrders.filter(o => normalizeText(o.status) === 'PENDIENTE'), o => o.dueDate, "yellow");
                 renderKpiSparkline("spark-o-danger", "VENCIDO", window.state.filteredOrders.filter(o => normalizeText(o.status) === 'FUERA DE TERMINO'), o => o.dueDate, "red");
             } else if (window.state.activeTab === 'reportes') {
-                const reportes =
-    window.state.filteredReportesPND?.length
-        ? window.state.filteredReportesPND
-        : (window.state.normalizedReportesPND?.length
-            ? window.state.normalizedReportesPND
-            : (window.state.rawReportesPND || []));
+                const reportes = Array.isArray(window.state.filteredReportesPND)
+                    ? window.state.filteredReportesPND
+                    : (window.state.normalizedReportesPND || window.state.rawReportesPND || []);
                 const total = reportes.length;
 
                 // KPIs calculados desde Columna P: Estatus Reporte
@@ -3281,12 +3276,6 @@ function normalizePlantKey(value) {
                 renderOrdersPlantBar();
                 renderOrdersTimeline();
             } else if (window.state.activeTab === 'reportes') {
-                function prettyPlantName(value) {
-    return String(value || "")
-        .trim()
-        .toLowerCase()
-        .replace(/\b\w/g, c => c.toUpperCase());
-}
                 renderReportesPNDCharts();
             } else {
                 renderAlertsDonut();
@@ -4682,21 +4671,15 @@ function normalizePlantKey(value) {
             };
         }
 function renderReportesPNDCharts() {
-    const reportes = window.state.filteredReportesPND?.length
-        ? window.state.filteredReportesPND
-        : (window.state.normalizedReportesPND?.length
-            ? window.state.normalizedReportesPND
-            : (window.state.rawReportesPND || []));
+            if (!Array.isArray(window.state.filteredReportesPND)) {
+                window.state.filteredReportesPND = window.state.normalizedReportesPND || window.state.rawReportesPND || [];
+            }
 
-    if (!window.state.filteredReportesPND || !window.state.filteredReportesPND.length) {
-        window.state.filteredReportesPND = reportes;
-    }
-
-    renderReportesPendientesPlanta();
-    renderReportesEstadoDonut();
-    renderReportesPendientesTecnico();
-    renderReportesTendencia();
-}
+            renderReportesPendientesPlanta();
+            renderReportesEstadoDonut();
+            renderReportesPendientesTecnico();
+            renderReportesTendencia();
+        }
 </script>
 </body>
 </html>
