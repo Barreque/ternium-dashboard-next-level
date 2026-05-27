@@ -3124,7 +3124,6 @@ function normalizePlantKey(value) {
                     return (
                         estatus.includes("NO ENVIADO") ||
                         estatus.includes("NO ENVIAR") ||
-                        estatus.includes("BORRADOR") ||
                         estatus.includes("PENDIENTE") ||
                         !estatus
                     );
@@ -3132,7 +3131,7 @@ function normalizePlantKey(value) {
 
                 const borrador = reportes.filter(r => {
     const estatus = getEstatusReportePND(r);
-    return estatus === "BORRADOR";
+    return normalizeText(estatus).includes("BORRADOR");
 }).length;
                 const pctPend = total > 0 ? Math.round((pendientes / total) * 100) : 0;
                 const pctEnv = total > 0 ? Math.round((enviados / total) * 100) : 0;
@@ -3272,6 +3271,12 @@ function normalizePlantKey(value) {
                 renderOrdersPlantBar();
                 renderOrdersTimeline();
             } else if (window.state.activeTab === 'reportes') {
+                function prettyPlantName(value) {
+    return String(value || "")
+        .trim()
+        .toLowerCase()
+        .replace(/\b\w/g, c => c.toUpperCase());
+}
                 renderReportesPNDCharts();
             } else {
                 renderAlertsDonut();
