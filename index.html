@@ -2986,7 +2986,7 @@ Array.from(uniquePlants.entries())
 
             // Filter Reportes PND
             window.state.filteredReportesPND = window.state.normalizedReportesPND.filter(r => {
-                const planta = normalizePlantName(getReportField(r, ["Planta"]));   
+                const planta = normalizePlantKey(getReportField(r, ["Planta"]));   
                 const fechaRaw = getReportField(r, ["Fecha"]);
                 const estado = getReporteEstadoGeneral(r);
                 const fecha = fechaRaw ? new Date(fechaRaw) : null;
