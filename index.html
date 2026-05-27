@@ -3790,7 +3790,7 @@ function normalizePlantKey(value) {
 });
 
             const entries = topEntriesFromMap(counts, 12);
-            const labels = entries.map(e => prettyPlantName(e[0]));
+            const labels = entries.map(e => e[0]);
             const data = entries.map(e => e[1]);
 
             window.state.charts['reportes-pendientes-planta'] = new Chart(ctx, {
