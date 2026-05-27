@@ -3055,6 +3055,11 @@ function normalizePlantKey(value) {
                 }
                 return true;
             });
+            if (window.state.activeTab === "reportes") {
+    renderKPIs();
+    renderReportesPNDCharts();
+    renderReportesTable();
+}
 
             // Reset pagination pages
             window.state.pagination.orders.page = 1;
