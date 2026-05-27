@@ -4528,100 +4528,101 @@ function normalizePlantKey(value) {
             : type === 'reportes'
                 ? window.state.filteredReportesPND
                 : window.state.filteredAlerts;
-                return;
-            }
 
-            // Excel en español abre mejor CSV con separador ; y BOM UTF-8.
-            // Usamos Blob para que exporte TODOS los registros, no solo una parte por límite de URL.
-            const separator = ";";
-            const headers =
-            type === 'orders'
-              ? ["Nº Orden", "Planta", "Descripción", "Vencimiento", "Fecha Inspección", "Estatus", "Ubicación", "Comentarios"]
-              : type === 'reportes'
-                  ? ["Fecha", "Planta", "N° Reporte", "Remisión", "Área", "Equipo", "Num Orden", "Usuario", "Técnico", "Auxiliar", "Concepto", "Precio", "Estado Formulario", "Estatus Reporte"]
-                  : ["Nº Aviso", "Relación Orden", "Severidad", "Planta", "Descripción", "Días Abierto", "Notas", "Ubicación", "Remonitoreo", "Última Insp."];
-
-            const cleanValue = (value) => {
-                if (value === null || value === undefined) return '';
-                return String(value)
-                    .replace(/\r?\n|\r/g, ' ')
-                    .replace(/"/g, '""')
-                    .trim();
-            };
-
-            const csvRows = [];
-            // Fuerza a Excel a separar columnas usando punto y coma al abrir con doble clic.
-            csvRows.push("sep=;");
-            csvRows.push(headers.map(h => `"${cleanValue(h)}"`).join(separator));
-
-           data.forEach(item => {
-    let row = [];
-
-    if (type === 'orders') {
-        row = [
-            item.id,
-            item.plant,
-            item.description,
-            item.dueDate ? item.dueDate.toLocaleDateString("es-MX") : "",
-            item.inspectionDate ? item.inspectionDate.toLocaleDateString("es-MX") : "",
-            item.status,
-            item.locationCode,
-            item.comments
-        ];
-    } else if (type === 'reportes') {
-        row = [
-            getReportField(item, ["Fecha"]),
-            getReportField(item, ["Planta"]),
-            getReportField(item, ["N° Reporte", "No Reporte", "Reporte"]),
-            getReportField(item, ["Remision", "Remisión"]),
-            getReportField(item, ["Area", "Área"]),
-            getReportField(item, ["Equipo"]),
-            getReportField(item, ["Num Orden", "Orden"]),
-            getReportField(item, ["Usuario"]),
-            getReportField(item, ["Tecnico", "Técnico"]),
-            getReportField(item, ["Auxiliar Tecnico", "Auxiliar Técnico"]),
-            getReportField(item, ["Concepto"]),
-            getReportField(item, ["Precio"]),
-            getReportField(item, ["EstadoFormulario", "Estado Formulario"]),
-            getEstatusReportePND(item)
-        ];
-    } else {
-        row = [
-            item.id,
-            item.orderId,
-            item.severity,
-            item.plant,
-            item.description,
-            item.daysOpen,
-            item.notes,
-            item.location,
-            item.remonitor,
-            item.lastInspection
-                ? item.lastInspection.toLocaleDateString("es-MX")
-                : ""
-        ];
+    if (!data || data.length === 0) {
+        alert("No hay registros para exportar.");
+        return;
     }
 
-    csvRows.push(row.map(v => `"${cleanValue(v)}"`).join(separator));
-});
+    const separator = ";";
 
-            const csvContent = "\uFEFF" + csvRows.join("\n");
-            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-            const url = URL.createObjectURL(blob);
-            const downloadLink = document.createElement("a");
-            const filename =
-    type === 'orders'
-        ? "Ordenes_Mantenimiento_Ternium.csv"
-        : type === 'reportes'
-            ? "Reportes_PND_Ternium.csv"
-            : "Avisos_Alarmas_Ternium.csv";
+    const headers =
+        type === 'orders'
+            ? ["Nº Orden", "Planta", "Descripción", "Vencimiento", "Fecha Inspección", "Estatus", "Ubicación", "Comentarios"]
+            : type === 'reportes'
+                ? ["Fecha", "Planta", "N° Reporte", "Remisión", "Área", "Equipo", "Num Orden", "Usuario", "Técnico", "Auxiliar", "Concepto", "Precio", "Estado Formulario", "Estatus Reporte"]
+                : ["Nº Aviso", "Relación Orden", "Severidad", "Planta", "Descripción", "Días Abierto", "Notas", "Ubicación", "Remonitoreo", "Última Insp."];
 
-            downloadLink.href = url;
-            downloadLink.download = filename;
-            document.body.appendChild(downloadLink);
-            downloadLink.click();
-            document.body.removeChild(downloadLink);
-            URL.revokeObjectURL(url);
+    const cleanValue = (value) => {
+        if (value === null || value === undefined) return "";
+        return String(value)
+            .replace(/\r?\n|\r/g, " ")
+            .replace(/"/g, '""')
+            .trim();
+    };
+
+    const csvRows = [];
+    csvRows.push("sep=;");
+    csvRows.push(headers.map(h => `"${cleanValue(h)}"`).join(separator));
+
+    data.forEach(item => {
+        let row = [];
+
+        if (type === 'orders') {
+            row = [
+                item.id,
+                item.plant,
+                item.description,
+                item.dueDate ? item.dueDate.toLocaleDateString("es-MX") : "",
+                item.inspectionDate ? item.inspectionDate.toLocaleDateString("es-MX") : "",
+                item.status,
+                item.locationCode,
+                item.comments
+            ];
+        } else if (type === 'reportes') {
+            row = [
+                getReportField(item, ["Fecha"]),
+                getReportField(item, ["Planta"]),
+                getReportField(item, ["N° Reporte", "No Reporte", "Reporte"]),
+                getReportField(item, ["Remision", "Remisión"]),
+                getReportField(item, ["Area", "Área"]),
+                getReportField(item, ["Equipo"]),
+                getReportField(item, ["Num Orden", "Orden"]),
+                getReportField(item, ["Usuario"]),
+                getReportField(item, ["Tecnico", "Técnico"]),
+                getReportField(item, ["Auxiliar Tecnico", "Auxiliar Técnico"]),
+                getReportField(item, ["Concepto"]),
+                getReportField(item, ["Precio"]),
+                getReportField(item, ["EstadoFormulario", "Estado Formulario"]),
+                getEstatusReportePND(item)
+            ];
+        } else {
+            row = [
+                item.id,
+                item.orderId,
+                item.severity,
+                item.plant,
+                item.description,
+                item.daysOpen,
+                item.notes,
+                item.location,
+                item.remonitor,
+                item.lastInspection ? item.lastInspection.toLocaleDateString("es-MX") : ""
+            ];
+        }
+
+        csvRows.push(row.map(v => `"${cleanValue(v)}"`).join(separator));
+    });
+
+    const csvContent = "\uFEFF" + csvRows.join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const downloadLink = document.createElement("a");
+
+    const filename =
+        type === 'orders'
+            ? "Ordenes_Mantenimiento_Ternium.csv"
+            : type === 'reportes'
+                ? "Reportes_PND_Ternium.csv"
+                : "Avisos_Alarmas_Ternium.csv";
+
+    downloadLink.href = url;
+    downloadLink.download = filename;
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+    URL.revokeObjectURL(url);
+}
         
     
         /* ===== NEXT LEVEL JS PATCH ===== */
