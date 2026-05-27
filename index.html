@@ -4646,6 +4646,9 @@ function renderReportesPNDCharts() {
         if (window.state.charts["chart-reportes-pendientes-planta"]) {
             window.state.charts["chart-reportes-pendientes-planta"].destroy();
         }
+console.log("REPORTES PND:", reportes.length);
+console.log("PENDIENTES:", pendientesPorPlanta);
+console.log("ESTADOS:", estados);
 
         window.state.charts["chart-reportes-pendientes-planta"] = new Chart(canvasPlanta, {
             type: "bar",
