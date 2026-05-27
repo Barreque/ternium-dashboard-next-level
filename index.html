@@ -4622,14 +4622,13 @@ function normalizePlantKey(value) {
 function renderReportesPNDCharts() {
     console.log("STATE:", window.state);
 
-const reportes = window.state.filteredReportsPND?.length
-    ? window.state.filteredReportsPND
-    : (window.state.normalizedReportsPND?.length
-        ? window.state.normalizedReportsPND
-        : (window.state.rawReportsPND || []));
+const reportes = window.state.filteredReportesPND?.length
+    ? window.state.filteredReportesPND
+    : (window.state.normalizedReportesPND?.length
+        ? window.state.normalizedReportesPND
+        : (window.state.rawReportesPND || []));
 
 console.log("REPORTES PND:", reportes.length);
-    console.log("REPORTES PND:", reportes.length);
 
     const pendientesPorPlanta = {};
     const estados = {};
