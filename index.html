@@ -4627,9 +4627,10 @@ const reportes =
      window.state.filteredReportsPND.length > 0)
         ? window.state.filteredReportsPND
         : (window.state.normalizedReportsPND || []);
-        
-        if (!reportes.length) {
+
+      if (!reportes.length) {
     console.warn("REPORTES AUN NO CARGADOS");
+    setTimeout(renderReportesPNDCharts, 500);
     return;
 }
 
