@@ -4620,15 +4620,13 @@ function normalizePlantKey(value) {
             };
         }
 function renderReportesPNDCharts() {
-    console.log("STATE:", window.state);
+    const reportes = window.state.filteredReportesPND?.length
+        ? window.state.filteredReportesPND
+        : (window.state.normalizedReportesPND?.length
+            ? window.state.normalizedReportesPND
+            : (window.state.rawReportesPND || []));
 
-const reportes = window.state.filteredReportesPND?.length
-    ? window.state.filteredReportesPND
-    : (window.state.normalizedReportesPND?.length
-        ? window.state.normalizedReportesPND
-        : (window.state.rawReportesPND || []));
-
-console.log("REPORTES PND:", reportes.length);
+    console.log("REPORTES PND:", reportes.length);
 
     const pendientesPorPlanta = {};
     const estados = {};
@@ -4636,26 +4634,30 @@ console.log("REPORTES PND:", reportes.length);
     reportes.forEach(r => {
         const planta = normalizePlantKey(getReportField(r, ["Planta"])) || "SIN PLANTA";
         const estado = String(getReporteEstadoGeneral(r) || "SIN ESTADO").trim();
+        const estadoUpper = estado.toUpperCase();
 
         estados[estado] = (estados[estado] || 0) + 1;
 
         if (
-            estado.toUpperCase().includes("BORRADOR") ||
-            estado.toUpperCase().includes("NO ENVIADO") ||
-            estado.toUpperCase().includes("COMPLETADO")
+            estadoUpper.includes("BORRADOR") ||
+            estadoUpper.includes("NO ENVIADO") ||
+            estadoUpper.includes("COMPLETADO") ||
+            estadoUpper.includes("PENDIENTE")
         ) {
             pendientesPorPlanta[planta] = (pendientesPorPlanta[planta] || 0) + 1;
         }
     });
+
+    const chartTextColor = "rgba(226,232,240,0.9)";
+    const chartMutedColor = "rgba(148,163,184,0.7)";
+    const chartGridColor = "rgba(148,163,184,0.07)";
+    const chartBorderColor = "#192135";
 
     const canvasPlanta = document.getElementById("chart-reportes-pendientes-planta");
     if (canvasPlanta) {
         if (window.state.charts["chart-reportes-pendientes-planta"]) {
             window.state.charts["chart-reportes-pendientes-planta"].destroy();
         }
-console.log("REPORTES PND:", reportes.length);
-console.log("PENDIENTES:", pendientesPorPlanta);
-console.log("ESTADOS:", estados);
 
         window.state.charts["chart-reportes-pendientes-planta"] = new Chart(canvasPlanta, {
             type: "bar",
@@ -4664,12 +4666,57 @@ console.log("ESTADOS:", estados);
                 datasets: [{
                     label: "Pendientes",
                     data: Object.values(pendientesPorPlanta),
-                    borderWidth: 1
+                    backgroundColor: "rgba(255,109,0,0.78)",
+                    borderColor: "#ff6d00",
+                    hoverBackgroundColor: "#ff8c1a",
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    maxBarThickness: 46
                 }]
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: chartTextColor,
+                            boxWidth: 10,
+                            usePointStyle: true,
+                            pointStyle: "circle"
+                        }
+                    },
+                    tooltip: {
+                        enabled: true,
+                        backgroundColor: "#0f172a",
+                        borderColor: "#334155",
+                        borderWidth: 1,
+                        titleColor: "#ffffff",
+                        bodyColor: "#cbd5e1"
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            color: chartMutedColor,
+                            font: { size: 10 },
+                            maxRotation: 20,
+                            minRotation: 0
+                        },
+                        grid: { color: chartGridColor },
+                        border: { display: false }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: chartMutedColor,
+                            font: { size: 10 },
+                            precision: 0
+                        },
+                        grid: { color: chartGridColor },
+                        border: { display: false }
+                    }
+                }
             }
         });
     }
@@ -4686,13 +4733,46 @@ console.log("ESTADOS:", estados);
                 labels: Object.keys(estados),
                 datasets: [{
                     data: Object.values(estados),
-                    borderWidth: 2
+                    backgroundColor: [
+                        "#10b981",
+                        "#ef4444",
+                        "#f59e0b",
+                        "#3b82f6",
+                        "#8b5cf6",
+                        "#f97316",
+                        "#14b8a6",
+                        "#ec4899",
+                        "#64748b"
+                    ],
+                    borderColor: chartBorderColor,
+                    borderWidth: 3,
+                    hoverOffset: 10
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                cutout: "65%"
+                cutout: "68%",
+                plugins: {
+                    legend: {
+                        position: "right",
+                        labels: {
+                            color: chartTextColor,
+                            padding: 16,
+                            boxWidth: 10,
+                            usePointStyle: true,
+                            pointStyle: "circle"
+                        }
+                    },
+                    tooltip: {
+                        enabled: true,
+                        backgroundColor: "#0f172a",
+                        borderColor: "#334155",
+                        borderWidth: 1,
+                        titleColor: "#ffffff",
+                        bodyColor: "#cbd5e1"
+                    }
+                }
             }
         });
     }
