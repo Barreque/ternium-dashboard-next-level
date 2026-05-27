@@ -2887,6 +2887,7 @@ const urls = [
         function initDashboard() {
             populateDropdownOptions();
             initCharts();
+            renderReportesPNDCharts();
             initMap();
             applyFilters();
         }
@@ -4618,7 +4619,73 @@ function normalizePlantKey(value) {
                 return result;
             };
         }
+function renderReportesPNDCharts() {
+    const reportes = window.state.normalizedReportsPND || [];
 
+    const pendientesPorPlanta = {};
+    const estados = {};
+
+    reportes.forEach(r => {
+        const planta = normalizePlantKey(getReportField(r, ["Planta"])) || "SIN PLANTA";
+        const estado = String(getReporteEstadoGeneral(r) || "SIN ESTADO").trim();
+
+        estados[estado] = (estados[estado] || 0) + 1;
+
+        if (
+            estado.toUpperCase().includes("BORRADOR") ||
+            estado.toUpperCase().includes("NO ENVIADO") ||
+            estado.toUpperCase().includes("COMPLETADO")
+        ) {
+            pendientesPorPlanta[planta] = (pendientesPorPlanta[planta] || 0) + 1;
+        }
+    });
+
+    const canvasPlanta = document.getElementById("chart-reportes-pendientes-planta");
+    if (canvasPlanta) {
+        if (window.state.charts["chart-reportes-pendientes-planta"]) {
+            window.state.charts["chart-reportes-pendientes-planta"].destroy();
+        }
+
+        window.state.charts["chart-reportes-pendientes-planta"] = new Chart(canvasPlanta, {
+            type: "bar",
+            data: {
+                labels: Object.keys(pendientesPorPlanta),
+                datasets: [{
+                    label: "Pendientes",
+                    data: Object.values(pendientesPorPlanta),
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    }
+
+    const canvasEstado = document.getElementById("chart-reportes-estado-donut");
+    if (canvasEstado) {
+        if (window.state.charts["chart-reportes-estado-donut"]) {
+            window.state.charts["chart-reportes-estado-donut"].destroy();
+        }
+
+        window.state.charts["chart-reportes-estado-donut"] = new Chart(canvasEstado, {
+            type: "doughnut",
+            data: {
+                labels: Object.keys(estados),
+                datasets: [{
+                    data: Object.values(estados),
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: "65%"
+            }
+        });
+    }
+}
 </script>
 </body>
 </html>
