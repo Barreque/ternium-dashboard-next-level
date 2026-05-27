@@ -3132,7 +3132,7 @@ function normalizePlantKey(value) {
 
                 const borrador = reportes.filter(r => {
     const estatus = getEstatusReportePND(r);
-    return estatus.includes("BORRADOR");
+    return estatus === "BORRADOR";
 }).length;
                 const pctPend = total > 0 ? Math.round((pendientes / total) * 100) : 0;
                 const pctEnv = total > 0 ? Math.round((enviados / total) * 100) : 0;
