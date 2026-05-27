@@ -2890,17 +2890,17 @@ function prettyPlantName(value) {
         .replace(/\b\w/g, c => c.toUpperCase());
 }
 
-window.state.normalizedOrders.forEach(o => {
+(window.state.normalizedOrders || []).forEach(o => {
     const key = normalizePlantKey(o.plant);
     if (key) uniquePlants.set(key, prettyPlantName(key));
 });
 
-window.state.normalizedAlerts.forEach(a => {
+(window.state.normalizedAlerts || []).forEach(a => {
     const key = normalizePlantKey(a.plant);
     if (key) uniquePlants.set(key, prettyPlantName(key));
 });
 
-window.state.normalizedReportsPND.forEach(r => {
+(window.state.normalizedReportsPND || []).forEach(r => {
     const key = normalizePlantKey(getReportField(r, ["Planta"]));
     if (key) uniquePlants.set(key, prettyPlantName(key));
 });
