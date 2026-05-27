@@ -3779,8 +3779,13 @@ function normalizePlantKey(value) {
             if (!ctx) return;
             if (window.state.charts['reportes-pendientes-planta']) window.state.charts['reportes-pendientes-planta'].destroy();
 
-            (window.state.filteredReportesPND || []).forEach(r => {
-    const planta = normalizePlantKey(getReportField(r, ["Planta"])) || "SIN PLANTA";
+            const counts = {};
+
+(window.state.filteredReportesPND || []).forEach(r => {
+    const planta = normalizePlantKey(
+        getReportField(r, ["Planta"])
+    ) || "SIN PLANTA";
+
     counts[planta] = (counts[planta] || 0) + 1;
 });
 
@@ -3873,7 +3878,11 @@ function normalizePlantKey(value) {
             const counts = {};
 
 (window.state.filteredReportesPND || []).forEach(r => {
-    const tecnico = getReportField(r, ["Tecnico", "Técnico"]) || "SIN TÉCNICO";
+    const tecnico = getReportField(
+        r,
+        ["Tecnico", "Técnico"]
+    ) || "SIN TÉCNICO";
+
     counts[tecnico] = (counts[tecnico] || 0) + 1;
 });
 
