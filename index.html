@@ -2366,6 +2366,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
                                 <th>Precio</th>
                                 <th>Estado Formulario</th>
                                 <th>Estatus Reporte</th>
+                                <th>PDF</th>
                             </tr>
                         </thead>
                         <tbody id="reportes-table-body"></tbody>
@@ -4246,7 +4247,7 @@ function normalizePlantKey(value) {
             const pagination = window.state.pagination.reportes;
 
             if (total === 0) {
-                tbody.innerHTML = '<tr><td colspan="14" style="text-align:center; color:var(--text-muted); padding:40px;">No se encontraron reportes PND con los filtros seleccionados.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="15" style="text-align:center; color:var(--text-muted); padding:40px;">No se encontraron reportes PND con los filtros seleccionados.</td></tr>';
                 document.getElementById("reportes-pagination-info").innerText = "Mostrando 0 de 0 registros";
                 document.getElementById("reportes-pagination-buttons").innerHTML = "";
                 return;
@@ -4262,6 +4263,7 @@ function normalizePlantKey(value) {
                 const estadoGeneral = getReporteEstadoGeneral(r);
                 const badgeClass = normalizeText(estadoFormulario) === "COMPLETADO" ? "badge-success" : (normalizeText(estadoFormulario) === "BORRADOR" ? "badge-danger" : "badge-muted");
                 const reporteClass = estadoGeneral === "Enviado" ? "badge-success" : (estadoGeneral === "Borrador" ? "badge-danger" : "badge-pending");
+                const pdfUrl = getReportField(r, ["PDF", "URL PDF", "Pdf", "pdfUrl"]);
 
                 tbody.innerHTML += `
                     <tr>
@@ -4279,6 +4281,24 @@ function normalizePlantKey(value) {
                         <td>${moneyMX(getReportField(r, ["Precio"]))}</td>
                         <td><span class="badge ${badgeClass}">${estadoFormulario || "-"}</span></td>
                         <td><span class="badge ${reporteClass}">${estadoGeneral || estatusReporte || "-"}</span></td>
+                        <td>
+    ${
+        pdfUrl
+            ? `<button onclick="window.open('${pdfUrl}','_blank')"
+                style="
+                    background:#ff6d00;
+                    color:white;
+                    border:none;
+                    padding:6px 10px;
+                    border-radius:8px;
+                    cursor:pointer;
+                    font-weight:600;
+                ">
+                📄 PDF
+              </button>`
+            : '-'
+    }
+</td>
                     </tr>
                 `;
             });
