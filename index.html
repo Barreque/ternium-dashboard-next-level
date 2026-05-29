@@ -69,11 +69,14 @@
             --transition-fast: 0.15s ease;
             --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
+/* Calendario blanco en modo oscuro */
+input[type="date"] {
+    color-scheme: dark;
 }
 
-/* Calendario blanco en modo oscuro */
 input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(1) brightness(2);
+    filter: invert(1) brightness(10) contrast(10);
+    opacity: 1;
     cursor: pointer;
 }
 
