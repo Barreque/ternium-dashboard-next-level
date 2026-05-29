@@ -73,6 +73,13 @@
 /* Calendario blanco en modo oscuro */
 input[type="date"] {
     color-scheme: dark;
+    color: #f8fafc;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(100%) brightness(200%);
+    opacity: 1;
+    cursor: pointer;
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator {
