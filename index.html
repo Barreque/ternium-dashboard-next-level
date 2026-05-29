@@ -4377,14 +4377,23 @@ function normalizePlantKey(value) {
         }
 
         function appendAIMessage(text, type = "bot") {
-            const box = document.getElementById("ai-messages");
-            const msg = document.createElement("div");
-            msg.className = `ai-message ${type}`;
-            msg.textContent = text;
-            box.appendChild(msg);
-            box.scrollTop = box.scrollHeight;
-            return msg;
-        }
+    const box = document.getElementById("ai-messages");
+    const msg = document.createElement("div");
+
+    msg.className = `ai-message ${type}`;
+
+    const html = String(text || "").replace(
+        /(https?:\/\/[^\s]+)/g,
+        '<a href="$1" target="_blank" style="color:#ff9f1a;font-weight:700;text-decoration:underline;">📄 Abrir PDF</a>'
+    );
+
+    msg.innerHTML = html;
+
+    box.appendChild(msg);
+    box.scrollTop = box.scrollHeight;
+
+    return msg;
+}
 
         function countBy(list, selector) {
             const counts = {};
