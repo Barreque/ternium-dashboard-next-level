@@ -2874,8 +2874,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
                 const timeString = new Date().toLocaleTimeString("es-MX", { hour: '2-digit', minute: '2-digit', second: '2-digit' });
                 sessionStorage.setItem("ternium_orders", JSON.stringify(window.state.rawOrders));
                 sessionStorage.setItem("ternium_alerts", JSON.stringify(window.state.rawAlerts));
-                sessionStorage.setItem("ternium_reportes_pnd", JSON.stringify(window.state.rawReportesPND));
                 sessionStorage.setItem("ternium_sync_time", timeString);
+                // No guardar Reportes PND en sessionStorage porque ya trae muchas URLs PDF y excede la cuota
+               // sessionStorage.setItem("ternium_reportes_pnd", JSON.stringify(window.state.rawReportesPND));
 
                 // Update UI elements
                 document.getElementById("last-sync-time").innerText = timeString;
