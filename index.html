@@ -1904,6 +1904,18 @@ input[type="date"]::-webkit-calendar-picker-indicator {
                     <option value="ALL">Todos los Estatus</option>
                 </select>
             </div>
+            <div class="filter-group" id="filter-area-group" style="display: none;">
+                 <label class="filter-label">Área</label>
+                 <select class="filter-select" id="filter-area" onchange="applyFilters()">
+                    <option value="ALL">Todas las Áreas</option>
+                </select>
+            </div>
+             <div class="filter-group" id="filter-tecnico-group" style="display: none;">
+                <label class="filter-label">Técnico</label>
+                <select class="filter-select" id="filter-tecnico" onchange="applyFilters()">
+                    <option value="ALL">Todos los Técnicos</option>
+                </select>
+            </div>
             <div class="filter-group">
                 <label class="filter-label">Fecha Inicio</label>
                 <input type="date" class="filter-input" id="filter-start-date" onchange="applyFilters()">
@@ -3000,6 +3012,8 @@ function normalizePlantKey(value) {
             window.state.filters.startDate = document.getElementById("filter-start-date").value;
             window.state.filters.endDate = document.getElementById("filter-end-date").value;
             window.state.filters.search = document.getElementById("filter-search").value.toLowerCase().trim();
+            window.state.filters.area = document.getElementById("filter-area")?.value || "ALL";
+            window.state.filters.tecnico = document.getElementById("filter-tecnico")?.value || "ALL";
 
             if (window.state.activeTab === 'orders' || window.state.activeTab === 'reportes') {
                 window.state.filters.status = document.getElementById("filter-status").value;
@@ -3054,6 +3068,8 @@ function normalizePlantKey(value) {
                 const estadoNorm = getEstatusReportePND(r);           // Ej. BORRADOR, ENVIADO, NO ENVIADO
                 const filtroStatus = normalizeText(window.state.filters.status);
                 const fecha = fechaRaw ? new Date(fechaRaw) : null;
+                const area = getReportField(report, ["Area", "Área"]);
+                    const tecnico = getReportField(report, ["Tecnico", "Técnico"]);
 
                 if (
                     window.state.filters.plant !== 'ALL' &&
