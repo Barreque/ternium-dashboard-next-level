@@ -3068,8 +3068,8 @@ function normalizePlantKey(value) {
                 const estadoNorm = getEstatusReportePND(r);           // Ej. BORRADOR, ENVIADO, NO ENVIADO
                 const filtroStatus = normalizeText(window.state.filters.status);
                 const fecha = fechaRaw ? new Date(fechaRaw) : null;
-                const area = getReportField(report, ["Area", "Área"]);
-                    const tecnico = getReportField(report, ["Tecnico", "Técnico"]);
+                const area = getReportField(r, ["Area", "Área"]);
+                const tecnico = getReportField(r, ["Tecnico", "Técnico"]);
 
                 if (
                     window.state.filters.plant !== 'ALL' &&
