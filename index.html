@@ -2627,6 +2627,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
             const title = document.getElementById("view-title");
             const subtitle = document.getElementById("view-subtitle");
             const filterStatusGroup = document.getElementById("filter-status-group");
+            const filterAreaGroup = document.getElementById("filter-area-group");
+            const filterTecnicoGroup = document.getElementById("filter-tecnico-group");
 
             if (tabId === 'orders') {
                 title.innerText = "Órdenes de Mantenimiento";
@@ -2636,6 +2638,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
                 title.innerText = "Reportes PND";
                 subtitle.innerText = "Consulta de reportes, remisiones, técnicos, equipos y conceptos desde el Libro 2.";
                 filterStatusGroup.style.display = "flex";
+                filterStatusGroup.style.display = "flex";
+                filterAreaGroup.style.display = "flex";
+                filterTecnicoGroup.style.display = "flex";
             } else {
                 title.innerText = "Avisos de Alarma y Monitoreo PND";
                 subtitle.innerText = "Monitoreo predictivo por ensayos no destructivos (PND) y alarmas críticas de rodillos.";
