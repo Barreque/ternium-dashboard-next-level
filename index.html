@@ -2942,6 +2942,40 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         function populateDropdownOptions() {
             const selectPlant = document.getElementById("filter-plant");
             const selectStatus = document.getElementById("filter-status");
+            const selectArea = document.getElementById("filter-area");
+            const selectTecnico = document.getElementById("filter-tecnico");
+
+if (selectArea && selectTecnico) {
+    const selectedArea = window.state.filters.area || "ALL";
+    const selectedTecnico = window.state.filters.tecnico || "ALL";
+
+    selectArea.innerHTML = '<option value="ALL">Todas las Áreas</option>';
+    selectTecnico.innerHTML = '<option value="ALL">Todos los Técnicos</option>';
+
+    if (window.state.activeTab === "reportes") {
+        const areas = new Set();
+        const tecnicos = new Set();
+
+        (window.state.normalizedReportesPND || []).forEach(r => {
+            const area = getReportField(r, ["Area", "Área"]);
+            const tecnico = getReportField(r, ["Tecnico", "Técnico"]);
+
+            if (area) areas.add(area);
+            if (tecnico) tecnicos.add(tecnico);
+        });
+
+        Array.from(areas).sort().forEach(area => {
+            selectArea.innerHTML += `<option value="${area}">${area}</option>`;
+        });
+
+        Array.from(tecnicos).sort().forEach(tecnico => {
+            selectTecnico.innerHTML += `<option value="${tecnico}">${tecnico}</option>`;
+        });
+
+        selectArea.value = selectedArea;
+        selectTecnico.value = selectedTecnico;
+    }
+}
             
             // Cache current values
             const selectedPlant = window.state.filters.plant;
