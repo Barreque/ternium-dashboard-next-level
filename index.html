@@ -3117,6 +3117,27 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 function normalizePlantKey(value) {
     return String(value || "").trim().toUpperCase();
 }
+
+function prettyPlantName(value) {
+    const key = normalizePlantKey(value);
+
+    const names = {
+        "ALL": "Todas las Plantas",
+        "GUERRERO": "Guerrero",
+        "UNIVERSIDAD": "Universidad",
+        "CHURUBUSCO": "Churubusco",
+        "JUVENTUD": "Juventud",
+        "PESQUERIA": "Pesquería",
+        "PESQUERÍA": "Pesquería",
+        "CSC APODACA": "CSC Apodaca",
+        "CSI APODACA": "CSI Apodaca",
+        "APODACA": "Apodaca",
+        "MONCLOVA": "Monclova",
+        "SAN LUIS": "San Luis"
+    };
+
+    return names[key] || String(value || "").trim();
+}
         // --- FILTERING LOGIC ---
         function applyFilters() {
             const f = getCurrentFilters();
