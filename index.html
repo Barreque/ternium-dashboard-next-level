@@ -2957,12 +2957,22 @@ if (selectArea && selectTecnico) {
         const tecnicos = new Set();
 
         (window.state.normalizedReportesPND || []).forEach(r => {
-            const area = getReportField(r, ["Area", "Área"]);
-            const tecnico = getReportField(r, ["Tecnico", "Técnico"]);
+    const planta = normalizePlantKey(getReportField(r, ["Planta"]));
+    const area = getReportField(r, ["Area", "Área"]);
+    const tecnico = getReportField(r, ["Tecnico", "Técnico"]);
 
-            if (area) areas.add(area);
-            if (tecnico) tecnicos.add(tecnico);
-        });
+    const plantaOk =
+        window.state.filters.plant === "ALL" ||
+        normalizePlantKey(window.state.filters.plant) === planta;
+
+    const tecnicoOk =
+        window.state.filters.tecnico === "ALL" ||
+        tecnico === window.state.filters.tecnico;
+
+    if (plantaOk && tecnicoOk && area) areas.add(area);
+
+    if (plantaOk && tecnico) tecnicos.add(tecnico);
+});
 
         Array.from(areas).sort().forEach(area => {
             selectArea.innerHTML += `<option value="${area}">${area}</option>`;
@@ -3053,6 +3063,7 @@ function normalizePlantKey(value) {
             window.state.filters.search = document.getElementById("filter-search").value.toLowerCase().trim();
             window.state.filters.area = document.getElementById("filter-area")?.value || "ALL";
             window.state.filters.tecnico = document.getElementById("filter-tecnico")?.value || "ALL";
+            
 
             if (window.state.activeTab === 'orders' || window.state.activeTab === 'reportes') {
                 window.state.filters.status = document.getElementById("filter-status").value;
@@ -3145,6 +3156,7 @@ function normalizePlantKey(value) {
             });
 
             // Trigger complete repaints
+            populateDropdownOptions();
             renderKPIs();
             renderCharts();
             renderTables();
