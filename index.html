@@ -2519,32 +2519,73 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
         // --- DASHBOARD STATE ---
         window.state = {
-            activeTab: 'orders', // 'orders' or 'alerts'
+            activeTab: 'orders',
+
             rawOrders: [],
             rawAlerts: [],
             rawReportesPND: [],
+
             normalizedOrders: [],
             normalizedAlerts: [],
             normalizedReportesPND: [],
+
             filteredOrders: [],
             filteredAlerts: [],
             filteredReportesPND: [],
-            filters: {
-                plant: 'ALL',
-                status: 'ALL',
-                startDate: '',
-                endDate: '',
-                search: ''
+
+            // Filtros independientes por sección.
+            // Así Órdenes, Avisos y Reportes no se afectan entre sí.
+            filtersByTab: {
+                orders: {
+                    plant: 'ALL',
+                    status: 'ALL',
+                    startDate: '',
+                    endDate: '',
+                    search: ''
+                },
+                alerts: {
+                    plant: 'ALL',
+                    status: 'ALL',
+                    startDate: '',
+                    endDate: '',
+                    search: ''
+                },
+                reportes: {
+                    plant: 'ALL',
+                    status: 'ALL',
+                    area: 'ALL',
+                    tecnico: 'ALL',
+                    startDate: '',
+                    endDate: '',
+                    search: ''
+                }
             },
+
             pagination: {
                 orders: { page: 1, limit: 10 },
                 alerts: { page: 1, limit: 10 },
                 reportes: { page: 1, limit: 10 }
             },
+
             charts: {},
             map: null,
             mapMarkers: []
         };
+
+        function getCurrentFilters() {
+            return window.state.filtersByTab[window.state.activeTab];
+        }
+
+        // Compatibilidad con funciones viejas que todavía usen window.state.filters.
+        // Siempre apunta a los filtros de la sección activa.
+        Object.defineProperty(window.state, 'filters', {
+            get() {
+                return getCurrentFilters();
+            },
+            set(value) {
+                window.state.filtersByTab[window.state.activeTab] = value;
+            }
+        });
 
 
         // --- STATUS COLOR HELPERS ---
@@ -2612,32 +2653,30 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         // Switch View Tab (Orders / Alarms)
         function switchTab(tabId, el) {
             window.state.activeTab = tabId;
-            
-            // UI classes
+
             document.querySelectorAll(".menu-item").forEach(item => item.classList.remove("active"));
             if (el) el.classList.add("active");
-            
+
             document.querySelectorAll(".view-section").forEach(view => view.classList.remove("active"));
             document.getElementById(`view-${tabId}`).classList.add("active");
 
-            // Close mobile sidebar drawer
             document.getElementById("sidebar").classList.remove("mobile-open");
 
-            // Update title and subtitles
             const title = document.getElementById("view-title");
             const subtitle = document.getElementById("view-subtitle");
             const filterStatusGroup = document.getElementById("filter-status-group");
             const filterAreaGroup = document.getElementById("filter-area-group");
             const filterTecnicoGroup = document.getElementById("filter-tecnico-group");
 
-            if (tabId === 'orders') {
+            if (tabId === "orders") {
                 title.innerText = "Órdenes de Mantenimiento";
                 subtitle.innerText = "Control operacional de preventivos mecánicos y planes de inspección.";
                 filterStatusGroup.style.display = "flex";
-            } else if (tabId === 'reportes') {
+                filterAreaGroup.style.display = "none";
+                filterTecnicoGroup.style.display = "none";
+            } else if (tabId === "reportes") {
                 title.innerText = "Reportes PND";
                 subtitle.innerText = "Consulta de reportes, remisiones, técnicos, equipos y conceptos desde el Libro 2.";
-                filterStatusGroup.style.display = "flex";
                 filterStatusGroup.style.display = "flex";
                 filterAreaGroup.style.display = "flex";
                 filterTecnicoGroup.style.display = "flex";
@@ -2645,22 +2684,39 @@ input[type="date"]::-webkit-calendar-picker-indicator {
                 title.innerText = "Avisos de Alarma y Monitoreo PND";
                 subtitle.innerText = "Monitoreo predictivo por ensayos no destructivos (PND) y alarmas críticas de rodillos.";
                 filterStatusGroup.style.display = "none";
+                filterAreaGroup.style.display = "none";
+                filterTecnicoGroup.style.display = "none";
             }
 
-            // Sync filters state & repaint
             populateDropdownOptions();
+
+            const f = getCurrentFilters();
+
+            document.getElementById("filter-plant").value = f.plant || "ALL";
+            document.getElementById("filter-status").value = f.status || "ALL";
+            document.getElementById("filter-start-date").value = f.startDate || "";
+            document.getElementById("filter-end-date").value = f.endDate || "";
+            document.getElementById("filter-search").value = f.search || "";
+
+            if (document.getElementById("filter-area")) {
+                document.getElementById("filter-area").value = f.area || "ALL";
+            }
+
+            if (document.getElementById("filter-tecnico")) {
+                document.getElementById("filter-tecnico").value = f.tecnico || "ALL";
+            }
+
             applyFilters();
 
-            // Resize charts to prevent render bugs in invisible views
             setTimeout(() => {
                 if (window.state.charts) {
                     Object.values(window.state.charts).forEach(c => {
-                        if (c && typeof c.resize === 'function') c.resize();
-                        if (c && typeof c.update === 'function') c.update();
+                        if (c && typeof c.resize === "function") c.resize();
+                        if (c && typeof c.update === "function") c.update();
                     });
                 }
-                // Recenter map
-                if (tabId === 'alerts' && window.state.map) {
+
+                if (tabId === "alerts" && window.state.map) {
                     window.state.map.resize();
                 }
             }, 100);
@@ -2945,198 +3001,212 @@ input[type="date"]::-webkit-calendar-picker-indicator {
             const selectArea = document.getElementById("filter-area");
             const selectTecnico = document.getElementById("filter-tecnico");
 
-if (selectArea && selectTecnico) {
-    const selectedArea = window.state.filters.area || "ALL";
-    const selectedTecnico = window.state.filters.tecnico || "ALL";
+            if (!selectPlant || !selectStatus) return;
 
-    selectArea.innerHTML = '<option value="ALL">Todas las Áreas</option>';
-    selectTecnico.innerHTML = '<option value="ALL">Todos los Técnicos</option>';
+            const f = getCurrentFilters();
 
-    if (window.state.activeTab === "reportes") {
-        const areas = new Set();
-        const tecnicos = new Set();
-
-        (window.state.normalizedReportesPND || []).forEach(r => {
-    const planta = normalizePlantKey(getReportField(r, ["Planta"]));
-    const area = getReportField(r, ["Area", "Área"]);
-    const tecnico = getReportField(r, ["Tecnico", "Técnico"]);
-
-    const plantaOk =
-        window.state.filters.plant === "ALL" ||
-        normalizePlantKey(window.state.filters.plant) === planta;
-
-    const tecnicoOk =
-        window.state.filters.tecnico === "ALL" ||
-        tecnico === window.state.filters.tecnico;
-
-    if (plantaOk && tecnicoOk && area) areas.add(area);
-
-    if (plantaOk && tecnico) tecnicos.add(tecnico);
-});
-
-        Array.from(areas).sort().forEach(area => {
-            selectArea.innerHTML += `<option value="${area}">${area}</option>`;
-        });
-
-        Array.from(tecnicos).sort().forEach(tecnico => {
-            selectTecnico.innerHTML += `<option value="${tecnico}">${tecnico}</option>`;
-        });
-
-        selectArea.value = selectedArea;
-        selectTecnico.value = selectedTecnico;
-    }
-}
-            
-            // Cache current values
-            const selectedPlant = window.state.filters.plant;
-            const selectedStatus = window.state.filters.status;
-
-            // Reset
             selectPlant.innerHTML = '<option value="ALL">Todas las Plantas</option>';
             selectStatus.innerHTML = '<option value="ALL">Todos los Estatus</option>';
 
-            // Get unique plants
-const uniquePlants = new Map();
+            if (selectArea) selectArea.innerHTML = '<option value="ALL">Todas las Áreas</option>';
+            if (selectTecnico) selectTecnico.innerHTML = '<option value="ALL">Todos los Técnicos</option>';
 
-function normalizePlantKey(value) {
-    return String(value || "").trim().toUpperCase();
-}
+            // Plantas por sección activa
+            const uniquePlants = new Map();
 
-function prettyPlantName(value) {
-    return String(value || "")
-        .trim()
-        .toLowerCase()
-        .replace(/\b\w/g, c => c.toUpperCase());
-}
+            if (window.state.activeTab === "orders") {
+                (window.state.normalizedOrders || []).forEach(o => {
+                    const key = normalizePlantKey(o.plant);
+                    if (key) uniquePlants.set(key, prettyPlantName(key));
+                });
+            }
 
-(window.state.normalizedOrders || []).forEach(o => {
-    const key = normalizePlantKey(o.plant);
-    if (key) uniquePlants.set(key, prettyPlantName(key));
-});
+            if (window.state.activeTab === "alerts") {
+                (window.state.normalizedAlerts || []).forEach(a => {
+                    const key = normalizePlantKey(a.plant);
+                    if (key) uniquePlants.set(key, prettyPlantName(key));
+                });
+            }
 
-(window.state.normalizedAlerts || []).forEach(a => {
-    const key = normalizePlantKey(a.plant);
-    if (key) uniquePlants.set(key, prettyPlantName(key));
-});
+            if (window.state.activeTab === "reportes") {
+                (window.state.normalizedReportesPND || []).forEach(r => {
+                    const key = normalizePlantKey(getReportField(r, ["Planta"]));
+                    if (key) uniquePlants.set(key, prettyPlantName(key));
+                });
+            }
 
-(window.state.normalizedReportsPND || []).forEach(r => {
-    const key = normalizePlantKey(getReportField(r, ["Planta"]));
-    if (key) uniquePlants.set(key, prettyPlantName(key));
-});
+            Array.from(uniquePlants.entries())
+                .sort((a, b) => a[1].localeCompare(b[1]))
+                .forEach(([key, label]) => {
+                    selectPlant.innerHTML += `<option value="${key}">${label}</option>`;
+                });
 
-Array.from(uniquePlants.entries())
-    .sort((a, b) => a[1].localeCompare(b[1]))
-    .forEach(([key, label]) => {
-        selectPlant.innerHTML += `<option value="${key}">${label}</option>`;
-    });
-
-            // Get unique statuses
+            // Estatus por sección activa
             const uniqueStatuses = new Set();
-            if (window.state.activeTab === 'reportes') {
-                window.state.normalizedReportesPND.forEach(r => {
+
+            if (window.state.activeTab === "orders") {
+                (window.state.normalizedOrders || []).forEach(o => {
+                    if (o.status) uniqueStatuses.add(o.status);
+                });
+            }
+
+            if (window.state.activeTab === "reportes") {
+                (window.state.normalizedReportesPND || []).forEach(r => {
                     const st = getReporteEstadoGeneral(r);
                     if (st) uniqueStatuses.add(st);
                 });
-            } else {
-                window.state.normalizedOrders.forEach(o => { if (o.status) uniqueStatuses.add(o.status); });
             }
-            
+
             Array.from(uniqueStatuses).sort().forEach(status => {
                 selectStatus.innerHTML += `<option value="${status}">${status}</option>`;
             });
 
-            // Re-apply values if they still exist
-            selectPlant.value = selectedPlant;
-            if (window.state.activeTab === 'orders' || window.state.activeTab === 'reportes') {
-                selectStatus.value = selectedStatus;
+            // Área y Técnico solo para Reportes PND, con filtros dependientes.
+            if (window.state.activeTab === "reportes" && selectArea && selectTecnico) {
+                const areas = new Set();
+                const tecnicos = new Set();
+
+                (window.state.normalizedReportesPND || []).forEach(r => {
+                    const planta = normalizePlantKey(getReportField(r, ["Planta"]));
+                    const area = getReportField(r, ["Area", "Área"]);
+                    const tecnico = getReportField(r, ["Tecnico", "Técnico"]);
+
+                    const plantaOk =
+                        f.plant === "ALL" ||
+                        normalizePlantKey(f.plant) === planta;
+
+                    const tecnicoOk =
+                        f.tecnico === "ALL" ||
+                        tecnico === f.tecnico;
+
+                    const areaOk =
+                        f.area === "ALL" ||
+                        area === f.area;
+
+                    if (plantaOk && tecnicoOk && area) areas.add(area);
+                    if (plantaOk && areaOk && tecnico) tecnicos.add(tecnico);
+                });
+
+                Array.from(areas).sort().forEach(area => {
+                    selectArea.innerHTML += `<option value="${area}">${area}</option>`;
+                });
+
+                Array.from(tecnicos).sort().forEach(tecnico => {
+                    selectTecnico.innerHTML += `<option value="${tecnico}">${tecnico}</option>`;
+                });
+
+                const areaValues = Array.from(selectArea.options).map(o => o.value);
+                const tecnicoValues = Array.from(selectTecnico.options).map(o => o.value);
+
+                if (!areaValues.includes(f.area)) f.area = "ALL";
+                if (!tecnicoValues.includes(f.tecnico)) f.tecnico = "ALL";
             }
+
+            const plantValues = Array.from(selectPlant.options).map(o => o.value);
+            const statusValues = Array.from(selectStatus.options).map(o => o.value);
+
+            if (!plantValues.includes(f.plant)) f.plant = "ALL";
+            if (!statusValues.includes(f.status)) f.status = "ALL";
+
+            selectPlant.value = f.plant || "ALL";
+            selectStatus.value = f.status || "ALL";
+
+            if (selectArea) selectArea.value = f.area || "ALL";
+            if (selectTecnico) selectTecnico.value = f.tecnico || "ALL";
         }
 function normalizePlantKey(value) {
     return String(value || "").trim().toUpperCase();
 }
         // --- FILTERING LOGIC ---
         function applyFilters() {
-            // Read filter controls
-            window.state.filters.plant = document.getElementById("filter-plant").value;
-            window.state.filters.startDate = document.getElementById("filter-start-date").value;
-            window.state.filters.endDate = document.getElementById("filter-end-date").value;
-            window.state.filters.search = document.getElementById("filter-search").value.toLowerCase().trim();
-            window.state.filters.area = document.getElementById("filter-area")?.value || "ALL";
-            window.state.filters.tecnico = document.getElementById("filter-tecnico")?.value || "ALL";
-            
+            const f = getCurrentFilters();
 
-            if (window.state.activeTab === 'orders' || window.state.activeTab === 'reportes') {
-                window.state.filters.status = document.getElementById("filter-status").value;
+            f.plant = document.getElementById("filter-plant").value;
+            f.startDate = document.getElementById("filter-start-date").value;
+            f.endDate = document.getElementById("filter-end-date").value;
+            f.search = document.getElementById("filter-search").value.toLowerCase().trim();
+
+            if (window.state.activeTab === "orders" || window.state.activeTab === "reportes") {
+                f.status = document.getElementById("filter-status").value;
             } else {
-                window.state.filters.status = 'ALL';
+                f.status = "ALL";
             }
 
-            // Reset pagination pages before repainting
+            if (window.state.activeTab === "reportes") {
+                f.area = document.getElementById("filter-area")?.value || "ALL";
+                f.tecnico = document.getElementById("filter-tecnico")?.value || "ALL";
+            }
+
             window.state.pagination.orders.page = 1;
             window.state.pagination.alerts.page = 1;
             window.state.pagination.reportes.page = 1;
 
-            // Filter Orders
-            window.state.filteredOrders = window.state.normalizedOrders.filter(order => {
-                if (window.state.filters.plant !== 'ALL' && order.plant !== window.state.filters.plant) return false;
-                if ((window.state.activeTab === 'orders') && window.state.filters.status !== 'ALL' && order.status !== window.state.filters.status) return false;
-                if (window.state.filters.startDate && order.dueDate && order.dueDate < new Date(window.state.filters.startDate)) return false;
-                if (window.state.filters.endDate && order.dueDate && order.dueDate > new Date(window.state.filters.endDate)) return false;
+            // Filtros independientes: Órdenes
+            const fo = window.state.filtersByTab.orders;
 
-                if (window.state.filters.search) {
+            window.state.filteredOrders = (window.state.normalizedOrders || []).filter(order => {
+                if (fo.plant !== "ALL" && order.plant !== fo.plant) return false;
+                if (fo.status !== "ALL" && order.status !== fo.status) return false;
+
+                if (fo.startDate && order.dueDate && order.dueDate < new Date(fo.startDate)) return false;
+                if (fo.endDate && order.dueDate && order.dueDate > new Date(fo.endDate)) return false;
+
+                if (fo.search) {
                     const searchStr = `${order.id} ${order.description} ${order.locationCode} ${order.comments}`.toLowerCase();
-                    if (!searchStr.includes(window.state.filters.search)) return false;
+                    if (!searchStr.includes(fo.search)) return false;
                 }
 
                 return true;
             });
-            if (window.state.activeTab === "reportes") {
-    renderKPIs();
-    renderReportesPNDCharts();
-    renderReportesTable();
-}
 
-            // Filter Alerts
-            window.state.filteredAlerts = window.state.normalizedAlerts.filter(alert => {
-                if (window.state.filters.plant !== 'ALL' && alert.plant !== window.state.filters.plant) return false;
-                if (window.state.filters.startDate && alert.createdDate && alert.createdDate < new Date(window.state.filters.startDate)) return false;
-                if (window.state.filters.endDate && alert.createdDate && alert.createdDate > new Date(window.state.filters.endDate)) return false;
+            // Filtros independientes: Avisos
+            const fa = window.state.filtersByTab.alerts;
 
-                if (window.state.filters.search) {
+            window.state.filteredAlerts = (window.state.normalizedAlerts || []).filter(alert => {
+                if (fa.plant !== "ALL" && alert.plant !== fa.plant) return false;
+
+                if (fa.startDate && alert.createdDate && alert.createdDate < new Date(fa.startDate)) return false;
+                if (fa.endDate && alert.createdDate && alert.createdDate > new Date(fa.endDate)) return false;
+
+                if (fa.search) {
                     const searchStr = `${alert.id} ${alert.orderId} ${alert.description} ${alert.location} ${alert.notes}`.toLowerCase();
-                    if (!searchStr.includes(window.state.filters.search)) return false;
+                    if (!searchStr.includes(fa.search)) return false;
                 }
 
                 return true;
             });
 
-            // Filter Reportes PND usando Columna P / Estatus Reporte
+            // Filtros independientes: Reportes PND
+            const fr = window.state.filtersByTab.reportes;
+
             window.state.filteredReportesPND = (window.state.normalizedReportesPND || []).filter(r => {
                 const planta = normalizePlantKey(getReportField(r, ["Planta"]));
                 const fechaRaw = getReportField(r, ["Fecha"]);
-                const estadoVisual = getReporteEstadoGeneral(r);     // Ej. Borrador, Enviado, No Enviado
-                const estadoNorm = getEstatusReportePND(r);           // Ej. BORRADOR, ENVIADO, NO ENVIADO
-                const filtroStatus = normalizeText(window.state.filters.status);
+                const estadoVisual = getReporteEstadoGeneral(r);
+                const estadoNorm = getEstatusReportePND(r);
+                const filtroStatus = normalizeText(fr.status);
                 const fecha = fechaRaw ? new Date(fechaRaw) : null;
                 const area = getReportField(r, ["Area", "Área"]);
                 const tecnico = getReportField(r, ["Tecnico", "Técnico"]);
 
                 if (
-                    window.state.filters.plant !== 'ALL' &&
-                    normalizePlantKey(planta) !== normalizePlantKey(window.state.filters.plant)
+                    fr.plant !== "ALL" &&
+                    planta !== normalizePlantKey(fr.plant)
                 ) return false;
 
                 if (
-                    window.state.activeTab === 'reportes' &&
-                    window.state.filters.status !== 'ALL' &&
+                    fr.status !== "ALL" &&
                     normalizeText(estadoVisual) !== filtroStatus &&
                     estadoNorm !== filtroStatus
                 ) return false;
 
-                if (window.state.filters.startDate && fecha && fecha < new Date(window.state.filters.startDate)) return false;
-                if (window.state.filters.endDate && fecha && fecha > new Date(window.state.filters.endDate)) return false;
+                if (fr.area !== "ALL" && area !== fr.area) return false;
+                if (fr.tecnico !== "ALL" && tecnico !== fr.tecnico) return false;
 
-                if (window.state.filters.search) {
+                if (fr.startDate && fecha && fecha < new Date(fr.startDate)) return false;
+                if (fr.endDate && fecha && fecha > new Date(fr.endDate)) return false;
+
+                if (fr.search) {
                     const searchStr = [
                         getReportField(r, ["N° Reporte", "No Reporte", "Reporte"]),
                         getReportField(r, ["Remision", "Remisión"]),
@@ -3149,13 +3219,13 @@ function normalizePlantKey(value) {
                         getReportField(r, ["Concepto"]),
                         getReportField(r, ["Estatus Reporte", "EstatusReporte", "ESTATUS REPORTE"])
                     ].join(" ").toLowerCase();
-                    if (!searchStr.includes(window.state.filters.search)) return false;
+
+                    if (!searchStr.includes(fr.search)) return false;
                 }
 
                 return true;
             });
 
-            // Trigger complete repaints
             populateDropdownOptions();
             renderKPIs();
             renderCharts();
@@ -3164,22 +3234,36 @@ function normalizePlantKey(value) {
         }
 
         function clearFilters() {
+            const tab = window.state.activeTab;
+
+            window.state.filtersByTab[tab] = {
+                plant: "ALL",
+                status: "ALL",
+                area: "ALL",
+                tecnico: "ALL",
+                startDate: "",
+                endDate: "",
+                search: ""
+            };
+
             document.getElementById("filter-plant").value = "ALL";
             document.getElementById("filter-start-date").value = "";
             document.getElementById("filter-end-date").value = "";
             document.getElementById("filter-search").value = "";
+
             if (document.getElementById("filter-status")) {
                 document.getElementById("filter-status").value = "ALL";
             }
 
-            window.state.filters = {
-                plant: 'ALL',
-                status: 'ALL',
-                startDate: '',
-                endDate: '',
-                search: ''
-            };
+            if (document.getElementById("filter-area")) {
+                document.getElementById("filter-area").value = "ALL";
+            }
 
+            if (document.getElementById("filter-tecnico")) {
+                document.getElementById("filter-tecnico").value = "ALL";
+            }
+
+            populateDropdownOptions();
             applyFilters();
         }
 
