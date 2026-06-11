@@ -3139,6 +3139,21 @@ function prettyPlantName(value) {
     return names[key] || String(value || "").trim();
 }
         // --- FILTERING LOGIC ---
+        function parseLocalDate(value) {
+    if (!value) return null;
+
+    if (value instanceof Date) {
+        return new Date(value.getFullYear(), value.getMonth(), value.getDate());
+    }
+
+    const parts = String(value).split("-");
+    if (parts.length === 3) {
+        return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+    }
+
+    const d = new Date(value);
+    return isNaN(d.getTime()) ? null : d;
+}
         function applyFilters() {
             const f = getCurrentFilters();
 
@@ -3169,8 +3184,13 @@ function prettyPlantName(value) {
                 if (fo.plant !== "ALL" && order.plant !== fo.plant) return false;
                 if (fo.status !== "ALL" && order.status !== fo.status) return false;
 
-                if (fo.startDate && order.dueDate && order.dueDate < new Date(fo.startDate)) return false;
-                if (fo.endDate && order.dueDate && order.dueDate > new Date(fo.endDate)) return false;
+                if (fo.startDate && order.dueDate && order.dueDate < parseLocalDate(fo.startDate)) return false;
+
+if (fo.endDate && order.dueDate) {
+    const end = parseLocalDate(fo.endDate);
+    end.setHours(23, 59, 59, 999);
+    if (order.dueDate > end) return false;
+}
 
                 if (fo.search) {
                     const searchStr = `${order.id} ${order.description} ${order.locationCode} ${order.comments}`.toLowerCase();
