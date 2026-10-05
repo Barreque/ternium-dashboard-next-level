@@ -2268,7 +2268,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
                         <div class="kpi-icon red"><i data-lucide="alert-circle"></i></div>
                     </div>
                     <div class="kpi-value" id="kpi-r-pendientes">0</div>
-                    <div class="kpi-trend down" id="kpi-r-pendientes-sub">Borrador + No enviado</div>
+                    <div class="kpi-trend down" id="kpi-r-pendientes-sub">Pendientes de envío final</div>
                 </div>
                 <div class="kpi-card">
                     <div class="kpi-card-header">
@@ -2276,7 +2276,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
                         <div class="kpi-icon green"><i data-lucide="send"></i></div>
                     </div>
                     <div class="kpi-value" id="kpi-r-enviados">0</div>
-                    <div class="kpi-trend up" id="kpi-r-enviados-sub">Estatus reporte</div>
+                    <div class="kpi-trend up" id="kpi-r-enviados-sub">REPORTE_FINAL_ENVIADO</div>
                 </div>
                 <div class="kpi-card">
                     <div class="kpi-card-header">
@@ -2293,7 +2293,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
                     <div class="chart-card-header">
                         <div>
                             <span class="chart-title">Reportes Pendientes por Planta</span>
-                            <p class="chart-subtitle">Borrador + Completado sin enviar / No enviado.</p>
+                            <p class="chart-subtitle">Registros con REPORTE_FINAL_ENVIADO en FALSE o vacío.</p>
                         </div>
                         <i data-lucide="bar-chart-2" class="text-muted" style="width: 20px;"></i>
                     </div>
@@ -2306,7 +2306,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
                     <div class="chart-card-header">
                         <div>
                             <span class="chart-title">Distribución General de Reportes</span>
-                            <p class="chart-subtitle">Enviado, No enviado, Borrador y otros estados.</p>
+                            <p class="chart-subtitle">Enviado, Pendiente y Borrador según CAPTURA.</p>
                         </div>
                         <i data-lucide="pie-chart" class="text-muted" style="width: 20px;"></i>
                     </div>
@@ -2351,7 +2351,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
                 <div class="table-card-header">
                     <div>
                         <span class="chart-title">Registros Detallados de Reportes PND</span>
-                        <p class="chart-subtitle" style="margin-top: 2px;">Datos leídos desde el Libro 2, hoja Macro. Puedes filtrar por planta, fecha, estado o buscar por equipo/orden/reporte.</p>
+                        <p class="chart-subtitle" style="margin-top: 2px;">Datos leídos directamente desde CAPTURA. Puedes filtrar por planta, fecha, estado o buscar por equipo/orden/reporte.</p>
                     </div>
                     <div class="table-controls">
                         <button class="export-btn" onclick="exportToCSV('reportes')">
@@ -2377,7 +2377,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
                                 <th>Concepto</th>
                                 <th>Precio</th>
                                 <th>Estado Formulario</th>
-                                <th>Estatus Reporte</th>
+                                <th>Estado Envío Final</th>
                                 <th>PDF</th>
                             </tr>
                         </thead>
@@ -2448,7 +2448,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         const API_URL = "https://script.google.com/macros/s/AKfycbxSrsstJhjiVxLojG9lFIudqxm0sN7UC9aKl5gCx9qgQWeuIW1XN3pl9_mUaHTxV2Vw/exec";
         const API_KEY = "d7srdhnmm8u5knb6b5r5i1738xzagk1al5q6";
 
-        // --- API MAESTRA: IA + LIBRO 2 REPORTES PND ---
+        // --- API MAESTRA: IA ---
         const MASTER_API_URL = "https://script.google.com/macros/s/AKfycbxSrsstJhjiVxLojG9lFIudqxm0sN7UC9aKl5gCx9qgQWeuIW1XN3pl9_mUaHTxV2Vw/exec";
 
         // --- CHATBERTO IA CONFIGURATION ---
@@ -2676,7 +2676,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
                 filterTecnicoGroup.style.display = "none";
             } else if (tabId === "reportes") {
                 title.innerText = "Reportes PND";
-                subtitle.innerText = "Consulta de reportes, remisiones, técnicos, equipos y conceptos desde el Libro 2.";
+                subtitle.innerText = "Consulta de reportes, remisiones, técnicos, equipos y estatus de envío directamente desde CAPTURA.";
                 filterStatusGroup.style.display = "flex";
                 filterAreaGroup.style.display = "flex";
                 filterTecnicoGroup.style.display = "flex";
@@ -2920,23 +2920,34 @@ input[type="date"]::-webkit-calendar-picker-indicator {
                     throw new Error("La API devolvió un estado incorrecto.");
                 }
 
-                // Libro 2 / Reportes PND. No bloquea el dashboard si falla.
+                // Reportes PND desde CAPTURA. No bloquea el dashboard si falla.
                 let resReportes = { success: false, data: [] };
                 try {
-                    resReportes = await fetchJson(MASTER_API_URL + "?action=reportes_pnd" + (forceSync ? ("&t=" + Date.now()) : ""), 180000);
+                    const reportesUrl =
+                        API_URL +
+                        "?action=data&key=" +
+                        encodeURIComponent(API_KEY) +
+                        "&sheet=CAPTURA" +
+                        (forceSync ? ("&t=" + Date.now()) : "");
+
+                    resReportes = await fetchJson(reportesUrl, 180000);
                 } catch (reportesErr) {
-                    console.warn("No se pudieron cargar Reportes PND:", reportesErr);
+                    console.warn("No se pudo cargar CAPTURA para Reportes PND:", reportesErr);
                 }
 
                 // Save to State
                 window.state.rawOrders = resOrders.data;
                 window.state.rawAlerts = resAlerts.data;
+
+                // Solo considerar filas que ya representan un reporte.
+                // REPORTE_FINAL_ENVIADO: TRUE = Enviado / FALSE o vacío = Pendiente.
                 window.state.rawReportesPND = resReportes.success
-  ? (resReportes.data || []).filter(r => {
-      const fecha = String(r.Fecha || r["Fecha"] || "");
-      return fecha.includes("2025") || fecha.includes("2026");
-    })
-  : [];
+                    ? (resReportes.data || []).filter(r =>
+                        String(
+                            getReportField(r, ["N° Reporte", "No Reporte", "Reporte"]) || ""
+                        ).trim() !== ""
+                    )
+                    : [];
 
                 // Normalize data
                 window.state.normalizedOrders = normalizeOrders(window.state.rawOrders);
@@ -2948,7 +2959,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
                 sessionStorage.setItem("ternium_orders", JSON.stringify(window.state.rawOrders));
                 sessionStorage.setItem("ternium_alerts", JSON.stringify(window.state.rawAlerts));
                 sessionStorage.setItem("ternium_sync_time", timeString);
-                // No guardar Reportes PND en sessionStorage porque ya trae muchas URLs PDF y excede la cuota
+                // No guardar CAPTURA de Reportes en sessionStorage para evitar exceder la cuota
                // sessionStorage.setItem("ternium_reportes_pnd", JSON.stringify(window.state.rawReportesPND));
 
                 // Update UI elements
@@ -3226,7 +3237,7 @@ if (fo.endDate && order.dueDate) {
                 const estadoVisual = getReporteEstadoGeneral(r);
                 const estadoNorm = getEstatusReportePND(r);
                 const filtroStatus = normalizeText(fr.status);
-                const fecha = fechaRaw ? new Date(fechaRaw) : null;
+                const fecha = parseReportDate(fechaRaw);
                 const area = getReportField(r, ["Area", "Área"]);
                 const tecnico = getReportField(r, ["Tecnico", "Técnico"]);
 
@@ -3258,7 +3269,9 @@ if (fo.endDate && order.dueDate) {
                         getReportField(r, ["Tecnico", "Técnico"]),
                         getReportField(r, ["Auxiliar Tecnico", "Auxiliar Técnico"]),
                         getReportField(r, ["Concepto"]),
-                        getReportField(r, ["Estatus Reporte", "EstatusReporte", "ESTATUS REPORTE"])
+                        getReporteEstadoGeneral(r),
+                        getReportField(r, ["REVISION_ESTADO"]),
+                        getReportField(r, ["FIRMA_ESTADO"])
                     ].join(" ").toLowerCase();
 
                     if (!searchStr.includes(fr.search)) return false;
@@ -3339,22 +3352,17 @@ if (fo.endDate && order.dueDate) {
                     : (window.state.normalizedReportesPND || window.state.rawReportesPND || []);
                 const total = reportes.length;
 
-                // KPIs calculados desde Columna P: Estatus Reporte
-                const enviados = reportes.filter(r => getEstatusReportePND(r) === "ENVIADO").length;
-                const pendientes = reportes.filter(r => {
-                    const estatus = getEstatusReportePND(r);
-                    return (
-                        estatus.includes("NO ENVIADO") ||
-                        estatus.includes("NO ENVIAR") ||
-                        estatus.includes("PENDIENTE") ||
-                        !estatus
-                    );
-                }).length;
+                // KPIs desde CAPTURA:
+                // REPORTE_FINAL_ENVIADO = TRUE => Enviado
+                // FALSE o vacío => Pendiente
+                const enviados = reportes.filter(isReporteFinalEnviado).length;
+                const pendientes = reportes.filter(r => !isReporteFinalEnviado(r)).length;
 
-                const borrador = reportes.filter(r => {
-    const estatus = getEstatusReportePND(r);
-    return normalizeText(estatus).includes("BORRADOR");
-}).length;
+                const borrador = reportes.filter(r =>
+                    normalizeText(
+                        getReportField(r, ["EstadoFormulario", "Estado Formulario"])
+                    ) === "BORRADOR"
+                ).length;
                 const pctPend = total > 0 ? Math.round((pendientes / total) * 100) : 0;
                 const pctEnv = total > 0 ? Math.round((enviados / total) * 100) : 0;
 
@@ -3364,7 +3372,7 @@ if (fo.endDate && order.dueDate) {
                 animateCounter("kpi-r-borrador", borrador);
                 const pendSub = document.getElementById("kpi-r-pendientes-sub");
                 const envSub = document.getElementById("kpi-r-enviados-sub");
-                if (pendSub) pendSub.innerText = `${pctPend}% pendientes / no enviados`;
+                if (pendSub) pendSub.innerText = `${pctPend}% pendientes de envío final`;
                 if (envSub) envSub.innerText = `${pctEnv}% reportes enviados`;
                 const borradorSub = document.getElementById("kpi-r-borrador-sub");
                 if (borradorSub) borradorSub.innerText =
@@ -3927,50 +3935,44 @@ if (fo.endDate && order.dueDate) {
 
 
         // --- REPORTES PND ANALYTICS HELPERS ---
+        function isReporteFinalEnviado(r) {
+            const raw = getReportField(r, [
+                "REPORTE_FINAL_ENVIADO",
+                "Reporte Final Enviado"
+            ]);
+
+            if (raw === true || raw === 1) return true;
+
+            const valor = normalizeText(raw);
+            return ["TRUE", "VERDADERO", "SI", "YES", "1"].includes(valor);
+        }
+
         function getEstatusReportePND(r) {
-            return normalizeText(getReportField(r, ["Estatus Reporte", "EstatusReporte", "ESTATUS REPORTE"]));
+            return isReporteFinalEnviado(r) ? "ENVIADO" : "PENDIENTE";
         }
 
         function getReporteEstadoGeneral(r) {
-            // Regla principal para Reportes PND: Columna P = Estatus Reporte.
-            // Se usa este campo para KPIs, gráficas y filtros de Reportes PND.
-            const estatusReporte = getEstatusReportePND(r);
-            const estadoFormulario = normalizeText(getReportField(r, ["EstadoFormulario", "Estado Formulario", "Estatus"]));
+            if (isReporteFinalEnviado(r)) return "Enviado";
 
-            if (estatusReporte === "ENVIADO") return "Enviado";
-            if (estatusReporte.includes("NO ENVIADO") || estatusReporte.includes("NO ENVIAR")) return "No Enviado";
-            if (estatusReporte.includes("BORRADOR")) return "Borrador";
-            if (estatusReporte.includes("PENDIENTE")) return "Pendiente";
-            if (estatusReporte.includes("CANCEL")) return "Cancelado";
+            const estadoFormulario = normalizeText(
+                getReportField(r, ["EstadoFormulario", "Estado Formulario"])
+            );
 
-            // Fallback visual si la columna P viene vacía.
             if (estadoFormulario === "BORRADOR") return "Borrador";
             if (estadoFormulario === "CANCELACION" || estadoFormulario === "CANCELADO") return "Cancelado";
-            if (estadoFormulario === "COMPLETADO") return "No Enviado";
-            return estadoFormulario || "Sin Estado";
+
+            return "Pendiente";
         }
 
         function getReportesPendientes(list) {
-            return (list || []).filter(r => {
-                const estatusReporte = getEstatusReportePND(r);
-                const estado = getReporteEstadoGeneral(r);
-                return (
-                    estatusReporte.includes("NO ENVIADO") ||
-                    estatusReporte.includes("NO ENVIAR") ||
-                    estatusReporte.includes("BORRADOR") ||
-                    estatusReporte.includes("PENDIENTE") ||
-                    estado === "Borrador" ||
-                    estado === "No Enviado" ||
-                    estado === "Pendiente"
-                );
-            });
+            return (list || []).filter(r => !isReporteFinalEnviado(r));
         }
 
         function getReporteEstadoColor(estado) {
             const key = normalizeText(estado);
             const colors = {
                 "ENVIADO": "#10b981",
-                "NO ENVIADO": "#f59e0b",
+                "PENDIENTE": "#f59e0b",
                 "BORRADOR": "#ef4444",
                 "COMPLETADO": "#3b82f6",
                 "CANCELADO": "#64748b",
@@ -3993,7 +3995,7 @@ if (fo.endDate && order.dueDate) {
 
             const counts = {};
 
-(window.state.filteredReportesPND || []).forEach(r => {
+getReportesPendientes(window.state.filteredReportesPND || []).forEach(r => {
     const planta = normalizePlantKey(
         getReportField(r, ["Planta"])
     ) || "SIN PLANTA";
@@ -4089,7 +4091,7 @@ if (fo.endDate && order.dueDate) {
 
             const counts = {};
 
-(window.state.filteredReportesPND || []).forEach(r => {
+getReportesPendientes(window.state.filteredReportesPND || []).forEach(r => {
     const tecnico = getReportField(
         r,
         ["Tecnico", "Técnico"]
@@ -4129,7 +4131,7 @@ if (fo.endDate && order.dueDate) {
             const timeline = {};
             window.state.filteredReportesPND.forEach(r => {
                 const raw = getReportField(r, ["Fecha"]);
-                const d = raw ? new Date(raw) : null;
+                const d = parseReportDate(raw);
                 if (!d || isNaN(d.getTime())) return;
                 const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
                 timeline[key] = (timeline[key] || 0) + 1;
@@ -4418,10 +4420,27 @@ if (fo.endDate && order.dueDate) {
 
 
         // 3. Reportes PND Table
+        function parseReportDate(value) {
+            if (!value) return null;
+            if (value instanceof Date && !isNaN(value.getTime())) return value;
+
+            const text = String(value).trim();
+
+            // CAPTURA normalmente entrega fechas como d/M/yyyy o dd/MM/yyyy.
+            const mx = text.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})(?:\s|$)/);
+            if (mx) {
+                const d = new Date(Number(mx[3]), Number(mx[2]) - 1, Number(mx[1]));
+                return isNaN(d.getTime()) ? null : d;
+            }
+
+            const d = new Date(text);
+            return isNaN(d.getTime()) ? null : d;
+        }
+
         function formatReportDate(value) {
             if (!value) return "-";
-            const d = new Date(value);
-            if (!isNaN(d.getTime())) return d.toLocaleDateString("es-MX");
+            const d = parseReportDate(value);
+            if (d) return d.toLocaleDateString("es-MX");
             return String(value);
         }
 
@@ -4452,11 +4471,11 @@ if (fo.endDate && order.dueDate) {
 
             paginatedData.forEach(r => {
                 const estadoFormulario = getReportField(r, ["EstadoFormulario", "Estado Formulario", "Estatus"]);
-                const estatusReporte = getReportField(r, ["Estatus Reporte", "EstadoReporte"]);
+                const estatusReporte = getEstatusReportePND(r);
                 const estadoGeneral = getReporteEstadoGeneral(r);
                 const badgeClass = normalizeText(estadoFormulario) === "COMPLETADO" ? "badge-success" : (normalizeText(estadoFormulario) === "BORRADOR" ? "badge-danger" : "badge-muted");
                 const reporteClass = estadoGeneral === "Enviado" ? "badge-success" : (estadoGeneral === "Borrador" ? "badge-danger" : "badge-pending");
-                const pdfUrl = getReportField(r, ["PDF", "URL PDF", "Pdf", "pdfUrl"]);
+                const pdfUrl = getReportField(r, ["PDF_REVISION_URL", "PDF", "URL PDF", "Pdf", "pdfUrl"]);
 
                 tbody.innerHTML += `
                     <tr>
@@ -4627,7 +4646,7 @@ if (fo.endDate && order.dueDate) {
             const alertsByPlant = countBy(alerts, a => a.plant);
             const reportesByPlant = countBy(reportesPND, r => getReportField(r, ["Planta"]));
             const reportesByTecnico = countBy(reportesPND, r => getReportField(r, ["Tecnico", "Técnico"]));
-            const reportesByEstado = countBy(reportesPND, r => getReportField(r, ["EstadoFormulario", "Estado Formulario", "Estatus"]));
+            const reportesByEstado = countBy(reportesPND, r => getReporteEstadoGeneral(r));
 
             const enTermino = orders.filter(o => normalizeText(o.status) === "EN TERMINO").length;
             const fueraTermino = orders.filter(o => normalizeText(o.status) === "FUERA DE TERMINO").length;
@@ -4681,7 +4700,7 @@ if (fo.endDate && order.dueDate) {
                     auxiliar: getReportField(r, ["Auxiliar Tecnico", "Auxiliar Técnico"]),
                     concepto: getReportField(r, ["Concepto"]),
                     precio: getReportField(r, ["Precio"]),
-                    estado: getReportField(r, ["EstadoFormulario", "Estado Formulario", "Estatus"])
+                    estado: getReporteEstadoGeneral(r)
                 }));
 
             return {
@@ -4780,7 +4799,7 @@ if (fo.endDate && order.dueDate) {
         type === 'orders'
             ? ["Nº Orden", "Planta", "Descripción", "Vencimiento", "Fecha Inspección", "Estatus", "Ubicación", "Comentarios"]
             : type === 'reportes'
-                ? ["Fecha", "Planta", "N° Reporte", "Remisión", "Área", "Equipo", "Num Orden", "Usuario", "Técnico", "Auxiliar", "Concepto", "Precio", "Estado Formulario", "Estatus Reporte"]
+                ? ["Fecha", "Planta", "N° Reporte", "Remisión", "Área", "Equipo", "Num Orden", "Usuario", "Técnico", "Auxiliar", "Concepto", "Precio", "Estado Formulario", "Estado Envío Final"]
                 : ["Nº Aviso", "Relación Orden", "Severidad", "Planta", "Descripción", "Días Abierto", "Notas", "Ubicación", "Remonitoreo", "Última Insp."];
 
     const cleanValue = (value) => {
@@ -4901,7 +4920,7 @@ if (fo.endDate && order.dueDate) {
 
             const total = data.length;
             const pendientes = typeof getReportesPendientes === "function" ? getReportesPendientes(data) : [];
-            const enviados = data.filter(r => getEstatusReportePND(r) === "ENVIADO").length;
+            const enviados = data.filter(isReporteFinalEnviado).length;
             const pct = total ? Math.round((enviados / total) * 100) : 0;
 
             const byPlant = {};
@@ -4921,7 +4940,7 @@ if (fo.endDate && order.dueDate) {
                 Se tienen <strong>${total.toLocaleString("es-MX")}</strong> reportes filtrados.
                 El avance de envío es de <strong>${pct}%</strong>
                 con <strong>${enviados.toLocaleString("es-MX")}</strong> reportes enviados y
-                <strong>${pendientes.length.toLocaleString("es-MX")}</strong> pendientes / no enviados.
+                <strong>${pendientes.length.toLocaleString("es-MX")}</strong> pendientes de envío final.
                 ${plantText}
             `;
         }
