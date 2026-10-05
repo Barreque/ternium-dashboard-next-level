@@ -2053,7 +2053,280 @@ input[type="date"]::-webkit-calendar-picker-indicator {
             .monitor-report-tile { min-height: 76px; }
         }
 
-    </style>
+    
+        /* ===== MONITOR INTERACTIVO / BACKLOG ===== */
+        .monitor-section-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin: 18px 0 10px;
+            padding: 0 2px;
+        }
+
+        .monitor-section-title {
+            font-size: 15px;
+            font-weight: 900;
+            letter-spacing: .05em;
+            color: var(--text-primary);
+            text-transform: uppercase;
+        }
+
+        .monitor-section-count {
+            min-width: 38px;
+            padding: 5px 10px;
+            border-radius: 999px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 900;
+            background: rgba(59,130,246,.14);
+            border: 1px solid rgba(59,130,246,.32);
+            color: #bfdbfe;
+        }
+
+        .monitor-inprogress-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 10px;
+        }
+
+        .monitor-process-tile {
+            min-height: 92px;
+            border-radius: 14px;
+            border: 1px solid rgba(59,130,246,.58);
+            background: linear-gradient(135deg, rgba(30,64,175,.22), rgba(15,23,42,.80));
+            padding: 13px 14px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease;
+        }
+
+        .monitor-process-tile:hover {
+            transform: translateY(-2px);
+            border-color: rgba(96,165,250,.95);
+            box-shadow: 0 10px 30px rgba(37,99,235,.18);
+        }
+
+        .monitor-process-number {
+            font-size: 27px;
+            line-height: 1;
+            font-weight: 950;
+            color: #ffffff;
+        }
+
+        .monitor-process-responsible {
+            margin-top: 9px;
+            font-size: 13px;
+            font-weight: 800;
+            color: #93c5fd;
+        }
+
+        .monitor-process-state {
+            margin-top: 3px;
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: .08em;
+            color: #60a5fa;
+        }
+
+        .monitor-inprogress-empty {
+            grid-column: 1 / -1;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px dashed rgba(100,116,139,.35);
+            color: var(--text-muted);
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .monitor-report-tile {
+            cursor: pointer;
+            transition: transform .16s ease, filter .16s ease, box-shadow .16s ease;
+        }
+
+        .monitor-report-tile:hover {
+            transform: translateY(-3px) scale(1.015);
+            filter: brightness(1.08);
+        }
+
+        .monitor-tap-hint {
+            margin-top: 6px;
+            font-size: 9px;
+            letter-spacing: .04em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,.48);
+            font-weight: 800;
+        }
+
+        .backlog-modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 18px;
+            background: rgba(2,6,23,.78);
+            backdrop-filter: blur(8px);
+        }
+
+        .backlog-modal-overlay.show {
+            display: flex;
+        }
+
+        .backlog-modal {
+            width: min(480px, 96vw);
+            border-radius: 18px;
+            border: 1px solid rgba(148,163,184,.24);
+            background: #111827;
+            box-shadow: 0 28px 80px rgba(0,0,0,.48);
+            overflow: hidden;
+        }
+
+        .backlog-modal-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 20px 22px 16px;
+            border-bottom: 1px solid rgba(148,163,184,.14);
+        }
+
+        .backlog-modal-kicker {
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: .09em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .backlog-modal-report {
+            margin-top: 4px;
+            font-size: 36px;
+            line-height: 1;
+            font-weight: 950;
+            color: #fff;
+        }
+
+        .backlog-modal-close {
+            width: 36px;
+            height: 36px;
+            border: 1px solid rgba(148,163,184,.20);
+            border-radius: 10px;
+            background: rgba(255,255,255,.03);
+            color: #cbd5e1;
+            cursor: pointer;
+            font-size: 22px;
+        }
+
+        .backlog-modal-body {
+            padding: 20px 22px 22px;
+        }
+
+        .backlog-modal-label {
+            display: block;
+            margin-bottom: 7px;
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: .05em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+        }
+
+        .backlog-modal-select {
+            width: 100%;
+            height: 46px;
+            padding: 0 13px;
+            border-radius: 10px;
+            border: 1px solid rgba(148,163,184,.25);
+            background: #0f172a;
+            color: #f8fafc;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .backlog-modal-current {
+            margin-top: 2px;
+            padding: 14px;
+            border-radius: 12px;
+            background: rgba(59,130,246,.10);
+            border: 1px solid rgba(59,130,246,.24);
+            color: #dbeafe;
+            line-height: 1.55;
+        }
+
+        .backlog-modal-error {
+            display: none;
+            margin-top: 12px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(239,68,68,.35);
+            background: rgba(239,68,68,.10);
+            color: #fecaca;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .backlog-modal-error.show {
+            display: block;
+        }
+
+        .backlog-modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .backlog-btn {
+            min-height: 42px;
+            padding: 0 17px;
+            border-radius: 10px;
+            border: 1px solid rgba(148,163,184,.22);
+            background: rgba(255,255,255,.04);
+            color: #e2e8f0;
+            font-weight: 850;
+            cursor: pointer;
+        }
+
+        .backlog-btn.primary {
+            border-color: rgba(16,185,129,.45);
+            background: rgba(16,185,129,.16);
+            color: #6ee7b7;
+        }
+
+        .backlog-btn.release {
+            border-color: rgba(245,158,11,.48);
+            background: rgba(245,158,11,.13);
+            color: #fcd34d;
+        }
+
+        .backlog-btn:disabled {
+            opacity: .55;
+            cursor: wait;
+        }
+
+        @media (max-width: 768px) {
+            .monitor-inprogress-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .backlog-modal-actions {
+                flex-direction: column-reverse;
+            }
+            .backlog-btn {
+                width: 100%;
+            }
+        }
+
+
+/* Banner offline deshabilitado: el estado real lo indica la conexión con la API */
+#pwa-offline-banner {
+    display: none !important;
+}
+
+</style>
 </head>
 <body>
 
@@ -2647,7 +2920,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
                         <span class="monitor-live-dot"></span>
                         <div>
                             <div class="monitor-heading">Reportes PND Pendientes</div>
-                            <div class="monitor-subheading">Los números más antiguos aparecen primero y desaparecen automáticamente al marcar REPORTE_FINAL_ENVIADO = TRUE.</div>
+                            <div class="monitor-subheading">Toca un número para asignarlo. Los reportes tomados aparecen arriba y desaparecen automáticamente al marcar REPORTE_FINAL_ENVIADO = TRUE.</div>
                         </div>
                     </div>
                     <div class="monitor-actions">
@@ -2675,14 +2948,65 @@ input[type="date"]::-webkit-calendar-picker-indicator {
                     </div>
                 </div>
 
+                <div class="monitor-section-head">
+                    <div class="monitor-section-title">En proceso ahora</div>
+                    <div class="monitor-section-count" id="monitor-inprogress-count">0</div>
+                </div>
+
+                <div class="monitor-inprogress-grid" id="monitor-inprogress-grid">
+                    <div class="monitor-inprogress-empty">Nadie ha tomado un reporte todavía.</div>
+                </div>
+
+                <div class="monitor-section-head">
+                    <div class="monitor-section-title">Pendientes más antiguos</div>
+                    <div class="monitor-section-count" id="monitor-available-count">0</div>
+                </div>
+
                 <div class="monitor-grid" id="monitor-report-grid"></div>
 
                 <div class="monitor-footnote">
-                    Cuando un reporte cambie a TRUE en REPORTE_FINAL_ENVIADO, dejará de aparecer en la siguiente actualización.
+                    Toca un N° Reporte para asignarlo. Los reportes en proceso se muestran arriba. Cuando REPORTE_FINAL_ENVIADO cambie a TRUE, el reporte desaparece automáticamente.
                 </div>
             </section>
         </div>
     </main>
+
+    <!-- Modal: tomar / liberar reporte -->
+    <div class="backlog-modal-overlay" id="backlog-modal-overlay" onclick="backlogOverlayClick(event)">
+        <div class="backlog-modal" role="dialog" aria-modal="true" aria-labelledby="backlog-modal-title">
+            <div class="backlog-modal-head">
+                <div>
+                    <div class="backlog-modal-kicker" id="backlog-modal-title">Reporte PND</div>
+                    <div class="backlog-modal-report" id="backlog-modal-report">—</div>
+                </div>
+                <button class="backlog-modal-close" type="button" onclick="closeBacklogModal()" aria-label="Cerrar">×</button>
+            </div>
+
+            <div class="backlog-modal-body">
+                <div id="backlog-take-content">
+                    <label class="backlog-modal-label" for="backlog-responsable-select">¿Quién va a trabajar este reporte?</label>
+                    <select class="backlog-modal-select" id="backlog-responsable-select">
+                        <option value="">Selecciona responsable...</option>
+                    </select>
+                </div>
+
+                <div id="backlog-release-content" style="display:none;">
+                    <div class="backlog-modal-current">
+                        <strong>Responsable:</strong>
+                        <span id="backlog-current-responsable">—</span><br>
+                        <strong>Estado:</strong> EN PROCESO
+                    </div>
+                </div>
+
+                <div class="backlog-modal-error" id="backlog-modal-error"></div>
+
+                <div class="backlog-modal-actions">
+                    <button class="backlog-btn" type="button" onclick="closeBacklogModal()">Cancelar</button>
+                    <button class="backlog-btn primary" id="backlog-main-action" type="button" onclick="submitBacklogAction()">Tomar reporte</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
 
@@ -2790,7 +3114,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         function updateOnlineStatus() {
             const banner = document.getElementById("pwa-offline-banner");
             if (!banner) return;
-            banner.classList.toggle("show", !navigator.onLine);
+            banner.classList.remove("show");
         }
 
         window.addEventListener("online", updateOnlineStatus);
@@ -2869,6 +3193,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         const MONITOR_REFRESH_MS = 30000;
         const MONITOR_MAX_VISIBLE = 48;
         let initialMonitorViewApplied = false;
+
+        window.state.backlogControl = [];
+        let backlogSelectedItem = null;
+        let backlogSelectedControl = null;
+        let backlogModalMode = "take";
+        let backlogActionBusy = false;
 
         function getCurrentFilters() {
             return window.state.filtersByTab[window.state.activeTab];
@@ -4323,11 +4653,16 @@ if (fo.endDate && order.dueDate) {
 
                 if (!reporte) return;
 
+                const id = String(
+                    getReportField(r, ["ID"]) || ""
+                ).trim();
+
                 const fecha = parseReportDate(getReportField(r, ["Fecha"]));
-                const current = unique.get(reporte);
+                const key = id || ("R:" + reporte);
+                const current = unique.get(key);
 
                 if (!current || (fecha && (!current.fecha || fecha < current.fecha))) {
-                    unique.set(reporte, { reporte, fecha, row: r });
+                    unique.set(key, { id, reporte, fecha, row: r });
                 }
             });
 
@@ -4358,41 +4693,129 @@ if (fo.endDate && order.dueDate) {
             return "age-new";
         }
 
+        function getBacklogActiveMap() {
+            const map = new Map();
+            (window.state.backlogControl || []).forEach(item => {
+                const id = String(item.ID_CAPTURA || "").trim();
+                const estado = normalizeText(item.ESTADO);
+                if (id && estado === "EN PROCESO") {
+                    map.set(id, item);
+                }
+            });
+            return map;
+        }
+
+        function getResponsablesMonitor() {
+            const source = window.state.normalizedReportesPND || window.state.rawReportesPND || [];
+            const names = new Set();
+
+            source.forEach(r => {
+                [
+                    getReportField(r, ["Tecnico", "Técnico"]),
+                    getReportField(r, ["Auxiliar Tecnico", "Auxiliar Técnico"])
+                ].forEach(value => {
+                    String(value || "")
+                        .split(/[,;/]+/)
+                        .map(x => x.trim())
+                        .filter(Boolean)
+                        .forEach(x => names.add(x));
+                });
+            });
+
+            return Array.from(names).sort((a, b) =>
+                a.localeCompare(b, "es", { sensitivity: "base" })
+            );
+        }
+
         function renderMonitorPendientes() {
             const grid = document.getElementById("monitor-report-grid");
+            const processGrid = document.getElementById("monitor-inprogress-grid");
             const totalEl = document.getElementById("monitor-pending-total");
             const visibleInfo = document.getElementById("monitor-visible-info");
-            if (!grid || !totalEl) return;
+            const processCountEl = document.getElementById("monitor-inprogress-count");
+            const availableCountEl = document.getElementById("monitor-available-count");
+
+            if (!grid || !processGrid || !totalEl) return;
 
             const pending = getMonitorPendingRows();
-            const visible = pending.slice(0, MONITOR_MAX_VISIBLE);
+            const activeMap = getBacklogActiveMap();
+
+            const inProcess = pending.filter(item =>
+                item.id && activeMap.has(item.id)
+            );
+
+            const available = pending.filter(item =>
+                !item.id || !activeMap.has(item.id)
+            );
+
+            const visible = available.slice(0, MONITOR_MAX_VISIBLE);
 
             totalEl.textContent = pending.length.toLocaleString("es-MX");
+            if (processCountEl) processCountEl.textContent = inProcess.length.toLocaleString("es-MX");
+            if (availableCountEl) availableCountEl.textContent = available.length.toLocaleString("es-MX");
+
+            processGrid.innerHTML = "";
             grid.innerHTML = "";
 
-            if (!pending.length) {
+            if (!inProcess.length) {
+                processGrid.innerHTML = `
+                    <div class="monitor-inprogress-empty">
+                        Nadie ha tomado un reporte todavía. Toca un número pendiente para asignarlo.
+                    </div>
+                `;
+            } else {
+                inProcess.forEach(item => {
+                    const control = activeMap.get(item.id);
+                    const tile = document.createElement("div");
+                    tile.className = "monitor-process-tile";
+                    tile.title = "Toca para liberar este reporte";
+                    tile.innerHTML = `
+                        <div class="monitor-process-number">${escapeHtmlMonitor(item.reporte)}</div>
+                        <div class="monitor-process-responsible">${escapeHtmlMonitor(control.RESPONSABLE || "Sin responsable")}</div>
+                        <div class="monitor-process-state">EN PROCESO · TOCA PARA LIBERAR</div>
+                    `;
+                    tile.addEventListener("click", () => openBacklogReleaseModal(item, control));
+                    processGrid.appendChild(tile);
+                });
+            }
+
+            if (!available.length) {
                 grid.innerHTML = `
                     <div class="monitor-empty">
                         <i data-lucide="circle-check-big" style="width:52px;height:52px;"></i>
-                        <span>Sin reportes pendientes</span>
+                        <span>Sin reportes disponibles</span>
                     </div>
                 `;
-                if (visibleInfo) visibleInfo.textContent = "No hay reportes pendientes en CAPTURA.";
-                if (window.lucide) lucide.createIcons();
-                return;
+            } else {
+                visible.forEach(item => {
+                    const tile = document.createElement("div");
+                    tile.className = `monitor-report-tile ${getMonitorAgeClass(item.fecha)}`;
+                    tile.title = item.id
+                        ? "Toca para tomar este reporte"
+                        : "Este registro no tiene ID en CAPTURA";
+
+                    tile.innerHTML = `
+                        <div class="monitor-report-number">${escapeHtmlMonitor(item.reporte)}</div>
+                        <div class="monitor-tap-hint">${item.id ? "Toca para tomar" : "Sin ID"}</div>
+                    `;
+
+                    if (item.id) {
+                        tile.addEventListener("click", () => openBacklogTakeModal(item));
+                    }
+
+                    grid.appendChild(tile);
+                });
             }
 
-            visible.forEach(item => {
-                const tile = document.createElement("div");
-                tile.className = `monitor-report-tile ${getMonitorAgeClass(item.fecha)}`;
-                tile.innerHTML = `<div class="monitor-report-number">${escapeHtmlMonitor(item.reporte)}</div>`;
-                grid.appendChild(tile);
-            });
-
             if (visibleInfo) {
-                visibleInfo.textContent = pending.length > visible.length
-                    ? `Mostrando los ${visible.length} reportes más antiguos de ${pending.length} pendientes.`
-                    : `Mostrando los ${pending.length} reportes pendientes.`;
+                visibleInfo.textContent =
+                    `Pendientes totales: ${pending.length}. ` +
+                    `En proceso: ${inProcess.length}. ` +
+                    (
+                        available.length > visible.length
+                            ? `Mostrando los ${visible.length} disponibles más antiguos de ${available.length}.`
+                            : `Disponibles para tomar: ${available.length}.`
+                    );
             }
 
             if (window.lucide) lucide.createIcons();
@@ -4407,36 +4830,222 @@ if (fo.endDate && order.dueDate) {
                 .replace(/'/g, "&#039;");
         }
 
+        function fillBacklogResponsables() {
+            const select = document.getElementById("backlog-responsable-select");
+            if (!select) return;
+
+            const current = select.value;
+            const names = getResponsablesMonitor();
+
+            select.innerHTML = '<option value="">Selecciona responsable...</option>';
+
+            names.forEach(name => {
+                const option = document.createElement("option");
+                option.value = name;
+                option.textContent = name;
+                select.appendChild(option);
+            });
+
+            if (current && names.includes(current)) {
+                select.value = current;
+            }
+        }
+
+        function openBacklogTakeModal(item) {
+            backlogSelectedItem = item;
+            backlogSelectedControl = null;
+            backlogModalMode = "take";
+
+            document.getElementById("backlog-modal-report").textContent = item.reporte;
+            document.getElementById("backlog-take-content").style.display = "block";
+            document.getElementById("backlog-release-content").style.display = "none";
+
+            const actionBtn = document.getElementById("backlog-main-action");
+            actionBtn.textContent = "Tomar reporte";
+            actionBtn.className = "backlog-btn primary";
+
+            setBacklogModalError("");
+            fillBacklogResponsables();
+
+            document.getElementById("backlog-responsable-select").value = "";
+            document.getElementById("backlog-modal-overlay").classList.add("show");
+        }
+
+        function openBacklogReleaseModal(item, control) {
+            backlogSelectedItem = item;
+            backlogSelectedControl = control;
+            backlogModalMode = "release";
+
+            document.getElementById("backlog-modal-report").textContent = item.reporte;
+            document.getElementById("backlog-take-content").style.display = "none";
+            document.getElementById("backlog-release-content").style.display = "block";
+            document.getElementById("backlog-current-responsable").textContent =
+                control && control.RESPONSABLE ? control.RESPONSABLE : "Sin responsable";
+
+            const actionBtn = document.getElementById("backlog-main-action");
+            actionBtn.textContent = "Liberar reporte";
+            actionBtn.className = "backlog-btn release";
+
+            setBacklogModalError("");
+            document.getElementById("backlog-modal-overlay").classList.add("show");
+        }
+
+        function closeBacklogModal() {
+            if (backlogActionBusy) return;
+            const overlay = document.getElementById("backlog-modal-overlay");
+            if (overlay) overlay.classList.remove("show");
+            backlogSelectedItem = null;
+            backlogSelectedControl = null;
+            setBacklogModalError("");
+        }
+
+        function backlogOverlayClick(event) {
+            if (event.target && event.target.id === "backlog-modal-overlay") {
+                closeBacklogModal();
+            }
+        }
+
+        function setBacklogModalError(message) {
+            const el = document.getElementById("backlog-modal-error");
+            if (!el) return;
+            el.textContent = message || "";
+            el.classList.toggle("show", Boolean(message));
+        }
+
+        async function submitBacklogAction() {
+            if (backlogActionBusy || !backlogSelectedItem) return;
+
+            if (backlogModalMode === "take") {
+                const select = document.getElementById("backlog-responsable-select");
+                const responsable = String(select ? select.value : "").trim();
+
+                if (!responsable) {
+                    setBacklogModalError("Selecciona quién va a trabajar este reporte.");
+                    return;
+                }
+
+                await postBacklogAction({
+                    action: "backlog_tomar",
+                    secret: AI_DASHBOARD_SECRET,
+                    id_captura: backlogSelectedItem.id,
+                    numero_reporte: backlogSelectedItem.reporte,
+                    responsable
+                });
+            } else {
+                await postBacklogAction({
+                    action: "backlog_liberar",
+                    secret: AI_DASHBOARD_SECRET,
+                    id_captura: backlogSelectedItem.id
+                });
+            }
+        }
+
+        async function postBacklogAction(payload) {
+            const actionBtn = document.getElementById("backlog-main-action");
+
+            backlogActionBusy = true;
+            if (actionBtn) {
+                actionBtn.disabled = true;
+                actionBtn.textContent = backlogModalMode === "take"
+                    ? "Asignando..."
+                    : "Liberando...";
+            }
+
+            setBacklogModalError("");
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "text/plain;charset=utf-8"
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+
+                if (!result.success) {
+                    throw new Error(result.error || "No fue posible actualizar el backlog.");
+                }
+
+                const overlay = document.getElementById("backlog-modal-overlay");
+                if (overlay) overlay.classList.remove("show");
+
+                backlogSelectedItem = null;
+                backlogSelectedControl = null;
+
+                await refreshMonitorData(true);
+            } catch (err) {
+                setBacklogModalError(err.message || "Error al actualizar el reporte.");
+            } finally {
+                backlogActionBusy = false;
+
+                if (actionBtn) {
+                    actionBtn.disabled = false;
+                    actionBtn.textContent = backlogModalMode === "take"
+                        ? "Tomar reporte"
+                        : "Liberar reporte";
+                }
+            }
+        }
+
+        document.addEventListener("keydown", event => {
+            if (event.key === "Escape") {
+                const overlay = document.getElementById("backlog-modal-overlay");
+                if (overlay && overlay.classList.contains("show")) {
+                    closeBacklogModal();
+                }
+            }
+        });
+
         async function refreshMonitorData(showBusy = false) {
             if (monitorFetchInProgress) return;
             monitorFetchInProgress = true;
 
             const info = document.getElementById("monitor-visible-info");
-            if (showBusy && info) info.textContent = "Actualizando CAPTURA...";
+            if (showBusy && info) info.textContent = "Actualizando CAPTURA y asignaciones...";
 
             try {
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 180000);
+                const now = Date.now();
 
-                const url =
+                const reportesUrl =
                     API_URL +
                     "?action=data&key=" + encodeURIComponent(API_KEY) +
-                    "&sheet=CAPTURA&t=" + Date.now();
+                    "&sheet=CAPTURA&t=" + now;
 
-                const response = await fetch(url, { signal: controller.signal });
+                const backlogUrl =
+                    API_URL +
+                    "?action=backlog_control&t=" + now;
+
+                const [reportesResponse, backlogResponse] = await Promise.all([
+                    fetch(reportesUrl, { signal: controller.signal }),
+                    fetch(backlogUrl, { signal: controller.signal })
+                ]);
+
                 clearTimeout(timeoutId);
 
-                const result = await response.json();
-                if (!result.success) {
-                    throw new Error(result.error || "La API no devolvió CAPTURA correctamente.");
+                const [reportesResult, backlogResult] = await Promise.all([
+                    reportesResponse.json(),
+                    backlogResponse.json()
+                ]);
+
+                if (!reportesResult.success) {
+                    throw new Error(reportesResult.error || "La API no devolvió CAPTURA correctamente.");
                 }
 
-                const rows = (result.data || []).filter(r =>
+                if (!backlogResult.success) {
+                    throw new Error(backlogResult.error || "No se pudo leer BACKLOG_CONTROL.");
+                }
+
+                const rows = (reportesResult.data || []).filter(r =>
                     String(getReportField(r, ["N° Reporte", "No Reporte", "Reporte"]) || "").trim() !== ""
                 );
 
                 window.state.rawReportesPND = rows;
                 window.state.normalizedReportesPND = rows;
+                window.state.backlogControl = backlogResult.data || [];
 
                 const nowText = new Date().toLocaleTimeString("es-MX", {
                     hour: "2-digit",
@@ -4452,8 +5061,12 @@ if (fo.endDate && order.dueDate) {
 
                 renderMonitorPendientes();
             } catch (err) {
-                console.warn("Monitor pendientes: no se pudo actualizar CAPTURA", err);
-                if (info) info.textContent = "No se pudo actualizar en este intento. Se conservan los datos anteriores.";
+                console.warn("Monitor pendientes: no se pudo actualizar", err);
+                if (info) {
+                    info.textContent =
+                        "No se pudo actualizar en este intento: " +
+                        (err.message || "error desconocido");
+                }
             } finally {
                 monitorFetchInProgress = false;
             }
