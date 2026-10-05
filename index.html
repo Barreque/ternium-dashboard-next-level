@@ -2496,14 +2496,11 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         }
 
         function updateOnlineStatus() {
-            const banner = document.getElementById("pwa-offline-banner");
-            if (!banner) return;
-            banner.classList.toggle("show", !navigator.onLine);
-        }
+    const banner = document.getElementById("pwa-offline-banner");
+    if (!banner) return;
 
-        window.addEventListener("online", updateOnlineStatus);
-        window.addEventListener("offline", updateOnlineStatus);
-        document.addEventListener("DOMContentLoaded", updateOnlineStatus);
+    banner.classList.remove("show");
+}
 
 
         // --- COORDINATES OF TERNIUM INDUSTRIAL PLANTS ---
