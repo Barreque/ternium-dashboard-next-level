@@ -4706,25 +4706,15 @@ if (fo.endDate && order.dueDate) {
         }
 
         function getResponsablesMonitor() {
-            const source = window.state.normalizedReportesPND || window.state.rawReportesPND || [];
-            const names = new Set();
-
-            source.forEach(r => {
-                [
-                    getReportField(r, ["Tecnico", "Técnico"]),
-                    getReportField(r, ["Auxiliar Tecnico", "Auxiliar Técnico"])
-                ].forEach(value => {
-                    String(value || "")
-                        .split(/[,;/]+/)
-                        .map(x => x.trim())
-                        .filter(Boolean)
-                        .forEach(x => names.add(x));
-                });
-            });
-
-            return Array.from(names).sort((a, b) =>
-                a.localeCompare(b, "es", { sensitivity: "base" })
-            );
+            return [
+                "Fernando",
+                "Luisiana",
+                "Eliud",
+                "Angelica",
+                "Selene",
+                "Luis",
+                "Eduardo"
+            ];
         }
 
         function renderMonitorPendientes() {
