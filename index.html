@@ -4693,31 +4693,69 @@ if (fo.endDate && order.dueDate) {
         function delayDate(row,names){return parseReportDate(delayField(row,names));}
         function delayDateText(date){return date && !isNaN(date.getTime())?date.toLocaleString('es-MX',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'Sin fecha registrada';}
         function delayDays(from,to){if(!from||isNaN(from.getTime()))return null;let a=new Date(from.getFullYear(),from.getMonth(),from.getDate()).getTime();let b=new Date(to.getFullYear(),to.getMonth(),to.getDate()).getTime();return Math.max(0,Math.floor((b-a)/86400000));}
+        // Reproducción del IFS de [ESTADO_PROCESO] de AppSheet en el mismo orden.
+        // Las fechas sirven para medir tiempos; NO determinan la responsabilidad.
+        function delayAppStatus(r){
+          const f=names=>delayField(r,names);
+          const n=names=>normalizeText(f(names));
+          const filled=names=>{const v=f(names);return v!==null&&v!==undefined&&String(v).trim()!=='';};
+          const form=n(['EstadoFormulario','Estado Formulario']);
+          const review=n(['REVISION_ESTADO']);
+          const sign=n(['FIRMA_ESTADO']);
+          const signed=filled(['Firma'])||(sign==='FIRMADO'&&filled(['FIRMA_FOLIO']));
+          const prelim=filled(['PRELIM_FECHA_GENERADO'])||filled(['PRELIM_PDF_ID'])||filled(['PRELIM_PDF_URL']);
+          const finalSent=isReporteFinalEnviado(r);
+          if(form==='FISICO')return 'FÍSICO / CAPTURA';
+          if(review==='APROBADO'&&finalSent&&signed)return 'FINALIZADO';
+          if(review==='APROBADO'&&!finalSent&&signed)return 'PENDIENTE ENVÍO CORREO';
+          if(review==='CORRECCION')return 'CORRECCIÓN';
+          if(!filled(['Firma'])&&(sign==='GENERAR CONSTANCIA'||sign==='GENERANDO CONSTANCIA'))return 'PENDIENTE GENERAR CONSTANCIA';
+          if(!filled(['Firma'])&&sign!=='FIRMADO'&&(sign==='LISTO PARA FIRMA'||prelim))return 'PENDIENTE FIRMA CONSTANCIA';
+          if(review==='APROBADO'&&!filled(['Firma'])&&sign!=='FIRMADO'&&!prelim)return 'PENDIENTE GENERAR CONSTANCIA';
+          const hasAviso=String(f(['Estatus'])??'').toUpperCase().split(',').map(s=>normalizeText(s.replace(/[\[\]"]/g,''))).includes('AVISO M8');
+          if(review==='PENDIENTE'&&filled(['XLSX_RUTA'])&&hasAviso&&!filled(['N° Aviso','N Aviso','Numero Aviso']))return 'PENDIENTE GENERAR AVISO M8';
+          if(review==='PENDIENTE')return 'PENDIENTE DE REVISIÓN';
+          if(sign==='FIRMADO')return 'FIRMADO';
+          if(form==='BORRADOR')return 'BORRADOR';
+          if(form==='COMPLETADO')return 'FINALIZADO';
+          return 'FINALIZADO';
+        }
         function delayStage(item){
-          const r=item.row;
+          const r=item.row,status=delayAppStatus(r);
           const signed=delayDate(r,['FIRMA_FECHA']);
           const revision=delayDate(r,['FECHA_ENVIO_REVISION']);
           const approved=delayDate(r,['FECHA_APROBACION']);
+          const aviso=delayDate(r,['FECHA_GENERACION_AVISO']);
           const sent=delayDate(r,['FECHA_ENVIO_FINAL']);
           const uploaded=delayDate(r,['FECHA_CARGA_SISTEMA']);
-          const uploadState=normalizeText(delayField(r,['ESTADO_CARGA_SISTEMA']));
-          const milestones=[{name:'Servicio',date:item.fecha},{name:'Firma',date:signed},{name:'Envío a revisión',date:revision},{name:'Aprobación',date:approved},{name:'Envío final',date:sent},{name:'Carga',date:uploaded}];
-          let name='Firma',started=item.fecha;
-          if(signed){name='Envío a revisión';started=signed;}
-          if(revision){name='Pendiente de revisión';started=revision; const estadoRevision=normalizeText(delayField(r,['REVISION_ESTADO'])); if(estadoRevision==='EN REVISION'||estadoRevision==='REVISION EN PROCESO')name='En revisión';}
-          if(approved){name='Envío final';started=approved;}
-          if(sent){name='Carga';started=sent;}
-          if(uploaded||uploadState==='CARGADO'){name='Finalizado';started=uploaded||sent;}
-          // Una fecha posterior, aunque falte una intermedia, demuestra el avance.
-          const last=milestones.filter(x=>x.date).slice(-1)[0];
-          if(last && last.date && last.date>started)started=last.date;
-          return {name,started,milestones,stageDays:delayDays(started,new Date()),totalDays:delayDays(item.fecha,new Date()),uploaded:!!uploaded||uploadState==='CARGADO'};
+          const isUploaded=!!uploaded||normalizeText(delayField(r,['ESTADO_CARGA_SISTEMA']))==='CARGADO';
+          const milestones=[{name:'Servicio',date:item.fecha},{name:'Firma',date:signed},{name:'Envío a revisión',date:revision},{name:'Aprobación',date:approved},{name:'Aviso M8',date:aviso},{name:'Envío por correo',date:sent},{name:'Carga Ternium',date:uploaded}];
+          let name,started=null;
+          switch(status){
+            case 'BORRADOR':name='Borrador';started=item.fecha;break;
+            case 'PENDIENTE GENERAR CONSTANCIA':name='Generar constancia';started=item.fecha;break;
+            case 'PENDIENTE FIRMA CONSTANCIA':name='Firma';started=delayDate(r,['PRELIM_FECHA_GENERADO']);break;
+            case 'FIRMADO':name='Envío a revisión';started=signed;break;
+            case 'PENDIENTE DE REVISIÓN':name='Pendiente de revisión';started=revision;break;
+            case 'CORRECCIÓN':name='Corrección';started=null;break; // Falta fecha de devolución a corrección.
+            case 'PENDIENTE GENERAR AVISO M8':name='Generar aviso';started=approved||revision;break;
+            case 'PENDIENTE ENVÍO CORREO':name='Envío final';started=aviso||approved;break;
+            case 'FÍSICO / CAPTURA':name='Físico / Captura';started=null;break;
+            case 'FINALIZADO':
+              // AppSheet marca FINALIZADO al enviar correo. Aún puede faltar carga Ternium.
+              if(isUploaded){name='Finalizado';started=uploaded;}
+              else if(isReporteFinalEnviado(r)){name='Carga';started=sent;}
+              else{name='Finalizado';started=null;}
+              break;
+            default:name='Estado por revisar';
+          }
+          return {name,status,started,milestones,stageDays:delayDays(started,new Date()),totalDays:delayDays(item.fecha,new Date()),uploaded:isUploaded};
         }
-        // Propietario operativo de cada fase: no atribuir al técnico retrasos administrativos.
-        function delayStageOwner(stage, tech){
-          if(stage==='Firma'||stage==='Envío a revisión')return tech||'Técnico sin identificar';
-          if(stage==='Pendiente de revisión'||stage==='En revisión'||stage==='Aprobación'||stage==='Envío final')return 'César Jiménez';
-          if(stage==='Carga')return 'Selene Martínez';
+        function delayStageOwner(stage,tech){
+          if(['Borrador','Generar constancia','Firma','Envío a revisión','Corrección'].includes(stage))return tech||'Técnico sin identificar';
+          if(['Pendiente de revisión','Envío final'].includes(stage))return 'César Jiménez';
+          if(['Carga','Generar aviso'].includes(stage))return 'Selene Martínez';
+          if(stage==='Físico / Captura')return 'Área de Captura';
           return 'Finalizado';
         }
         // Separación explícita: el historial anterior al 25/09/2026 NO entra al ranking individual.
@@ -4731,7 +4769,7 @@ if (fo.endDate && order.dueDate) {
             const id=String(delayField(r,['ID'])||'').trim();
             const fecha=parseReportDate(delayField(r,['Fecha']));
             const state=normalizeText(delayField(r,['EstadoFormulario','Estado Formulario']));
-            if(['CANCELADO','CANCELACION','FISICO'].includes(state))return;
+            if(['CANCELADO','CANCELACION'].includes(state))return;
             unique.set(id||('R:'+reporte),{id,reporte,fecha,row:r});
           });
           const map=getBacklogActiveMap(), nuevos=[], historicos=[], sinFecha=[];
@@ -4744,13 +4782,17 @@ if (fo.endDate && order.dueDate) {
               if(!isReporteFinalEnviado(r))sinFecha.push({...base,name:'Fecha por validar',owner:'Área de Captura',stageDays:null,totalDays:null});
               return;
             }
+            if(normalizeText(delayField(r,['EstadoFormulario']))==='FISICO'){
+              historicos.push({...base,name:'Físico / Captura',owner:'Área de Captura',stageDays:null,totalDays:delayDays(item.fecha,new Date())});
+              return;
+            }
             if(item.fecha<MONITOR_FECHA_NUEVO_FLUJO){
               // Histórico: sólo se considera pendiente si no está marcado como enviado.
               if(!isReporteFinalEnviado(r))historicos.push({...base,name:'Área de Captura',owner:'Área de Captura',stageDays:delayDays(item.fecha,new Date()),totalDays:delayDays(item.fecha,new Date())});
               return;
             }
             const st=delayStage(item);
-            if(st.uploaded)return;
+            if(st.uploaded||st.name==='Finalizado')return;
             nuevos.push({...base,...st,owner:delayStageOwner(st.name,base.tech)});
           });
           const byDelay=(a,b)=>(b.stageDays??-1)-(a.stageDays??-1)||(b.totalDays??-1)-(a.totalDays??-1);
@@ -4854,7 +4896,7 @@ if (fo.endDate && order.dueDate) {
           const grid=document.getElementById('monitor-inprogress-grid');grid.innerHTML=process.slice(0,30).map(x=>`<div class="monitor-process-tile" data-id="${escapeHtmlMonitor(x.id)}"><div class="monitor-process-number">${escapeHtmlMonitor(x.reporte)}</div><div class="monitor-process-responsible">${escapeHtmlMonitor(x.assigned)}</div><div class="monitor-process-state">${x.stageDays??'S/F'} días · EN PROCESO</div></div>`).join('')||'<div class="delay-empty">No hay asignaciones activas</div>';
           grid.querySelectorAll('[data-id]').forEach(e=>e.addEventListener('click',()=>{const x=all.find(t=>t.id===e.dataset.id);if(x)openBacklogReleaseModal(x,getBacklogActiveMap().get(x.id));}));
           const avail=document.getElementById('monitor-report-grid');avail.innerHTML=all.filter(x=>!x.assigned).slice(0,25).map(x=>`<button data-id="${escapeHtmlMonitor(x.id)}">${escapeHtmlMonitor(x.reporte)}</button>`).join('');avail.querySelectorAll('button').forEach(e=>e.addEventListener('click',()=>{const x=all.find(t=>t.id===e.dataset.id);if(x?.id)openBacklogTakeModal(x);}));
-          write('monitor-visible-info',`Mostrando ${visible.length} de ${selected.length} reportes. Fechas ausentes: S/F. El ranking atribuye la espera al responsable de la etapa actual; valida fechas faltantes antes de tomar decisiones.`);
+          write('monitor-visible-info',`Mostrando ${visible.length} de ${selected.length} reportes. Fechas ausentes: S/F. La responsabilidad se determina por el estado AppSheet. S/F significa que no hay fecha suficiente para calcular el atraso de esa etapa.`);
           // Histórico en sección independiente: no afecta promedios ni rankings del flujo nuevo.
           write('delay-historical-total',split.historicos.length.toLocaleString('es-MX'));
           write('delay-undated-total',split.sinFecha.length.toLocaleString('es-MX'));
