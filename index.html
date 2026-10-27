@@ -2918,11 +2918,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         <!-- TAB 4: MONITOR GERENCIAL DE ATRASOS -->
         <div id="view-monitor" class="view-section">
           <section class="delay-shell">
-            <div class="delay-head"><div><h2>Monitor de Reportes Pendientes</h2><p>Reportes con mayor atraso, etapa detenida y técnicos asociados. Seguimiento basado en CAPTURA.</p></div><div class="delay-head-actions"><span id="monitor-last-update">—</span><button class="delay-btn" onclick="refreshMonitorData(true)">↻ Actualizar ahora</button><button class="delay-btn secondary" onclick="toggleMonitorFullscreen()">⛶ Pantalla completa</button></div></div>
+            <div class="delay-head"><div><h2>Monitor de Reportes Pendientes</h2><p>Nuevo flujo desde el 25/09/2026. Históricos separados para Área de Captura.</p></div><div class="delay-head-actions"><span id="monitor-last-update">—</span><button class="delay-btn" onclick="refreshMonitorData(true)">↻ Actualizar ahora</button><button class="delay-btn secondary" onclick="toggleMonitorFullscreen()">⛶ Pantalla completa</button></div></div>
             <div class="delay-filters"><label>PLANTA<select id="delay-filter-plant" onchange="renderMonitorPendientes()"><option value="">Todas las plantas</option></select></label><label>TÉCNICO<select id="delay-filter-tech" onchange="renderMonitorPendientes()"><option value="">Todos los técnicos</option></select></label><label>RESPONSABLE DE ETAPA<select id="delay-filter-owner" onchange="renderMonitorPendientes()"><option value="">Todos los responsables</option></select></label><label>ETAPA<select id="delay-filter-stage" onchange="renderMonitorPendientes()"><option value="">Todas las etapas</option><option value="Firma">Firma</option><option value="Revisión">Envío a revisión</option><option value="Aprobación">Aprobación</option><option value="Envío final">Envío por correo</option><option value="Carga">Carga en sistema</option></select></label><label>BUSCAR<input id="delay-filter-search" placeholder="N° reporte, equipo, responsable..." oninput="renderMonitorPendientes()"></label><button class="delay-btn secondary" onclick="resetDelayFilters()">Limpiar</button></div>
-            <div class="delay-kpis"><div class="delay-kpi"><small>REPORTES PENDIENTES</small><strong id="delay-kpi-total">—</strong><span>Sin cierre de carga a sistema</span></div><div class="delay-kpi red"><small>CRÍTICOS · MÁS DE 7 DÍAS</small><strong id="delay-kpi-critical">—</strong><span>En la etapa actual</span></div><div class="delay-kpi orange"><small>ATRASO PROMEDIO</small><strong id="delay-kpi-average">—</strong><span>Días en la etapa actual</span></div><div class="delay-kpi"><small>RESPONSABLE CON MÁS ATRASO</small><strong id="delay-kpi-person">—</strong><span id="delay-kpi-person-sub">Responsable de etapa</span></div><div class="delay-kpi"><small>PENDIENTES DE FIRMA</small><strong id="delay-kpi-sign">—</strong><span>Sin constancia firmada</span></div><div class="delay-kpi purple"><small>PENDIENTES DE CARGA</small><strong id="delay-kpi-upload">—</strong><span>Enviados, sin carga confirmada</span></div></div>
-            <div class="delay-two"><div class="delay-panel"><div class="delay-panel-head"><h3>Responsables con mayor atraso</h3><p>Días acumulados de espera por etapa: técnico, César Jiménez o Selene Martínez.</p></div><div id="delay-ranking"></div></div><div class="delay-panel"><div class="delay-panel-head"><h3>Antigüedad en etapa actual</h3><p>Distribución de reportes por días esperando el siguiente paso.</p></div><div id="delay-buckets"></div><div class="delay-legend">Umbrales de seguimiento configurables: atención 3–7 días, crítico más de 7 días.</div></div></div>
-            <div class="delay-panel delay-table-panel"><div class="delay-panel-head"><h3>Reportes más atrasados <span id="monitor-pending-total" class="delay-count">0</span></h3><p>Ordenados por días en la etapa actual. Haz clic en un reporte para ver todo su historial.</p><div id="monitor-visible-info"></div></div><div class="delay-table-scroll"><table class="delay-table"><thead><tr><th>REPORTE</th><th>PLANTA / EQUIPO</th><th>TÉCNICO ASOCIADO</th><th>ETAPA ACTUAL</th><th>RESPONSABLE DE ETAPA</th><th>DÍAS EN ETAPA</th><th>DÍAS TOTALES</th><th>ASIGNADO A</th><th>SEGUIMIENTO</th></tr></thead><tbody id="delay-report-rows"></tbody></table></div></div>
+            <div class="delay-kpis"><div class="delay-kpi"><small>NUEVO FLUJO · PENDIENTES</small><strong id="delay-kpi-total">—</strong><span>Sin cierre de carga a sistema</span></div><div class="delay-kpi red"><small>CRÍTICOS · MÁS DE 7 DÍAS</small><strong id="delay-kpi-critical">—</strong><span>En la etapa actual</span></div><div class="delay-kpi orange"><small>ATRASO PROMEDIO</small><strong id="delay-kpi-average">—</strong><span>Días en la etapa actual</span></div><div class="delay-kpi"><small>MAYOR ATRASO · FLUJO NUEVO</small><strong id="delay-kpi-person">—</strong><span id="delay-kpi-person-sub">Responsable de etapa</span></div><div class="delay-kpi"><small>PENDIENTES DE FIRMA</small><strong id="delay-kpi-sign">—</strong><span>Sin constancia firmada</span></div><div class="delay-kpi purple"><small>PENDIENTES DE CARGA</small><strong id="delay-kpi-upload">—</strong><span>Enviados, sin carga confirmada</span></div></div>
+            <div class="delay-two"><div class="delay-panel"><div class="delay-panel-head"><h3>Responsables con mayor atraso · flujo nuevo</h3><p>Días acumulados de espera por etapa: técnico, César Jiménez o Selene Martínez.</p></div><div id="delay-ranking"></div></div><div class="delay-panel"><div class="delay-panel-head"><h3>Antigüedad en etapa actual</h3><p>Distribución de reportes por días esperando el siguiente paso.</p></div><div id="delay-buckets"></div><div class="delay-legend">Umbrales de seguimiento configurables: atención 3–7 días, crítico más de 7 días.</div></div></div>
+            <div class="delay-panel delay-table-panel"><div class="delay-panel-head"><h3>Reportes más atrasados · flujo nuevo <span id="monitor-pending-total" class="delay-count">0</span></h3><p>Ordenados por días en la etapa actual. Haz clic en un reporte para ver todo su historial.</p><div id="monitor-visible-info"></div></div><div class="delay-table-scroll"><table class="delay-table"><thead><tr><th>REPORTE</th><th>PLANTA / EQUIPO</th><th>TÉCNICO ASOCIADO</th><th>ETAPA ACTUAL</th><th>RESPONSABLE DE ETAPA</th><th>DÍAS EN ETAPA</th><th>DÍAS TOTALES</th><th>ASIGNADO A</th><th>SEGUIMIENTO</th></tr></thead><tbody id="delay-report-rows"></tbody></table></div></div>
+            <div class="delay-panel delay-table-panel"><div class="delay-panel-head"><h3>Históricos pendientes · Área de Captura <span id="delay-historical-total" class="delay-count">0</span></h3><p>Servicios anteriores al 25/09/2026 sin REPORTE_FINAL_ENVIADO confirmado. No se incluyen en los rankings de técnicos, César ni Selene.</p><p>Registros sin fecha de servicio para validar: <b id="delay-undated-total">0</b>. Los reportes anteriores ya marcados como enviados no se presumen pendientes de carga.</p></div><div class="delay-table-scroll"><table class="delay-table"><thead><tr><th>REPORTE</th><th>PLANTA</th><th>FECHA SERVICIO</th><th>ÁREA RESPONSABLE</th><th>DÍAS DESDE SERVICIO</th><th>ASIGNADO A</th></tr></thead><tbody id="delay-historical-rows"></tbody></table></div></div>
             <div class="delay-panel"><div class="delay-panel-head"><h3>Asignaciones en proceso <span id="monitor-inprogress-count" class="delay-count">0</span></h3><p>Conserva el flujo actual para tomar y liberar reportes pendientes.</p></div><div id="monitor-inprogress-grid" class="monitor-inprogress-grid"></div><div class="delay-footer"><span>Reportes disponibles para asignar: <b id="monitor-available-count">0</b></span><div id="monitor-report-grid" class="delay-available-grid"></div></div></div>
             <div id="delay-detail-overlay" class="delay-overlay" onclick="if(event.target===this)closeDelayDetail()"><div class="delay-detail"><button class="delay-close" onclick="closeDelayDetail()">×</button><div id="delay-detail-content"></div></div></div>
           </section>
@@ -4706,37 +4707,48 @@ if (fo.endDate && order.dueDate) {
           if(stage==='Carga')return 'Selene Martínez';
           return 'Finalizado';
         }
-        function delayRows(){
-          // Pendientes sin envío + enviados del flujo nuevo pendientes de carga.
-          // Se excluyen los históricos anteriores al flujo con fechas confiables,
-          // para no crear artificialmente cientos de pendientes de carga antiguos.
+        // Separación explícita: el historial anterior al 25/09/2026 NO entra al ranking individual.
+        const MONITOR_FECHA_NUEVO_FLUJO = new Date(2026, 8, 25);
+        function delaySplitRows(){
           const original=window.state.normalizedReportesPND||window.state.rawReportesPND||[];
-          const baseline=new Date(2026,8,23);
           const unique=new Map();
           original.forEach(r=>{
             const reporte=String(delayField(r,['N° Reporte','No Reporte','Reporte'])||'').trim();
             if(!reporte)return;
             const id=String(delayField(r,['ID'])||'').trim();
             const fecha=parseReportDate(delayField(r,['Fecha']));
-            const finalSent=isReporteFinalEnviado(r);
-            if(finalSent && (!fecha || fecha<baseline))return;
             const state=normalizeText(delayField(r,['EstadoFormulario','Estado Formulario']));
             if(['CANCELADO','CANCELACION','FISICO'].includes(state))return;
             unique.set(id||('R:'+reporte),{id,reporte,fecha,row:r});
           });
-          const current=[...unique.values()];
-          const map=getBacklogActiveMap();
-          // Cuando la carga esté registrada, el reporte deja de estar pendiente aunque no se haya actualizado el otro indicador.
-          return current.map(item=>{
+          const map=getBacklogActiveMap(), nuevos=[], historicos=[], sinFecha=[];
+          unique.forEach(item=>{
+            const r=item.row;
+            const uploaded=!!delayDate(r,['FECHA_CARGA_SISTEMA'])||normalizeText(delayField(r,['ESTADO_CARGA_SISTEMA']))==='CARGADO';
+            if(uploaded)return;
+            const base={...item,plant:String(delayField(r,['Planta'])||'Sin planta'),tech:String(delayField(r,['Tecnico','Técnico'])||'Sin técnico'),equipment:String(delayField(r,['Equipo'])||''),assigned:map.get(item.id)?.RESPONSABLE||''};
+            if(!item.fecha){
+              if(!isReporteFinalEnviado(r))sinFecha.push({...base,name:'Fecha por validar',owner:'Área de Captura',stageDays:null,totalDays:null});
+              return;
+            }
+            if(item.fecha<MONITOR_FECHA_NUEVO_FLUJO){
+              // Histórico: sólo se considera pendiente si no está marcado como enviado.
+              if(!isReporteFinalEnviado(r))historicos.push({...base,name:'Área de Captura',owner:'Área de Captura',stageDays:delayDays(item.fecha,new Date()),totalDays:delayDays(item.fecha,new Date())});
+              return;
+            }
             const st=delayStage(item);
-            return {...item,...st,plant:String(delayField(item.row,['Planta'])||'Sin planta'),tech:String(delayField(item.row,['Tecnico','Técnico'])||'Sin técnico'),equipment:String(delayField(item.row,['Equipo'])||''),assigned:map.get(item.id)?.RESPONSABLE||'',owner:delayStageOwner(st.name,String(delayField(item.row,['Tecnico','Técnico'])||'Sin técnico'))};
-          }).filter(x=>!x.uploaded).sort((a,b)=>(b.stageDays??-1)-(a.stageDays??-1)||(b.totalDays??-1)-(a.totalDays??-1));
+            if(st.uploaded)return;
+            nuevos.push({...base,...st,owner:delayStageOwner(st.name,base.tech)});
+          });
+          const byDelay=(a,b)=>(b.stageDays??-1)-(a.stageDays??-1)||(b.totalDays??-1)-(a.totalDays??-1);
+          return {nuevos:nuevos.sort(byDelay),historicos:historicos.sort(byDelay),sinFecha};
         }
+        function delayRows(){return delaySplitRows().nuevos;}
         function updateDelaySelect(id,items){const el=document.getElementById(id);if(!el)return;const old=el.value;const first=el.options[0].textContent;el.innerHTML='<option value="">'+escapeHtmlMonitor(first)+'</option>'+[...new Set(items.filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es')).map(v=>'<option value="'+escapeHtmlMonitor(v)+'">'+escapeHtmlMonitor(v)+'</option>').join('');el.value=old;}
         function resetDelayFilters(){['delay-filter-plant','delay-filter-tech','delay-filter-owner','delay-filter-stage','delay-filter-search'].forEach(id=>{const x=document.getElementById(id);if(x)x.value='';});renderMonitorPendientes();}
         function renderMonitorPendientes(){
           if(!document.getElementById('delay-report-rows'))return;
-          const all=delayRows();updateDelaySelect('delay-filter-plant',all.map(x=>x.plant));updateDelaySelect('delay-filter-tech',all.map(x=>x.tech));updateDelaySelect('delay-filter-owner',all.map(x=>x.owner));
+          const split=delaySplitRows();const all=split.nuevos;updateDelaySelect('delay-filter-plant',all.map(x=>x.plant));updateDelaySelect('delay-filter-tech',all.map(x=>x.tech));updateDelaySelect('delay-filter-owner',all.map(x=>x.owner));
           const f=id=>String(document.getElementById(id)?.value||'');
           const query=normalizeText(f('delay-filter-search'));
           const selected=all.filter(x=>(!f('delay-filter-plant')||x.plant===f('delay-filter-plant'))&&(!f('delay-filter-tech')||x.tech===f('delay-filter-tech'))&&(!f('delay-filter-owner')||x.owner===f('delay-filter-owner'))&&(!f('delay-filter-stage')||x.name===f('delay-filter-stage'))&&(!query||normalizeText([x.reporte,x.tech,x.owner,x.plant,x.equipment,x.assigned].join(' ')).includes(query)));
@@ -4754,6 +4766,10 @@ if (fo.endDate && order.dueDate) {
           grid.querySelectorAll('[data-id]').forEach(e=>e.addEventListener('click',()=>{const x=all.find(t=>t.id===e.dataset.id);if(x)openBacklogReleaseModal(x,getBacklogActiveMap().get(x.id));}));
           const avail=document.getElementById('monitor-report-grid');avail.innerHTML=all.filter(x=>!x.assigned).slice(0,25).map(x=>`<button data-id="${escapeHtmlMonitor(x.id)}">${escapeHtmlMonitor(x.reporte)}</button>`).join('');avail.querySelectorAll('button').forEach(e=>e.addEventListener('click',()=>{const x=all.find(t=>t.id===e.dataset.id);if(x?.id)openBacklogTakeModal(x);}));
           write('monitor-visible-info',`Mostrando ${Math.min(150,selected.length)} de ${selected.length} reportes. Fechas ausentes: S/F. El ranking atribuye la espera al responsable de la etapa actual; valida fechas faltantes antes de tomar decisiones.`);
+          // Histórico en sección independiente: no afecta promedios ni rankings del flujo nuevo.
+          write('delay-historical-total',split.historicos.length.toLocaleString('es-MX'));
+          write('delay-undated-total',split.sinFecha.length.toLocaleString('es-MX'));
+          document.getElementById('delay-historical-rows').innerHTML=split.historicos.slice(0,100).map(x=>`<tr><td><b>${escapeHtmlMonitor(x.reporte)}</b></td><td>${escapeHtmlMonitor(x.plant)}</td><td>${escapeHtmlMonitor(delayDateText(x.fecha))}</td><td><b>Área de Captura</b></td><td>${x.totalDays??'S/F'}</td><td>${escapeHtmlMonitor(x.assigned||'Sin asignar')}</td></tr>`).join('')||'<tr><td colspan="6" class="delay-empty">No hay pendientes históricos según REPORTE_FINAL_ENVIADO.</td></tr>';
           if(window.lucide)lucide.createIcons();
         }
         function openDelayDetail(index){const x=window.delayCurrentRows?.[index];if(!x)return;const overlay=document.getElementById('delay-detail-overlay');const content=document.getElementById('delay-detail-content');let steps=x.milestones.map((m,i)=>{const prev=x.milestones[i-1];const delta=i&&m.date&&prev?.date?delayDays(prev.date,m.date):null;return `<div class="delay-timeline-item"><strong>${i+1}. ${escapeHtmlMonitor(m.name)}</strong><span>${escapeHtmlMonitor(delayDateText(m.date))}</span>${delta!==null?`<span style="display:block;color:#ffad46">${delta} días desde la etapa anterior</span>`:''}</div>`;}).join('');content.innerHTML=`<h2>Reporte ${escapeHtmlMonitor(x.reporte)}</h2><p class="delay-note">${escapeHtmlMonitor(x.plant)} · ${escapeHtmlMonitor(x.equipment)}<br>Técnico: <b>${escapeHtmlMonitor(x.tech)}</b> · Responsable de etapa: <b>${escapeHtmlMonitor(x.owner)}</b> · Asignación operativa: <b>${escapeHtmlMonitor(x.assigned||'Sin asignar')}</b><br>Etapa detenida: <b>${escapeHtmlMonitor(x.name)}</b> · Días en etapa: <b>${x.stageDays??'Sin fecha'}</b> · Antigüedad total: <b>${x.totalDays??'Sin fecha'}</b></p><div class="delay-timeline">${steps}</div><p class="delay-note">Las etapas sin fecha se presentan como no registradas; no se imputan automáticamente a un responsable.</p><div class="delay-detail-action" id="delay-detail-actions"></div>`;const actions=content.querySelector('#delay-detail-actions');if(x.name==='Carga'&&x.id){const b=document.createElement('button');b.className='delay-btn';b.textContent='Confirmar carga en sistema';b.onclick=()=>confirmDelayUpload(x);actions.appendChild(b);}if(!x.assigned&&x.id){const b=document.createElement('button');b.className='delay-btn secondary';b.style.marginLeft='8px';b.textContent='Asignar reporte';b.onclick=()=>{closeDelayDetail();openBacklogTakeModal(x);};actions.appendChild(b);}overlay.classList.add('show');}
