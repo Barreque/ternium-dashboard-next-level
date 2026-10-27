@@ -4701,10 +4701,10 @@ if (fo.endDate && order.dueDate) {
           const sent=delayDate(r,['FECHA_ENVIO_FINAL']);
           const uploaded=delayDate(r,['FECHA_CARGA_SISTEMA']);
           const uploadState=normalizeText(delayField(r,['ESTADO_CARGA_SISTEMA']));
-          const milestones=[{name:'Servicio',date:item.fecha},{name:'Firma',date:signed},{name:'Revisión',date:revision},{name:'Aprobación',date:approved},{name:'Envío final',date:sent},{name:'Carga',date:uploaded}];
+          const milestones=[{name:'Servicio',date:item.fecha},{name:'Firma',date:signed},{name:'Envío a revisión',date:revision},{name:'Aprobación',date:approved},{name:'Envío final',date:sent},{name:'Carga',date:uploaded}];
           let name='Firma',started=item.fecha;
-          if(signed){name='Revisión';started=signed;}
-          if(revision){name='Aprobación';started=revision;}
+          if(signed){name='Envío a revisión';started=signed;}
+          if(revision){name='Pendiente de revisión';started=revision; const estadoRevision=normalizeText(delayField(r,['REVISION_ESTADO'])); if(estadoRevision==='EN REVISION'||estadoRevision==='REVISION EN PROCESO')name='En revisión';}
           if(approved){name='Envío final';started=approved;}
           if(sent){name='Carga';started=sent;}
           if(uploaded||uploadState==='CARGADO'){name='Finalizado';started=uploaded||sent;}
@@ -4715,8 +4715,8 @@ if (fo.endDate && order.dueDate) {
         }
         // Propietario operativo de cada fase: no atribuir al técnico retrasos administrativos.
         function delayStageOwner(stage, tech){
-          if(stage==='Firma'||stage==='Revisión')return tech||'Técnico sin identificar';
-          if(stage==='Aprobación'||stage==='Envío final')return 'César Jiménez';
+          if(stage==='Firma'||stage==='Envío a revisión')return tech||'Técnico sin identificar';
+          if(stage==='Pendiente de revisión'||stage==='En revisión'||stage==='Aprobación'||stage==='Envío final')return 'César Jiménez';
           if(stage==='Carga')return 'Selene Martínez';
           return 'Finalizado';
         }
