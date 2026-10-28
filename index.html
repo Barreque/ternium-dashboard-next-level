@@ -4914,66 +4914,7 @@ if (fo.endDate && order.dueDate) {
           </style></head><body><div class="tools"><button onclick="window.print()">Imprimir / Guardar como PDF</button><button class="alt" onclick="window.close()">Cerrar</button></div><header><div><div class="brand">CONTROL DE CALIDAD Y CONSULTORÍA PND</div><div class="title">Seguimiento de reportes pendientes</div><div class="name">${escapeHtmlMonitor(tech)}</div><div class="muted">Solo reportes actualmente a cargo del técnico · Flujo desde el 25/09/2026</div></div><div class="meta"><b>Fecha de corte</b><br>${escapeHtmlMonitor(now)}<br><br>Documento de seguimiento interno</div></header>
           <div class="kpis"><div class="kpi"><strong>${rows.length}</strong><span>Reportes pendientes</span></div><div class="kpi alert"><strong>${crit}</strong><span>Críticos: más de 7 días</span></div><div class="kpi"><strong>${attention}</strong><span>En atención: de 3 a 7 días</span></div><div class="kpi"><strong>${maxDays}</strong><span>Mayor espera en etapa (días)</span></div></div>
           <div class="section">Detalle por atender · ordenado por mayor atraso</div><table><colgroup><col style="width:10%"><col style="width:13%"><col style="width:22%"><col style="width:15%"><col style="width:18%"><col style="width:8%"><col style="width:14%"></colgroup><thead><tr><th>N° reporte</th><th>Planta</th><th>Equipo</th><th>Etapa actual</th><th>Acción requerida</th><th>Días</th><th>Fecha compromiso / avance</th></tr></thead><tbody>${rows.map(x=>`<tr><td class="num">${escapeHtmlMonitor(x.reporte)}</td><td>${escapeHtmlMonitor(x.plant)}</td><td>${escapeHtmlMonitor(x.equipment)}</td><td>${escapeHtmlMonitor(x.name)}</td><td>${escapeHtmlMonitor(delayRequiredAction(x))}</td><td class="${x.stageDays===null?'':x.stageDays>7?'danger':x.stageDays>=3?'warn':''}">${x.stageDays===null?'S/F':x.stageDays}</td><td>_____________________</td></tr>`).join('')}</tbody></table>
-          <div class="actions"><b>Solicitud de seguimiento:</b> Dar prioridad a los casos críticos, completar la acción requerida y confirmar avance y fecha compromiso. Los casos S/F requieren validar la fecha de inicio de etapa.</div><div class="footer">Este reporte se genera con la información disponible en el monitor al corte indicado. No incluye pendientes actualmente a cargo de César Jiménez, Selene Martínez o Área de Captura. Verificar registros en AppSheet antes de atribuir atrasos. El documento no acredita envío por WhatsApp.</div><script id="daily-dashboard-script">
-(function(){
-const NEW_DATE=new Date(2026,8,25);
-const techStages=new Set(['Borrador','Generar constancia','Firma','Envío a revisión','Corrección']);
-let picked='',daysBack=0,chosenReport='';
-const $=id=>document.getElementById(id);
-const text=(id,v)=>{if($(id))$(id).textContent=String(v)};
-const val=(r,fields)=>delayField(r,fields);
-const dateKey=d=>d?`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`:'';
-const today=()=>dateKey(new Date());
-function allRows(){
-const raw=window.state?.normalizedReportesPND||window.state?.rawReportesPND||[];
-const seen=new Map();
-raw.forEach(r=>{
-const num=String(val(r,['N° Reporte','No Reporte','Reporte'])||'').trim();
-const dt=parseReportDate(val(r,['Fecha']));
-if(!num||!dt||dt<NEW_DATE||normalizeText(val(r,['EstadoFormulario']))==='CANCELADO')return;
-const id=String(val(r,['ID'])||num);
-const item={id,reporte:num,fecha:dt,row:r};
-const status=delayAppStatus(r), stage=delayStage(item);
-const finished=status==='FINALIZADO'||isReporteFinalEnviado(r);
-const tech=String(val(r,['Tecnico','Técnico'])||'Sin técnico');
-seen.set(id,{...item,tech,plant:String(val(r,['Planta'])||''),equipment:String(val(r,['Equipo'])||''),status,stage,finished,signed:!!val(r,['Firma'])||normalizeText(val(r,['FIRMA_ESTADO']))==='FIRMADO',owner:delayStageOwner(stage.name,tech)});
-});return [...seen.values()];
-}
-function periodItems(items){const end=$('daily-date')?.value||today();const dt=new Date(end+'T12:00:00');if(isNaN(dt.getTime()))return [];
-return items.filter(x=>{const v=dateKey(x.fecha);const start=new Date(dt);start.setDate(start.getDate()-daysBack+ (daysBack?1:0));return v>=dateKey(start)&&v<=end;});}
-function isTechOpen(x){return !x.finished&&techStages.has(x.stage.name)&&x.owner===x.tech}
-function fillTable(){const items=allRows(), period=periodItems(items), mode=$('daily-table-mode')?.value||'open', q=normalizeText($('daily-search')?.value||'');
-const matches=(x)=>!q||normalizeText([x.reporte,x.plant,x.equipment,x.tech,x.owner].join(' ')).includes(q);
-const data=(mode==='period'?period:items.filter(x=>!x.finished)).filter(x=>!picked||x.tech===picked).filter(matches).sort((a,b)=>{if(mode==='open')return (b.stage.stageDays??-1)-(a.stage.stageDays??-1);return b.fecha-a.fecha;});
-text('daily-report-title',picked?'Reportes de '+picked:mode==='open'?'Pendientes acumulados de todos los técnicos':'Producción del periodo');text('daily-count-note',data.length+' reportes mostrados · '+(mode==='open'?'Los enviados/finalizados no aparecen aquí.':'Incluye también los ya cerrados.')+' S/F = fecha de etapa no registrada.');
-$('daily-reports').innerHTML=data.slice(0,500).map(x=>{const d=x.stage.stageDays;const action=x.finished?'Cerrado':x.stage.name==='Carga'?'Cargar en Ternium':x.stage.name==='Generar aviso'?'Generar aviso M8':x.stage.name==='Pendiente de revisión'?'Revisar / aprobar':x.stage.name==='Envío final'?'Enviar por correo':typeof delayRequiredAction==='function'?delayRequiredAction({name:x.stage.name}):'Dar seguimiento';return `<tr><td><button class="daily-link" data-report="${escapeHtmlMonitor(x.id)}">${escapeHtmlMonitor(x.reporte)}</button></td><td>${dateKey(x.fecha)}</td><td>${escapeHtmlMonitor(x.plant)}</td><td>${escapeHtmlMonitor(x.equipment)}</td><td><span class="daily-pill">${escapeHtmlMonitor(x.status)}</span></td><td>${escapeHtmlMonitor(x.finished?'Finalizado':x.owner)}</td><td class="${d>7?'daily-red':''}">${x.finished?'—':d??'S/F'}</td><td>${escapeHtmlMonitor(action)}</td><td>${x.finished?'Cerrado':'Pendiente'}</td></tr>`}).join('')||'<tr><td colspan="9" class="daily-empty">Sin reportes para esta selección</td></tr>';
-$('daily-reports').querySelectorAll('[data-report]').forEach(b=>b.onclick=()=>{chosenReport=b.dataset.report;showEvolution();});
-}
-function showEvolution(){const x=allRows().find(x=>x.id===chosenReport);if(!x){$('daily-evolution').textContent='Selecciona un reporte';return;}
-$('daily-evolution').innerHTML=`<strong>Reporte ${escapeHtmlMonitor(x.reporte)}</strong> · ${escapeHtmlMonitor(x.status)}<div class="daily-note">Técnico: ${escapeHtmlMonitor(x.tech)} · ${escapeHtmlMonitor(x.plant)}</div>`+x.stage.milestones.map(m=>`<div style="padding:7px 0;border-bottom:1px solid #2e425e;display:flex;justify-content:space-between;gap:8px"><span>${escapeHtmlMonitor(m.name)}</span><b>${m.date?escapeHtmlMonitor(delayDateText(m.date)):'—'}</b></div>`).join('')+`<p class="daily-note">Estado actual: ${escapeHtmlMonitor(x.finished?'Finalizado':x.stage.name)} · Responsable: ${escapeHtmlMonitor(x.finished?'—':x.owner)}. No se inventan fechas faltantes.</p>`;
-}
-function render(){if(!$('daily-dashboard'))return;const items=allRows(), period=periodItems(items);if(!$('daily-date')?.value)$('daily-date').value=today();
-const count=(arr,fn)=>arr.filter(fn).length;
-text('daily-total',period.length);text('daily-signed',count(period,x=>x.signed));text('daily-unsigned',count(period,x=>!x.signed));text('daily-review',count(period,x=>!x.finished&&x.owner==='César Jiménez'));text('daily-next',count(period,x=>!x.finished&&x.owner==='Selene Martínez'));text('daily-closed',count(period,x=>x.finished));
-const groups=new Map();period.forEach(x=>{if(!groups.has(x.tech))groups.set(x.tech,[]);groups.get(x.tech).push(x)});
-$('daily-technicians').innerHTML=[...groups].sort((a,b)=>b[1].length-a[1].length).map(([name,arr])=>{const signed=count(arr,x=>x.signed);const pct=Math.round(100*signed/arr.length);return `<tr class="${name===picked?'picked':''}" data-tech="${escapeHtmlMonitor(name)}"><td><strong>${escapeHtmlMonitor(name)}</strong></td><td>${arr.length}</td><td class="daily-green">${signed}</td><td class="daily-red">${arr.length-signed}</td><td class="daily-blue">${count(arr,x=>!x.finished&&x.owner==='César Jiménez')}</td><td class="daily-orange">${count(arr,x=>!x.finished&&x.owner==='Selene Martínez')}</td><td>${count(arr,x=>x.finished)}</td><td><span>${pct}%</span><div class="daily-progress"><div style="width:${pct}%"></div></div></td></tr>`}).join('')||'<tr><td colspan="8" class="daily-empty">No hay servicios en el periodo elegido</td></tr>';
-$('daily-technicians').querySelectorAll('[data-tech]').forEach(row=>row.onclick=()=>{picked=row.dataset.tech;window.delaySelectedTech=picked;window.delayOwnerGroup='tech';const dropdown=$('delay-filter-tech');if(dropdown)dropdown.value=picked;render();});
-const person=$('daily-person');if(picked){const mine=period.filter(x=>x.tech===picked),open=items.filter(x=>x.tech===picked&&!x.finished);const signed=count(mine,x=>x.signed);person.innerHTML=`<div class="daily-selected">${escapeHtmlMonitor(picked)}</div><div class="daily-muted">${mine.length} servicios en el periodo · ${open.length} pendientes acumulados</div><div class="daily-selected-grid"><div><b>${mine.length}</b><small>Servicios</small></div><div><b class="daily-green">${signed}</b><small>Con firma</small></div><div><b class="daily-red">${mine.length-signed}</b><small>Sin firma</small></div><div><b class="daily-orange">${open.length}</b><small>Abiertos</small></div></div>`;}else person.innerHTML='<h3>Selecciona un técnico</h3><p class="daily-muted">Haz clic en su nombre para revisar sus servicios del periodo y sus pendientes acumulados.</p>';
-const open=items.filter(x=>!x.finished), owners=[['Técnicos',count(open,isTechOpen)],['César Jiménez',count(open,x=>x.owner==='César Jiménez')],['Selene Martínez',count(open,x=>x.owner==='Selene Martínez')],['Área de Captura',count(open,x=>x.owner==='Área de Captura')]];
-$('daily-owners').innerHTML=owners.map(([label,n])=>`<button type="button" data-owner="${escapeHtmlMonitor(label)}"><b>${n}</b><small>${escapeHtmlMonitor(label)}</small></button>`).join('');$('daily-owners').querySelectorAll('[data-owner]').forEach(b=>b.onclick=()=>{picked='';window.delaySelectedTech='';$('daily-table-mode').value='open';render();const legacy=$('delay-filter-owner');if(legacy){legacy.value=b.dataset.owner==='Técnicos'?'':b.dataset.owner;} });
-const hist=typeof delaySplitRows==='function'?delaySplitRows().historicos.length:0;text('daily-historical',hist+' pendientes históricos (antes de 25/09/2026) se administran por Área de Captura, fuera del ranking del flujo nuevo.');fillTable();if(chosenReport)showEvolution();
-}
-window.renderDailyDashboard=render;
-window.dailySetPeriod=n=>{daysBack=n;$('daily-date').value=today();render();};
-function readyPdf(){if(!picked){alert('Selecciona primero un técnico.');return false;}window.delaySelectedTech=picked;const el=$('delay-filter-tech');if(el)el.value=picked;window.delayOwnerGroup='tech';window.delayShowAllRows=true;renderMonitorPendientes();return true;}
-window.dailyPrintSelected=()=>{if(readyPdf())printDelayPdf()};
-window.dailyExportSelected=()=>{if(readyPdf())exportDelayCsv()};
-window.dailyWhatsappSelected=()=>{if(readyPdf())prepareDelayWhatsApp()};
-const base=window.renderMonitorPendientes;
-window.renderMonitorPendientes=function(...args){const res=base.apply(this,args);render();return res;};
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',render);else render();
-})();
-</script>
+          <div class="actions"><b>Solicitud de seguimiento:</b> Dar prioridad a los casos críticos, completar la acción requerida y confirmar avance y fecha compromiso. Los casos S/F requieren validar la fecha de inicio de etapa.</div><div class="footer">Este reporte se genera con la información disponible en el monitor al corte indicado. No incluye pendientes actualmente a cargo de César Jiménez, Selene Martínez o Área de Captura. Verificar registros en AppSheet antes de atribuir atrasos. El documento no acredita envío por WhatsApp.</div>
 </body></html>`;
           const w=window.open('','_blank');if(!w){alert('Permite ventanas emergentes para abrir el formato de impresión');return;}
           w.document.open();w.document.write(html);w.document.close();w.focus();
@@ -6369,6 +6310,66 @@ function renderReportesPNDCharts() {
             renderReportesPendientesTecnico();
             renderReportesTendencia();
         }
+</script>
+<script id="daily-dashboard-script">
+(function(){
+const NEW_DATE=new Date(2026,8,25);
+const techStages=new Set(['Borrador','Generar constancia','Firma','Envío a revisión','Corrección']);
+let picked='',daysBack=0,chosenReport='';
+const $=id=>document.getElementById(id);
+const text=(id,v)=>{if($(id))$(id).textContent=String(v)};
+const val=(r,fields)=>delayField(r,fields);
+const dateKey=d=>d?`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`:'';
+const today=()=>dateKey(new Date());
+function allRows(){
+const raw=window.state?.normalizedReportesPND||window.state?.rawReportesPND||[];
+const seen=new Map();
+raw.forEach(r=>{
+const num=String(val(r,['N° Reporte','No Reporte','Reporte'])||'').trim();
+const dt=parseReportDate(val(r,['Fecha']));
+if(!num||!dt||dt<NEW_DATE||normalizeText(val(r,['EstadoFormulario']))==='CANCELADO')return;
+const id=String(val(r,['ID'])||num);
+const item={id,reporte:num,fecha:dt,row:r};
+const status=delayAppStatus(r), stage=delayStage(item);
+const finished=status==='FINALIZADO'||isReporteFinalEnviado(r);
+const tech=String(val(r,['Tecnico','Técnico'])||'Sin técnico');
+seen.set(id,{...item,tech,plant:String(val(r,['Planta'])||''),equipment:String(val(r,['Equipo'])||''),status,stage,finished,signed:!!val(r,['Firma'])||normalizeText(val(r,['FIRMA_ESTADO']))==='FIRMADO',owner:delayStageOwner(stage.name,tech)});
+});return [...seen.values()];
+}
+function periodItems(items){const end=$('daily-date')?.value||today();const dt=new Date(end+'T12:00:00');if(isNaN(dt.getTime()))return [];
+return items.filter(x=>{const v=dateKey(x.fecha);const start=new Date(dt);start.setDate(start.getDate()-daysBack+ (daysBack?1:0));return v>=dateKey(start)&&v<=end;});}
+function isTechOpen(x){return !x.finished&&techStages.has(x.stage.name)&&x.owner===x.tech}
+function fillTable(){const items=allRows(), period=periodItems(items), mode=$('daily-table-mode')?.value||'open', q=normalizeText($('daily-search')?.value||'');
+const matches=(x)=>!q||normalizeText([x.reporte,x.plant,x.equipment,x.tech,x.owner].join(' ')).includes(q);
+const data=(mode==='period'?period:items.filter(x=>!x.finished)).filter(x=>!picked||x.tech===picked).filter(matches).sort((a,b)=>{if(mode==='open')return (b.stage.stageDays??-1)-(a.stage.stageDays??-1);return b.fecha-a.fecha;});
+text('daily-report-title',picked?'Reportes de '+picked:mode==='open'?'Pendientes acumulados de todos los técnicos':'Producción del periodo');text('daily-count-note',data.length+' reportes mostrados · '+(mode==='open'?'Los enviados/finalizados no aparecen aquí.':'Incluye también los ya cerrados.')+' S/F = fecha de etapa no registrada.');
+$('daily-reports').innerHTML=data.slice(0,500).map(x=>{const d=x.stage.stageDays;const action=x.finished?'Cerrado':x.stage.name==='Carga'?'Cargar en Ternium':x.stage.name==='Generar aviso'?'Generar aviso M8':x.stage.name==='Pendiente de revisión'?'Revisar / aprobar':x.stage.name==='Envío final'?'Enviar por correo':typeof delayRequiredAction==='function'?delayRequiredAction({name:x.stage.name}):'Dar seguimiento';return `<tr><td><button class="daily-link" data-report="${escapeHtmlMonitor(x.id)}">${escapeHtmlMonitor(x.reporte)}</button></td><td>${dateKey(x.fecha)}</td><td>${escapeHtmlMonitor(x.plant)}</td><td>${escapeHtmlMonitor(x.equipment)}</td><td><span class="daily-pill">${escapeHtmlMonitor(x.status)}</span></td><td>${escapeHtmlMonitor(x.finished?'Finalizado':x.owner)}</td><td class="${d>7?'daily-red':''}">${x.finished?'—':d??'S/F'}</td><td>${escapeHtmlMonitor(action)}</td><td>${x.finished?'Cerrado':'Pendiente'}</td></tr>`}).join('')||'<tr><td colspan="9" class="daily-empty">Sin reportes para esta selección</td></tr>';
+$('daily-reports').querySelectorAll('[data-report]').forEach(b=>b.onclick=()=>{chosenReport=b.dataset.report;showEvolution();});
+}
+function showEvolution(){const x=allRows().find(x=>x.id===chosenReport);if(!x){$('daily-evolution').textContent='Selecciona un reporte';return;}
+$('daily-evolution').innerHTML=`<strong>Reporte ${escapeHtmlMonitor(x.reporte)}</strong> · ${escapeHtmlMonitor(x.status)}<div class="daily-note">Técnico: ${escapeHtmlMonitor(x.tech)} · ${escapeHtmlMonitor(x.plant)}</div>`+x.stage.milestones.map(m=>`<div style="padding:7px 0;border-bottom:1px solid #2e425e;display:flex;justify-content:space-between;gap:8px"><span>${escapeHtmlMonitor(m.name)}</span><b>${m.date?escapeHtmlMonitor(delayDateText(m.date)):'—'}</b></div>`).join('')+`<p class="daily-note">Estado actual: ${escapeHtmlMonitor(x.finished?'Finalizado':x.stage.name)} · Responsable: ${escapeHtmlMonitor(x.finished?'—':x.owner)}. No se inventan fechas faltantes.</p>`;
+}
+function render(){if(!$('daily-dashboard'))return;const items=allRows(), period=periodItems(items);if(!$('daily-date')?.value)$('daily-date').value=today();
+const count=(arr,fn)=>arr.filter(fn).length;
+text('daily-total',period.length);text('daily-signed',count(period,x=>x.signed));text('daily-unsigned',count(period,x=>!x.signed));text('daily-review',count(period,x=>!x.finished&&x.owner==='César Jiménez'));text('daily-next',count(period,x=>!x.finished&&x.owner==='Selene Martínez'));text('daily-closed',count(period,x=>x.finished));
+const groups=new Map();period.forEach(x=>{if(!groups.has(x.tech))groups.set(x.tech,[]);groups.get(x.tech).push(x)});
+$('daily-technicians').innerHTML=[...groups].sort((a,b)=>b[1].length-a[1].length).map(([name,arr])=>{const signed=count(arr,x=>x.signed);const pct=Math.round(100*signed/arr.length);return `<tr class="${name===picked?'picked':''}" data-tech="${escapeHtmlMonitor(name)}"><td><strong>${escapeHtmlMonitor(name)}</strong></td><td>${arr.length}</td><td class="daily-green">${signed}</td><td class="daily-red">${arr.length-signed}</td><td class="daily-blue">${count(arr,x=>!x.finished&&x.owner==='César Jiménez')}</td><td class="daily-orange">${count(arr,x=>!x.finished&&x.owner==='Selene Martínez')}</td><td>${count(arr,x=>x.finished)}</td><td><span>${pct}%</span><div class="daily-progress"><div style="width:${pct}%"></div></div></td></tr>`}).join('')||'<tr><td colspan="8" class="daily-empty">No hay servicios en el periodo elegido</td></tr>';
+$('daily-technicians').querySelectorAll('[data-tech]').forEach(row=>row.onclick=()=>{picked=row.dataset.tech;window.delaySelectedTech=picked;window.delayOwnerGroup='tech';const dropdown=$('delay-filter-tech');if(dropdown)dropdown.value=picked;render();});
+const person=$('daily-person');if(picked){const mine=period.filter(x=>x.tech===picked),open=items.filter(x=>x.tech===picked&&!x.finished);const signed=count(mine,x=>x.signed);person.innerHTML=`<div class="daily-selected">${escapeHtmlMonitor(picked)}</div><div class="daily-muted">${mine.length} servicios en el periodo · ${open.length} pendientes acumulados</div><div class="daily-selected-grid"><div><b>${mine.length}</b><small>Servicios</small></div><div><b class="daily-green">${signed}</b><small>Con firma</small></div><div><b class="daily-red">${mine.length-signed}</b><small>Sin firma</small></div><div><b class="daily-orange">${open.length}</b><small>Abiertos</small></div></div>`;}else person.innerHTML='<h3>Selecciona un técnico</h3><p class="daily-muted">Haz clic en su nombre para revisar sus servicios del periodo y sus pendientes acumulados.</p>';
+const open=items.filter(x=>!x.finished), owners=[['Técnicos',count(open,isTechOpen)],['César Jiménez',count(open,x=>x.owner==='César Jiménez')],['Selene Martínez',count(open,x=>x.owner==='Selene Martínez')],['Área de Captura',count(open,x=>x.owner==='Área de Captura')]];
+$('daily-owners').innerHTML=owners.map(([label,n])=>`<button type="button" data-owner="${escapeHtmlMonitor(label)}"><b>${n}</b><small>${escapeHtmlMonitor(label)}</small></button>`).join('');$('daily-owners').querySelectorAll('[data-owner]').forEach(b=>b.onclick=()=>{picked='';window.delaySelectedTech='';$('daily-table-mode').value='open';render();const legacy=$('delay-filter-owner');if(legacy){legacy.value=b.dataset.owner==='Técnicos'?'':b.dataset.owner;} });
+const hist=typeof delaySplitRows==='function'?delaySplitRows().historicos.length:0;text('daily-historical',hist+' pendientes históricos (antes de 25/09/2026) se administran por Área de Captura, fuera del ranking del flujo nuevo.');fillTable();if(chosenReport)showEvolution();
+}
+window.renderDailyDashboard=render;
+window.dailySetPeriod=n=>{daysBack=n;$('daily-date').value=today();render();};
+function readyPdf(){if(!picked){alert('Selecciona primero un técnico.');return false;}window.delaySelectedTech=picked;const el=$('delay-filter-tech');if(el)el.value=picked;window.delayOwnerGroup='tech';window.delayShowAllRows=true;renderMonitorPendientes();return true;}
+window.dailyPrintSelected=()=>{if(readyPdf())printDelayPdf()};
+window.dailyExportSelected=()=>{if(readyPdf())exportDelayCsv()};
+window.dailyWhatsappSelected=()=>{if(readyPdf())prepareDelayWhatsApp()};
+const base=window.renderMonitorPendientes;
+window.renderMonitorPendientes=function(...args){const res=base.apply(this,args);render();return res;};
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',render);else render();
+})();
 </script>
 </body>
 </html>
