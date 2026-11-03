@@ -2969,7 +2969,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 <div id="daily-dashboard">
 <div class="daily-header"><div><h2>Monitor de Reportes Pendientes</h2><div class="daily-muted">Producción diaria y seguimiento hasta Enviado / Finalizado · Flujo desde 25/09/2026</div></div><div class="daily-controls"><label>Fecha de servicio<input id="daily-date" type="date" onchange="renderDailyDashboard()"></label><button type="button" class="daily-btn" onclick="dailySetPeriod(0)">Hoy</button><button type="button" class="daily-btn" onclick="dailySetPeriod(7)">Últimos 7 días</button><button type="button" class="daily-btn" onclick="dailySetPeriod(30)">Últimos 30 días</button><button type="button" class="daily-btn orange" onclick="refreshMonitorData(true)">↻ Actualizar</button></div></div>
 <div class="daily-kpis"><div class="daily-card"><small>Reportes del periodo</small><b id="daily-total">—</b><span>Por fecha de servicio</span></div><div class="daily-card"><small>Constancia firmada</small><b class="daily-green" id="daily-signed">—</b><span>Firma registrada</span></div><div class="daily-card"><small>Sin constancia firmada</small><b class="daily-red" id="daily-unsigned">—</b><span>Acción del técnico</span></div><div class="daily-card"><small>En revisión</small><b class="daily-blue" id="daily-review">—</b><span>Actualmente con César</span></div><div class="daily-card"><small>En etapa posterior</small><b class="daily-orange" id="daily-next">—</b><span>Aviso / correo / carga</span></div><div class="daily-card"><small>Enviados / finalizados</small><b id="daily-closed">—</b><span>Fuera de pendientes</span></div></div>
-<div class="daily-main"><div class="daily-panel"><h3>Producción por técnico</h3><p class="daily-muted">Servicios del periodo y su estado actual. Selecciona un técnico para consultar sus reportes.</p><div class="daily-table-wrap"><table class="daily-table"><thead><tr><th>TÉCNICO</th><th>TOTAL</th><th>CON FIRMA</th><th>SIN FIRMA</th><th>REVISIÓN</th><th>POSTERIORES</th><th>CERRADOS</th><th>% FIRMA</th></tr></thead><tbody id="daily-technicians"></tbody></table></div></div><div class="daily-panel"><div id="daily-person"><h3>Selecciona un técnico</h3><p class="daily-muted">Aquí aparecerá su producción y sus reportes pendientes acumulados.</p></div><div class="daily-pdf-filter" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:14px 0 10px"><label for="daily-pdf-status" style="font-size:12px;font-weight:700;color:#b8cbe2">Incluir en el PDF:</label><select id="daily-pdf-status" aria-label="Filtrar estatus del PDF individual" style="background:#12213a;color:#f8fafc;border:1px solid #405474;border-radius:7px;padding:9px 12px;min-width:235px;max-width:100%"><option value="all">Todos los pendientes del técnico</option><option value="firma">Solo pendiente de firma (03)</option><option value="sin_firma">Todos los pendientes sin firma</option></select></div><div class="daily-actions"><button class="daily-btn orange" onclick="dailyPrintSelected()">PDF individual</button><button class="daily-btn" onclick="dailyExportSelected()">Excel / CSV</button><button class="daily-btn" onclick="dailyWhatsappSelected()">WhatsApp + PDF</button></div><div class="daily-muted">El PDF se adjunta manualmente en WhatsApp normal. No se envía automáticamente.</div></div></div>
+<div class="daily-main"><div class="daily-panel"><h3>Producción por técnico</h3><p class="daily-muted">Servicios del periodo y su estado actual. Selecciona un técnico para consultar sus reportes.</p><div class="daily-table-wrap"><table class="daily-table"><thead><tr><th>TÉCNICO</th><th>TOTAL</th><th>CON FIRMA</th><th>SIN FIRMA</th><th>REVISIÓN</th><th>POSTERIORES</th><th>CERRADOS</th><th>% FIRMA</th></tr></thead><tbody id="daily-technicians"></tbody></table></div></div><div class="daily-panel"><div id="daily-person"><h3>Selecciona un técnico</h3><p class="daily-muted">Aquí aparecerá su producción y sus reportes pendientes acumulados.</p></div><div class="daily-pdf-filter" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:14px 0 10px"><label for="daily-pdf-status" style="font-size:12px;font-weight:700;color:#b8cbe2">Incluir en el PDF:</label><select id="daily-pdf-status" aria-label="Filtrar estatus del PDF individual" style="background:#12213a;color:#f8fafc;border:1px solid #405474;border-radius:7px;padding:9px 12px;min-width:235px;max-width:100%"><option value="all">Todos los pendientes del técnico</option><option value="firma">Solo pendiente de firma (03)</option><option value="sin_firma">Todos los pendientes sin firma</option></select></div><div class="daily-phone-row" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 12px"><label for="daily-phone" style="font-size:12px;font-weight:700;color:#b8cbe2">WhatsApp del técnico:</label><input id="daily-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="10 dígitos · ej. 8112345678" maxlength="18" aria-label="Número de WhatsApp del técnico seleccionado" style="background:#12213a;color:#f8fafc;border:1px solid #405474;border-radius:7px;padding:9px 12px;width:235px;max-width:100%"/><span id="daily-phone-note" class="daily-muted" style="font-size:11px">Se guarda en este navegador por técnico.</span></div><div class="daily-actions"><button class="daily-btn orange" onclick="dailyPrintSelected()">PDF individual</button><button class="daily-btn" onclick="dailyExportSelected()">Excel / CSV</button><button class="daily-btn" onclick="dailyWhatsappSelected()">WhatsApp + PDF</button></div><div class="daily-muted">El PDF se adjunta manualmente en WhatsApp normal. No se envía automáticamente.</div></div></div>
 <div class="daily-panel daily-section"><div class="daily-section-heading"><div><h3 id="daily-report-title">Reportes del técnico seleccionado</h3><div class="daily-muted">Reporte individual: producción del periodo; pendientes abiertos: cualquier fecha desde 25/09/2026.</div></div><div class="daily-controls"><select id="daily-table-mode" onchange="renderDailyDashboard()"><option value="open">Pendientes acumulados</option><option value="period">Producción del periodo</option></select><input id="daily-search" placeholder="Buscar reporte / equipo" oninput="renderDailyDashboard()"></div></div><div class="daily-table-wrap"><table class="daily-table"><thead><tr><th>REPORTE</th><th>FECHA SERVICIO</th><th>PLANTA</th><th>EQUIPO</th><th>ESTATUS ACTUAL</th><th>RESPONSABLE ACTUAL</th><th>DÍAS EN ETAPA</th><th>PRÓXIMA ACCIÓN</th><th>SEGUIMIENTO</th></tr></thead><tbody id="daily-reports"></tbody></table></div><p class="daily-note" id="daily-count-note"></p></div>
 <div class="daily-split"><div class="daily-panel"><h3>Pendientes acumulados por responsable</h3><p class="daily-muted">Solo reportes abiertos, de todas las fechas. No incluye enviados o finalizados.</p><div class="daily-responsible" id="daily-owners"></div><p class="daily-note" id="daily-historical"></p></div><div class="daily-panel"><h3>Evolución de un reporte</h3><p class="daily-muted">Selecciona un número de reporte en la tabla para consultar sus fechas y próximas acciones.</p><div id="daily-evolution" class="daily-empty">Sin reporte seleccionado</div></div></div>
 </div>
@@ -4901,11 +4901,9 @@ if (fo.endDate && order.dueDate) {
           const m={'Borrador':'Completar captura','Generar constancia':'Generar constancia','Firma':'Firmar constancia','Envío a revisión':'Enviar a revisión','Corrección':'Corregir y reenviar'};
           return m[x.name]||'Validar estatus';
         }
-        function printDelayPdf(pdfStatusFilter='all'){
-          const payload=delayIndividualTechRows();if(!payload)return;
-          const tech=payload.tech;
-          // El filtro afecta exclusivamente el PDF: ni los KPIs ni el monitor se alteran.
-          const rows=payload.rows.filter(x=>{
+        // Misma selección para el PDF y el texto de WhatsApp; nunca envía pendientes de otros responsables.
+        function delayFilterIndividualRows(rows,pdfStatusFilter='all'){
+          return rows.filter(x=>{
             if(pdfStatusFilter==='firma')return x.status==='PENDIENTE FIRMA CONSTANCIA';
             if(pdfStatusFilter==='sin_firma'){
               const r=x.row||{};
@@ -4915,6 +4913,12 @@ if (fo.endDate && order.dueDate) {
             }
             return true;
           });
+        }
+        function printDelayPdf(pdfStatusFilter='all'){
+          const payload=delayIndividualTechRows();if(!payload)return;
+          const tech=payload.tech;
+          // El filtro afecta exclusivamente las exportaciones individuales, no los indicadores.
+          const rows=delayFilterIndividualRows(payload.rows,pdfStatusFilter);
           if(!rows.length){alert('El técnico no tiene reportes para el filtro seleccionado.');return;}
           const pdfFilterLabel=pdfStatusFilter==='firma'?'Solo pendientes de firma (03)':pdfStatusFilter==='sin_firma'?'Sin constancia firmada':'Todos los pendientes';
           const now=new Date().toLocaleString('es-MX');
@@ -4935,18 +4939,24 @@ if (fo.endDate && order.dueDate) {
         function delayPhoneKey(){return 'delay_phone_'+(window.delaySelectedTech||document.getElementById('delay-filter-tech')?.value||'');}
         function prepareDelayWhatsApp(){
           const payload=delayIndividualTechRows();if(!payload)return;
-          const rows=payload.rows;
           const tech=payload.tech;
           if(!tech){alert('Primero selecciona a un técnico en el ranking o en el filtro de Técnico.');return;}
-          const phoneInput=document.getElementById('delay-phone');const digits=String(phoneInput?.value||'').replace(/\D/g,'');
-          if(digits.length!==10&&digits.length!==12){alert('Captura el número de WhatsApp del técnico (10 dígitos en México).');return;}
+          const pdfStatusFilter=document.getElementById('daily-pdf-status')?.value||'all';
+          const rows=delayFilterIndividualRows(payload.rows,pdfStatusFilter);
+          if(!rows.length){alert('No hay reportes de este técnico para el filtro seleccionado.');return;}
+          const phoneInput=document.getElementById('daily-phone')||document.getElementById('delay-phone');
+          const digits=String(phoneInput?.value||'').replace(/\D/g,'');
+          if(digits.length!==10&&!(digits.length===12&&digits.startsWith('52'))){alert('Captura el WhatsApp del técnico: 10 dígitos mexicanos o 52 + 10 dígitos.');phoneInput?.focus();return;}
           try{localStorage.setItem(delayPhoneKey(),digits);}catch(e){}
-          const critical=rows.filter(x=>x.stageDays>7).length;
-          const message='Buen día, '+tech+'.\n\nTe comparto el seguimiento de tus reportes pendientes con corte al '+new Date().toLocaleDateString('es-MX')+'.\n\nTotal pendiente: '+rows.length+'\nReportes críticos (>7 días): '+critical+'\n\nTe comparto el detalle en el PDF que adjuntaré a este mensaje, con número de reporte, equipo, planta, etapa pendiente y días transcurridos. Favor de revisar y confirmar avance y fecha compromiso de los casos más atrasados.\n\nControl de Calidad y Consultoría PND.';
-          // Abrir el chat primero para que el navegador no bloquee la ventana; el PDF se imprime por separado.
+          const critical=rows.filter(x=>x.stageDays!==null&&x.stageDays>7).length;
+          const filterLabel=pdfStatusFilter==='firma'?'PENDIENTES DE FIRMA DE CONSTANCIA (03)':pdfStatusFilter==='sin_firma'?'REPORTES SIN CONSTANCIA FIRMADA':'REPORTES PENDIENTES';
+          const detail=rows.slice(0,30).map(x=>'• '+x.reporte+' · '+x.plant+' · '+(x.stageDays===null?'S/F':x.stageDays+' días')).join('\n');
+          const extra=rows.length>30?'\n… y '+(rows.length-30)+' adicionales en el PDF.':'';
+          const message='Buen día, '+tech+'.\n\nTe comparto tu seguimiento de '+filterLabel.toLowerCase()+' con corte al '+new Date().toLocaleDateString('es-MX')+'.\n\nTotal: '+rows.length+'\nCríticos (>7 días): '+critical+'\n\nReportes:\n'+detail+extra+'\n\nAdjuntaré el PDF con el detalle completo. Favor de dar prioridad a los pendientes y confirmar avance y fecha compromiso.\n\nControl de Calidad y Consultoría PND.';
+          // WhatsApp normal abre el mensaje; el PDF generado con el MISMO filtro se adjunta manualmente.
           const url='https://wa.me/'+(digits.length===10?'52'+digits:digits)+'?text='+encodeURIComponent(message);
           window.open(url,'_blank','noopener,noreferrer');
-          const status=document.getElementById('delay-followup-status');if(status)status.textContent='WhatsApp abierto. Ahora genera el PDF, guárdalo y adjúntalo manualmente antes de enviar.';
+          const status=document.getElementById('delay-followup-status');if(status)status.textContent='WhatsApp preparado con '+rows.length+' reportes del filtro. Genera el PDF con ese mismo filtro y adjúntalo manualmente.';
         }
         function registerDelayFollowup(){
           const tech=window.delaySelectedTech||document.getElementById('delay-filter-tech')?.value;
@@ -6330,6 +6340,13 @@ const NEW_DATE=new Date(2026,8,25);
 const techStages=new Set(['Borrador','Generar constancia','Firma','Envío a revisión','Corrección']);
 let picked='',daysBack=0,chosenReport='';
 const $=id=>document.getElementById(id);
+function syncDailyPhone(){
+  const input=$('daily-phone'),note=$('daily-phone-note');if(!input)return;
+  input.disabled=!picked;
+  const key=picked?'delay_phone_'+picked:'';
+  if(input.dataset.key!==key){input.dataset.key=key;try{input.value=key?localStorage.getItem(key)||'':'';}catch(e){input.value='';}}
+  if(note)note.textContent=picked?'Número de '+picked+' · guardado en este navegador':'Selecciona primero un técnico';
+}
 const text=(id,v)=>{if($(id))$(id).textContent=String(v)};
 const val=(r,fields)=>delayField(r,fields);
 const dateKey=d=>d?`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`:'';
@@ -6368,7 +6385,7 @@ text('daily-total',period.length);text('daily-signed',count(period,x=>x.signed))
 const groups=new Map();period.forEach(x=>{if(!groups.has(x.tech))groups.set(x.tech,[]);groups.get(x.tech).push(x)});
 $('daily-technicians').innerHTML=[...groups].sort((a,b)=>b[1].length-a[1].length).map(([name,arr])=>{const signed=count(arr,x=>x.signed);const pct=Math.round(100*signed/arr.length);return `<tr class="${name===picked?'picked':''}" data-tech="${escapeHtmlMonitor(name)}"><td><strong>${escapeHtmlMonitor(name)}</strong></td><td>${arr.length}</td><td class="daily-green">${signed}</td><td class="daily-red">${arr.length-signed}</td><td class="daily-blue">${count(arr,x=>!x.finished&&x.owner==='César Jiménez')}</td><td class="daily-orange">${count(arr,x=>!x.finished&&x.owner==='Selene Martínez')}</td><td>${count(arr,x=>x.finished)}</td><td><span>${pct}%</span><div class="daily-progress"><div style="width:${pct}%"></div></div></td></tr>`}).join('')||'<tr><td colspan="8" class="daily-empty">No hay servicios en el periodo elegido</td></tr>';
 $('daily-technicians').querySelectorAll('[data-tech]').forEach(row=>row.onclick=()=>{picked=row.dataset.tech;window.delaySelectedTech=picked;window.delayOwnerGroup='tech';const dropdown=$('delay-filter-tech');if(dropdown)dropdown.value=picked;render();});
-const person=$('daily-person');if(picked){const mine=period.filter(x=>x.tech===picked),open=items.filter(x=>x.tech===picked&&!x.finished);const signed=count(mine,x=>x.signed);person.innerHTML=`<div class="daily-selected">${escapeHtmlMonitor(picked)}</div><div class="daily-muted">${mine.length} servicios en el periodo · ${open.length} pendientes acumulados</div><div class="daily-selected-grid"><div><b>${mine.length}</b><small>Servicios</small></div><div><b class="daily-green">${signed}</b><small>Con firma</small></div><div><b class="daily-red">${mine.length-signed}</b><small>Sin firma</small></div><div><b class="daily-orange">${open.length}</b><small>Abiertos</small></div></div>`;}else person.innerHTML='<h3>Selecciona un técnico</h3><p class="daily-muted">Haz clic en su nombre para revisar sus servicios del periodo y sus pendientes acumulados.</p>';
+syncDailyPhone();const person=$('daily-person');if(picked){const mine=period.filter(x=>x.tech===picked),open=items.filter(x=>x.tech===picked&&!x.finished);const signed=count(mine,x=>x.signed);person.innerHTML=`<div class="daily-selected">${escapeHtmlMonitor(picked)}</div><div class="daily-muted">${mine.length} servicios en el periodo · ${open.length} pendientes acumulados</div><div class="daily-selected-grid"><div><b>${mine.length}</b><small>Servicios</small></div><div><b class="daily-green">${signed}</b><small>Con firma</small></div><div><b class="daily-red">${mine.length-signed}</b><small>Sin firma</small></div><div><b class="daily-orange">${open.length}</b><small>Abiertos</small></div></div>`;}else person.innerHTML='<h3>Selecciona un técnico</h3><p class="daily-muted">Haz clic en su nombre para revisar sus servicios del periodo y sus pendientes acumulados.</p>';
 const open=items.filter(x=>!x.finished), owners=[['Técnicos',count(open,isTechOpen)],['César Jiménez',count(open,x=>x.owner==='César Jiménez')],['Selene Martínez',count(open,x=>x.owner==='Selene Martínez')],['Área de Captura',count(open,x=>x.owner==='Área de Captura')]];
 $('daily-owners').innerHTML=owners.map(([label,n])=>`<button type="button" data-owner="${escapeHtmlMonitor(label)}"><b>${n}</b><small>${escapeHtmlMonitor(label)}</small></button>`).join('');$('daily-owners').querySelectorAll('[data-owner]').forEach(b=>b.onclick=()=>{picked='';window.delaySelectedTech='';$('daily-table-mode').value='open';render();const legacy=$('delay-filter-owner');if(legacy){legacy.value=b.dataset.owner==='Técnicos'?'':b.dataset.owner;} });
 const hist=typeof delaySplitRows==='function'?delaySplitRows().historicos.length:0;text('daily-historical',hist+' pendientes históricos (antes de 25/09/2026) se administran por Área de Captura, fuera del ranking del flujo nuevo.');fillTable();if(chosenReport)showEvolution();
@@ -6379,6 +6396,8 @@ function readyPdf(){if(!picked){alert('Selecciona primero un técnico.');return 
 window.dailyPrintSelected=()=>{if(readyPdf())printDelayPdf($('daily-pdf-status')?.value||'all')};
 window.dailyExportSelected=()=>{if(readyPdf())exportDelayCsv()};
 window.dailyWhatsappSelected=()=>{if(readyPdf())prepareDelayWhatsApp()};
+$('daily-phone')?.addEventListener('input',()=>{if(!picked)return;const digits=$('daily-phone').value.replace(/\D/g,'').slice(0,12);try{localStorage.setItem('delay_phone_'+picked,digits);}catch(e){};});
+$('daily-pdf-status')?.addEventListener('change',()=>{const v=$('daily-pdf-status').value;const note=$('daily-phone-note');if(note&&picked)note.textContent=(v==='firma'?'WhatsApp y PDF: solo estado 03':'WhatsApp y PDF: '+(v==='sin_firma'?'sin constancia firmada':'todos los pendientes'))+' · '+picked;});
 const base=window.renderMonitorPendientes;
 window.renderMonitorPendientes=function(...args){const res=base.apply(this,args);render();return res;};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',render);else render();
