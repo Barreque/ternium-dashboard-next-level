@@ -2349,7 +2349,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 #view-remisiones .rem-filters label{display:flex;flex-direction:column;gap:6px;min-width:135px;font-size:10px;text-transform:uppercase;letter-spacing:.7px;color:#9bb0cb;font-weight:750}#view-remisiones .rem-filters .rem-search{flex:1;min-width:190px}
 #view-remisiones .rem-filters input,#view-remisiones .rem-filters select{height:37px;max-width:100%;border:1px solid #32455f;border-radius:7px;padding:0 10px;background:#1a2943;color:#e9f1ff;outline:none;font-size:12px}
 #view-remisiones .rem-kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:11px;margin-bottom:14px}#view-remisiones .rem-kpi,#view-remisiones .rem-panel{background:linear-gradient(145deg,#192740,#152139);border:1px solid #2c405f;border-radius:12px;padding:16px}
-#view-remisiones .rem-kpi small{display:block;color:#9baec7;font-size:10px;font-weight:700;letter-spacing:.4px}#view-remisiones .rem-kpi strong{display:block;font-size:30px;margin:9px 0 4px;font-weight:800}#view-remisiones .rem-kpi span,#view-remisiones .rem-note{color:#8fa5c1;font-size:11px}
+#view-remisiones .rem-kpi small{display:block;color:#9baec7;font-size:10px;font-weight:700;letter-spacing:.4px}#view-remisiones .rem-kpi strong{display:block;font-size:30px;margin:9px 0 4px;font-weight:800}#view-remisiones .rem-kpi span,#view-remisiones .rem-note{color:#8fa5c1;font-size:11px}#view-remisiones .rem-kpi .rem-money{font-size:clamp(18px,1.75vw,29px);letter-spacing:-.5px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
 #view-remisiones .rem-overview{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}#view-remisiones .rem-bars{display:flex;flex-direction:column;gap:10px;margin-top:15px}#view-remisiones .rem-bar-row{display:grid;grid-template-columns:minmax(110px,170px) 1fr 45px;align-items:center;gap:10px;font-size:12px}#view-remisiones .rem-bar-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#d4dfef}#view-remisiones .rem-bar-track{background:#283b57;border-radius:20px;height:10px;overflow:hidden}#view-remisiones .rem-bar-fill{display:block;background:linear-gradient(90deg,#ff8b15,#ef426b);height:100%;border-radius:20px}#view-remisiones .rem-bar-number{text-align:right;font-weight:750}
 #view-remisiones .rem-table-head{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap;margin-bottom:12px}#view-remisiones .rem-page-controls{display:flex;align-items:center;gap:10px;color:#b3c5dd;font-size:12px}
 #view-remisiones .rem-table-wrap{overflow:auto;max-height:660px}#view-remisiones .rem-table{width:100%;border-collapse:collapse;min-width:1000px;font-size:12px}#view-remisiones .rem-table th{position:sticky;top:0;background:#19304e;color:#b3c5df;font-size:10px;letter-spacing:.35px;text-align:left;padding:12px 11px;z-index:1}#view-remisiones .rem-table td{padding:11px;border-bottom:1px solid #293c57;color:#dee9fa}#view-remisiones .rem-table tbody tr:hover{background:#243752}#view-remisiones .rem-empty{text-align:center;color:#aac0d8!important;padding:28px!important}
@@ -3001,12 +3001,14 @@ input[type="date"]::-webkit-calendar-picker-indicator {
           </div>
           <div id="rem-error" class="rem-message" style="display:none"></div>
           <div class="rem-kpis">
-            <div class="rem-kpi"><small>REMISIONES ÚNICAS</small><strong id="rem-kpi-unique">—</strong><span>Dentro de los filtros</span></div>
-            <div class="rem-kpi"><small>REGISTROS</small><strong id="rem-kpi-rows">—</strong><span>Detalle de remisiones</span></div>
-            <div class="rem-kpi"><small>PENDIENTES DE SUBIR</small><strong id="rem-kpi-pending">—</strong><span>Según estatus de la hoja</span></div>
-            <div class="rem-kpi"><small>FACTURADOS</small><strong id="rem-kpi-invoiced">—</strong><span>Según estatus de la hoja</span></div>
-            <div class="rem-kpi"><small>SIN COBRO</small><strong id="rem-kpi-unpaid">—</strong><span>Según estatus de la hoja</span></div>
+            <div class="rem-kpi"><small>VALOR TOTAL DE REMISIONES</small><strong class="rem-money" id="rem-money-all">—</strong><span id="rem-kpi-unique">—</span><span> remisiones únicas</span></div>
+            <div class="rem-kpi"><small>PENDIENTES DE SUBIR</small><strong class="rem-money" id="rem-money-pending">—</strong><span id="rem-kpi-pending">—</span><span> registros</span></div>
+            <div class="rem-kpi"><small>FACTURADOS</small><strong class="rem-money" id="rem-money-invoiced">—</strong><span id="rem-kpi-invoiced">—</span><span> registros</span></div>
+            <div class="rem-kpi"><small>SIN COBRO</small><strong class="rem-money" id="rem-money-unpaid">—</strong><span id="rem-kpi-unpaid">—</span><span> registros</span></div>
+            <div class="rem-kpi"><small>SUBIDOS AL SISTEMA</small><strong class="rem-money" id="rem-money-uploaded">—</strong><span id="rem-kpi-uploaded">—</span><span> registros</span></div>
+            <div class="rem-kpi"><small>PENDIENTES OPERACIÓN</small><strong class="rem-money" id="rem-money-operacion">—</strong><span id="rem-kpi-operacion">—</span><span> registros</span></div>
           </div>
+          <div class="rem-note" id="rem-money-note" style="margin-bottom:14px">Los importes salen directamente de la columna S (Total) de Detalle de remision.</div>
           <div class="rem-overview">
             <div class="rem-panel"><h3>Remisiones por estatus</h3><p>Distribución de registros según el texto que aparece en Sheets.</p><div id="rem-status-bars" class="rem-bars"></div></div>
             <div class="rem-panel"><h3>Detalle por planta</h3><p>Registros por planta, respetando los filtros actuales.</p><div id="rem-plant-bars" class="rem-bars"></div></div>
@@ -3629,27 +3631,42 @@ input[type="date"]::-webkit-calendar-picker-indicator {
                     API_URL + "?action=data&key=" + encodeURIComponent(API_KEY) + "&sheet=avisos%20dashboard" + cacheBust
                 ];
 
-                const fetchJson = (url, timeoutMs = 25000) => {
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-                    return fetch(url, { signal: controller.signal })
-                        .then(r => r.json())
-                        .finally(() => clearTimeout(timeoutId));
+                // Google Apps Script puede tardar más de 25 s en devolver hojas grandes.
+                // No dar por fallida toda la aplicación ante un timeout transitorio.
+                const fetchJson = async (url, timeoutMs = 75000, attempts = 2) => {
+                    let lastError;
+                    for (let attempt = 1; attempt <= attempts; attempt++) {
+                        const controller = new AbortController();
+                        const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+                        try {
+                            const response = await fetch(url, { signal: controller.signal, cache: 'no-store' });
+                            if (!response.ok) throw new Error('HTTP ' + response.status);
+                            const payload = await response.json();
+                            if (!payload || payload.success !== true) {
+                                throw new Error(payload?.error || 'La API no confirmó la consulta');
+                            }
+                            return payload;
+                        } catch (error) {
+                            lastError = error;
+                            console.warn('Intento de API ' + attempt + '/' + attempts + ':', error);
+                        } finally {
+                            clearTimeout(timeoutId);
+                        }
+                    }
+                    throw lastError || new Error('Error de conexión');
                 };
 
-                const [resOrders, resAlerts] = await Promise.all(
-                    urls.map(url =>
-                        fetchJson(url).catch(err => ({
-                            success: false,
-                            error: err.message,
-                            data: []
-                        }))
-                    )
+                const [ordersResult, alertsResult] = await Promise.allSettled(
+                    urls.map(url => fetchJson(url))
                 );
-
-                if (!resOrders.success || !resAlerts.success) {
-                    throw new Error("La API devolvió un estado incorrecto.");
+                const errors = [];
+                if (ordersResult.status === 'rejected') errors.push('Órdenes: ' + ordersResult.reason?.message);
+                if (alertsResult.status === 'rejected') errors.push('Avisos M8: ' + alertsResult.reason?.message);
+                if (errors.length) {
+                    throw new Error('No fue posible cargar: ' + errors.join(' | '));
                 }
+                const resOrders = ordersResult.value;
+                const resAlerts = alertsResult.value;
 
                 // Reportes PND desde CAPTURA. No bloquea el dashboard si falla.
                 let resReportes = { success: false, data: [] };
@@ -3709,7 +3726,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
                 document.getElementById("api-status").innerText = "Error de Conexión";
                 
                 // Attempt to load from fallback/mock data if offline to avoid blank page
-                alert("No se pudo conectar a la API en tiempo real. Por favor reintente o valide su clave API.");
+                alert("No fue posible actualizar Órdenes y Avisos M8. Detalle: " + (err?.message || "Error desconocido") + ". Verifica la conexión e intenta sincronizar nuevamente.");
             } finally {
                 if (syncBtn) {
                     syncBtn.classList.remove("loading");
@@ -6525,12 +6542,38 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   function statusType(s){const t=norm(s);if(t.includes('FACTURAD'))return 'invoice';if(t.includes('SIN COBRO')||t.includes('NO COBRAD'))return 'unpaid';if(t.includes('SUBIDO')||t.includes('CARGADO')||t.includes('EN SISTEMA'))return 'ok';if(t.includes('PENDIENT'))return 'pending';return '';}
   function drawBars(target,field){const dest=el(target);if(!dest)return;const counts=new Map();filtered.forEach(r=>{const x=val(r,field)||'Sin especificar';counts.set(x,(counts.get(x)||0)+1);});const items=[...counts.entries()].sort((a,b)=>b[1]-a[1]).slice(0,9);const max=Math.max(1,...items.map(x=>x[1]));dest.innerHTML=items.length?items.map(([name,count])=>'<div class="rem-bar-row"><span class="rem-bar-name" title="'+escapeHtml(name)+'">'+escapeHtml(name)+'</span><span class="rem-bar-track"><span class="rem-bar-fill" style="width:'+Math.round(count/max*100)+'%"></span></span><span class="rem-bar-number">'+count.toLocaleString('es-MX')+'</span></div>').join(''):'<p class="rem-empty">Sin registros</p>';}
   function recompute(){const planta=el('filter-planta')?.value||'',status=el('filter-status')?.value||'',start=el('filter-start')?.value||'',end=el('filter-end')?.value||'',q=norm(el('filter-search')?.value||'');filtered=data.filter(r=>{if(planta && val(r,'Planta')!==planta)return false;if(status && val(r,'Estatus')!==status)return false;const d=dateISO(r.Fecha);if(start && (!d||d<start))return false;if(end && (!d||d>end))return false;if(q && !norm([r.Remision,r.Reportes,r.Estatus,r.Orden,r.Planta,r.Fecha,r.Equipo].join(' ')).includes(q))return false;return true;});}
-  function draw(){recompute();const unique=new Set(filtered.map(r=>val(r,'Remision')).filter(Boolean));el('kpi-unique').textContent=unique.size.toLocaleString('es-MX');el('kpi-rows').textContent=filtered.length.toLocaleString('es-MX');el('kpi-pending').textContent=filtered.filter(r=>{const s=norm(r.Estatus);return s.includes('PENDIENT') && (s.includes('SUBIR')||s.includes('SISTEMA'));}).length.toLocaleString('es-MX');el('kpi-invoiced').textContent=filtered.filter(r=>norm(r.Estatus).includes('FACTURAD')).length.toLocaleString('es-MX');el('kpi-unpaid').textContent=filtered.filter(r=>{const s=norm(r.Estatus);return s.includes('SIN COBRO')||s.includes('NO COBRAD');}).length.toLocaleString('es-MX');drawBars('status-bars','Estatus');drawBars('plant-bars','Planta');const totalPages=Math.max(1,Math.ceil(filtered.length/PAGE_SIZE));page=Math.max(1,Math.min(page,totalPages));const chunk=filtered.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE);el('page-label').textContent=page+' / '+totalPages;el('counter').textContent=filtered.length.toLocaleString('es-MX')+' registros · Mostrando '+(filtered.length?(page-1)*PAGE_SIZE+1:0)+'–'+Math.min(page*PAGE_SIZE,filtered.length);el('table-body').innerHTML=chunk.length?chunk.map(r=>'<tr><td><b>'+escapeHtml(r.Remision)+'</b></td><td>'+escapeHtml(r.Reportes)+'</td><td><span class="rem-status '+statusType(r.Estatus)+'">'+escapeHtml(r.Estatus||'Sin estatus')+'</span></td><td>'+escapeHtml(r.Orden)+'</td><td>'+escapeHtml(r.Planta)+'</td><td>'+escapeHtml(r.Fecha)+'</td><td>'+escapeHtml(r.HoraInicio)+'</td><td>'+escapeHtml(r.HoraFin)+'</td><td>'+escapeHtml(r.Equipo)+'</td></tr>').join(''):'<tr><td colspan="9" class="rem-empty">Sin registros con estos filtros</td></tr>';}
+  function draw(){recompute();const unique=new Set(filtered.map(r=>val(r,'Remision')).filter(Boolean));el('kpi-unique').textContent=unique.size.toLocaleString('es-MX');el('kpi-pending').textContent=filtered.filter(r=>{const s=norm(r.Estatus);return s.includes('PENDIENT') && (s.includes('SUBIR')||s.includes('SISTEMA'));}).length.toLocaleString('es-MX');el('kpi-invoiced').textContent=filtered.filter(r=>norm(r.Estatus).includes('FACTURAD')).length.toLocaleString('es-MX');el('kpi-unpaid').textContent=filtered.filter(r=>{const s=norm(r.Estatus);return s.includes('SIN COBRO')||s.includes('NO COBRAD');}).length.toLocaleString('es-MX');// Importes tomados directamente de la columna S (Total) de Detalle de remision.
+    // Cada fila del detalle se suma una sola vez (_row identifica la fila original).
+    const money=n=>new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN',minimumFractionDigits:2,maximumFractionDigits:2}).format(n);
+    function monto(v){
+      let s=text(v).trim().replace(/[$\s]/g,'');
+      if(!s)return null;
+      if(s.includes(',')&&s.includes('.'))s=s.lastIndexOf(',')>s.lastIndexOf('.')?s.replace(/\./g,'').replace(',','.'):s.replace(/,/g,'');
+      else if(s.includes(','))s=/,\d{1,2}$/.test(s)?s.replace(',','.'):s.replace(/,/g,'');
+      const n=Number(s);return Number.isFinite(n)?n:null;
+    }
+    const vistos=new Set();
+    const rows=filtered.filter(r=>{const key=r._row == null?null:String(r._row);if(key!==null){if(vistos.has(key))return false;vistos.add(key);}return true;});
+    const sum=(test)=>{let amount=0,missing=0,records=0;rows.forEach(r=>{if(!test(norm(r.Estatus)))return;records++;const n=monto(r.Total);if(n===null)missing++;else amount+=n;});return {amount,missing,records};};
+    const buckets={
+      all:sum(()=>true),
+      pending:sum(s=>s.includes('PENDIENT')&&(s.includes('SUBIR')||s.includes('SISTEMA'))),
+      invoiced:sum(s=>s.includes('FACTURAD')),
+      unpaid:sum(s=>s.includes('SIN COBRO')||s.includes('NO COBRAD')),
+      uploaded:sum(s=>s.includes('SUBIDO')||s.includes('CARGADO')),
+      operacion:sum(s=>s.includes('OPERACION'))
+    };
+    Object.entries(buckets).forEach(([k,v])=>{const target=el('money-'+k);if(target){target.textContent=money(v.amount);target.title=v.missing?v.missing+' filas sin Total en columna S':'';}});
+    const setCount=(k,n)=>{const target=el('kpi-'+k);if(target)target.textContent=n.toLocaleString('es-MX');};
+    setCount('uploaded',buckets.uploaded.records);
+    setCount('operacion',buckets.operacion.records);
+    const note=el('money-note');if(note)note.textContent='Importes tomados de Detalle de remision, columna S (Total). '+rows.length+' registros filtrados; '+buckets.all.missing+' sin importe. Se suma cada fila una sola vez; las remisiones únicas se cuentan por separado.';
+    drawBars('status-bars','Estatus');drawBars('plant-bars','Planta');const totalPages=Math.max(1,Math.ceil(filtered.length/PAGE_SIZE));page=Math.max(1,Math.min(page,totalPages));const chunk=filtered.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE);el('page-label').textContent=page+' / '+totalPages;el('counter').textContent=filtered.length.toLocaleString('es-MX')+' registros · Mostrando '+(filtered.length?(page-1)*PAGE_SIZE+1:0)+'–'+Math.min(page*PAGE_SIZE,filtered.length);el('table-body').innerHTML=chunk.length?chunk.map(r=>'<tr><td><b>'+escapeHtml(r.Remision)+'</b></td><td>'+escapeHtml(r.Reportes)+'</td><td><span class="rem-status '+statusType(r.Estatus)+'">'+escapeHtml(r.Estatus||'Sin estatus')+'</span></td><td>'+escapeHtml(r.Orden)+'</td><td>'+escapeHtml(r.Planta)+'</td><td>'+escapeHtml(r.Fecha)+'</td><td>'+escapeHtml(r.HoraInicio)+'</td><td>'+escapeHtml(r.HoraFin)+'</td><td>'+escapeHtml(r.Equipo)+'</td></tr>').join(''):'<tr><td colspan="9" class="rem-empty">Sin registros con estos filtros</td></tr>';}
   window.renderRemisiones=function(){page=1;draw();};
   window.remisionesPage=function(step){page+=step;draw();};
   window.clearRemisionesFilters=function(){['filter-planta','filter-status','filter-start','filter-end','filter-search'].forEach(id=>{const x=el(id);if(x)x.value='';});page=1;draw();};
   window.loadRemisiones=async function(force){if(loading)return loading;if(loaded&&!force){draw();return;}const msg=el('error');msg.style.display='none';el('updated').textContent='Cargando remisiones…';loading=(async()=>{try{const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),120000);let response;try{response=await fetch(API_URL+'?action=remisiones_detalle&t='+Date.now(),{signal:controller.signal});}finally{clearTimeout(timer);}if(!response.ok)throw Error('Respuesta HTTP '+response.status);const result=await response.json();if(!result.success)throw Error(result.error||'Error leyendo Detalle de remision');data=Array.isArray(result.data)?result.data:[];loaded=true;optionList('filter-planta',uniq('Planta'),'Todas las plantas');optionList('filter-status',uniq('Estatus'),'Todos los estatus');el('updated').textContent='Actualizado '+new Date().toLocaleString('es-MX');page=1;draw();}catch(err){msg.textContent='No fue posible consultar Detalle de remision: '+err.message+'. Verifica que hayas publicado la nueva versión de Apps Script y que exista la pestaña con ese nombre.';msg.style.display='block';el('updated').textContent='No disponible';}})();try{await loading;}finally{loading=null;}};
-  window.exportRemisionesCsv=function(){if(!loaded){alert('Primero carga las remisiones.');return;}const cols=[['Remision','Remisión'],['Reportes','Reportes'],['Estatus','Estatus'],['Orden','Orden'],['Planta','Planta'],['Fecha','Fecha'],['HoraInicio','Hora inicio'],['HoraFin','Hora fin'],['Equipo','Equipo']];const quote=(v)=>'"'+text(v).replace(/^([=+@\-\t\r])/,'\'$1').replace(/"/g,'""')+'"';const csv='\uFEFF'+[cols.map(x=>quote(x[1])).join(';'),...filtered.map(r=>cols.map(x=>quote(r[x[0]])).join(';'))].join('\r\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));a.download='Remisiones_Detalle_'+new Date().toISOString().slice(0,10)+'.csv';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);};
+  window.exportRemisionesCsv=function(){if(!loaded){alert('Primero carga las remisiones.');return;}const cols=[['Remision','Remisión'],['Reportes','Reportes'],['Estatus','Estatus'],['Orden','Orden'],['Planta','Planta'],['Fecha','Fecha'],['HoraInicio','Hora inicio'],['HoraFin','Hora fin'],['Equipo','Equipo'],['Total','Total MXN (columna S)']];const quote=(v)=>'"'+text(v).replace(/^([=+@\-\t\r])/,'\'$1').replace(/"/g,'""')+'"';const csv='\uFEFF'+[cols.map(x=>quote(x[1])).join(';'),...filtered.map(r=>cols.map(x=>quote(r[x[0]])).join(';'))].join('\r\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));a.download='Remisiones_Detalle_'+new Date().toISOString().slice(0,10)+'.csv';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);};
 })();
 </script>
 
