@@ -3024,7 +3024,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         <div id="view-monitor" class="view-section">
           <section class="delay-shell">
 <div id="daily-dashboard">
-<div class="daily-header"><div><h2>Monitor de Reportes Pendientes</h2><div class="daily-muted">Producción diaria y seguimiento hasta Enviado / Finalizado · Flujo desde 25/09/2026</div></div><div class="daily-controls"><label>Fecha de servicio<input id="daily-date" type="date" onchange="renderDailyDashboard()"></label><button type="button" class="daily-btn" onclick="dailySetPeriod(0)">Hoy</button><button type="button" class="daily-btn" onclick="dailySetPeriod(7)">Últimos 7 días</button><button type="button" class="daily-btn" onclick="dailySetPeriod(30)">Últimos 30 días</button><button type="button" class="daily-btn orange" onclick="refreshMonitorData(true)">↻ Actualizar</button></div></div>
+<div class="daily-header"><div><h2>Monitor de Reportes Pendientes</h2><div class="daily-muted">Producción diaria y seguimiento hasta Enviado / Finalizado · Flujo desde 25/09/2026</div></div><div class="daily-controls"><label>Desde<input id="daily-date-from" type="date" onchange="dailyRangeChanged()" aria-label="Fecha inicial de servicio"></label><label>Hasta<input id="daily-date-to" type="date" onchange="dailyRangeChanged()" aria-label="Fecha final de servicio"></label><button type="button" class="daily-btn" onclick="dailySetPeriod(0)">Hoy</button><button type="button" class="daily-btn" onclick="dailySetPeriod(7)">Últimos 7 días</button><button type="button" class="daily-btn" onclick="dailySetPeriod(30)">Últimos 30 días</button><button type="button" class="daily-btn orange" onclick="refreshMonitorData(true)">↻ Actualizar</button></div></div>
 <div class="daily-kpis"><div class="daily-card"><small>Reportes del periodo</small><b id="daily-total">—</b><span>Por fecha de servicio</span></div><div class="daily-card"><small>Constancia firmada</small><b class="daily-green" id="daily-signed">—</b><span>Firma registrada</span></div><div class="daily-card"><small>Sin constancia firmada</small><b class="daily-red" id="daily-unsigned">—</b><span>Acción del técnico</span></div><div class="daily-card"><small>Firmados sin enviar a revisión</small><b class="daily-orange" id="daily-unsubmitted">—</b><span>Pendientes con el técnico</span></div><div class="daily-card"><small>En revisión</small><b class="daily-blue" id="daily-review">—</b><span>Actualmente con César</span></div><div class="daily-card"><small>En etapa posterior</small><b class="daily-orange" id="daily-next">—</b><span>Aviso / correo / carga</span></div><div class="daily-card"><small>Enviados / finalizados</small><b id="daily-closed">—</b><span>Fuera de pendientes</span></div></div>
 <div class="daily-main"><div class="daily-panel"><h3>Producción por técnico</h3><p class="daily-muted">Servicios del periodo y su estado actual. «Firmados sin enviar» siguen con el técnico; «En revisión» ya están con César. Selecciona un técnico para ver el detalle.</p><div class="daily-table-wrap"><table class="daily-table"><thead><tr><th>TÉCNICO</th><th>TOTAL</th><th>CON FIRMA</th><th>SIN FIRMA</th><th title="Firmados pero aún no enviados a revisión. Responsabilidad del técnico">FIRMADOS SIN ENVIAR</th><th title="Ya enviados a revisión; responsabilidad de César">EN REVISIÓN · CÉSAR</th><th>POSTERIORES</th><th>CERRADOS</th><th>% FIRMA</th></tr></thead><tbody id="daily-technicians"></tbody></table></div></div><div class="daily-panel"><div id="daily-person"><h3>Selecciona un técnico</h3><p class="daily-muted">Aquí aparecerá su producción y sus reportes pendientes acumulados.</p></div><div class="daily-pdf-filter" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:14px 0 10px"><label for="daily-pdf-status" style="font-size:12px;font-weight:700;color:#b8cbe2">Incluir en el PDF:</label><select id="daily-pdf-status" aria-label="Filtrar estatus del PDF individual" style="background:#12213a;color:#f8fafc;border:1px solid #405474;border-radius:7px;padding:9px 12px;min-width:235px;max-width:100%"><option value="all">Todos los pendientes del técnico</option><option value="firma">Solo pendiente de firma (03)</option><option value="sin_firma">Todos los pendientes sin firma</option><option value="firmado">Firmados sin enviar a revisión (04)</option></select></div><div class="daily-phone-row" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 12px"><label for="daily-phone" style="font-size:12px;font-weight:700;color:#b8cbe2">WhatsApp del técnico:</label><input id="daily-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="10 dígitos · ej. 8112345678" maxlength="18" aria-label="Número de WhatsApp del técnico seleccionado" style="background:#12213a;color:#f8fafc;border:1px solid #405474;border-radius:7px;padding:9px 12px;width:235px;max-width:100%"/><span id="daily-phone-note" class="daily-muted" style="font-size:11px">Se guarda en este navegador por técnico.</span></div><div class="daily-actions"><button class="daily-btn orange" onclick="dailyPrintSelected()">PDF individual</button><button class="daily-btn" onclick="dailyExportSelected()">Excel / CSV</button><button class="daily-btn" onclick="dailyWhatsappSelected()">WhatsApp + PDF</button></div><div class="daily-muted">El PDF se adjunta manualmente en WhatsApp normal. No se envía automáticamente.</div></div></div>
 <div class="daily-panel daily-section"><div class="daily-section-heading"><div><h3 id="daily-report-title">Reportes del técnico seleccionado</h3><div class="daily-muted">Reporte individual: producción del periodo; pendientes abiertos: cualquier fecha desde 25/09/2026.</div></div><div class="daily-controls"><select id="daily-table-mode" onchange="renderDailyDashboard()"><option value="open">Pendientes acumulados</option><option value="period">Producción del periodo</option></select><input id="daily-search" placeholder="Buscar reporte / equipo" oninput="renderDailyDashboard()"></div></div><div class="daily-table-wrap"><table class="daily-table"><thead><tr><th>REPORTE</th><th>FECHA SERVICIO</th><th>PLANTA</th><th>EQUIPO</th><th>ESTATUS ACTUAL</th><th>RESPONSABLE ACTUAL</th><th>DÍAS EN ETAPA</th><th>PRÓXIMA ACCIÓN</th><th>SEGUIMIENTO</th></tr></thead><tbody id="daily-reports"></tbody></table></div><p class="daily-note" id="daily-count-note"></p></div>
@@ -6421,7 +6421,7 @@ function renderReportesPNDCharts() {
 (function(){
 const NEW_DATE=new Date(2026,8,25);
 const techStages=new Set(['Borrador','Generar constancia','Firma','Envío a revisión','Corrección']);
-let picked='',daysBack=0,chosenReport='';
+let picked='',chosenReport='';
 const $=id=>document.getElementById(id);
 // Directorio interno de contactos por técnico. No determina la cuenta remitente:
 // el mensaje sale de la sesión de WhatsApp Web abierta.
@@ -6484,8 +6484,20 @@ const tech=String(val(r,['Tecnico','Técnico'])||'Sin técnico');
 seen.set(id,{...item,tech,plant:String(val(r,['Planta'])||''),equipment:String(val(r,['Equipo'])||''),status,stage,finished,signed:!!val(r,['Firma'])||normalizeText(val(r,['FIRMA_ESTADO']))==='FIRMADO',owner:delayStageOwner(stage.name,tech)});
 });return [...seen.values()];
 }
-function periodItems(items){const end=$('daily-date')?.value||today();const dt=new Date(end+'T12:00:00');if(isNaN(dt.getTime()))return [];
-return items.filter(x=>{const v=dateKey(x.fecha);const start=new Date(dt);start.setDate(start.getDate()-daysBack+ (daysBack?1:0));return v>=dateKey(start)&&v<=end;});}
+function initDailyDates(){
+  const from=$('daily-date-from'),to=$('daily-date-to');
+  if(!from||!to)return;
+  if(!from.value)from.value=today();
+  if(!to.value)to.value=today();
+  from.max=to.value;
+  to.min=from.value;
+}
+function periodItems(items){
+  initDailyDates();
+  const start=$('daily-date-from')?.value||today(),end=$('daily-date-to')?.value||today();
+  if(start>end)return [];
+  return items.filter(x=>{const v=dateKey(x.fecha);return v>=start&&v<=end;});
+}
 function isTechOpen(x){return !x.finished&&techStages.has(x.stage.name)&&x.owner===x.tech}
 // El estado 04 FIRMADO es responsabilidad del técnico. Solo cambia a César
 // cuando el estado calculado en AppSheet es 05 PENDIENTE DE REVISIÓN.
@@ -6500,7 +6512,7 @@ $('daily-reports').querySelectorAll('[data-report]').forEach(b=>b.onclick=()=>{c
 function showEvolution(){const x=allRows().find(x=>x.id===chosenReport);if(!x){$('daily-evolution').textContent='Selecciona un reporte';return;}
 $('daily-evolution').innerHTML=`<strong>Reporte ${escapeHtmlMonitor(x.reporte)}</strong> · ${escapeHtmlMonitor(x.status)}<div class="daily-note">Técnico: ${escapeHtmlMonitor(x.tech)} · ${escapeHtmlMonitor(x.plant)}</div>`+x.stage.milestones.map(m=>`<div style="padding:7px 0;border-bottom:1px solid #2e425e;display:flex;justify-content:space-between;gap:8px"><span>${escapeHtmlMonitor(m.name)}</span><b>${m.date?escapeHtmlMonitor(delayDateText(m.date)):'—'}</b></div>`).join('')+`<p class="daily-note">Estado actual: ${escapeHtmlMonitor(x.finished?'Finalizado':x.stage.name)} · Responsable: ${escapeHtmlMonitor(x.finished?'—':x.owner)}. No se inventan fechas faltantes.</p>`;
 }
-function render(){if(!$('daily-dashboard'))return;const items=allRows(), period=periodItems(items);if(!$('daily-date')?.value)$('daily-date').value=today();
+function render(){if(!$('daily-dashboard'))return;const items=allRows(), period=periodItems(items);
 const count=(arr,fn)=>arr.filter(fn).length;
 text('daily-total',period.length);text('daily-signed',count(period,x=>x.signed));text('daily-unsigned',count(period,x=>!x.signed));text('daily-unsubmitted',count(period,isFirmadoSinEnviar));text('daily-review',count(period,x=>!x.finished&&x.owner==='César Jiménez'));text('daily-next',count(period,x=>!x.finished&&x.owner==='Selene Martínez'));text('daily-closed',count(period,x=>x.finished));
 const groups=new Map();period.forEach(x=>{if(!groups.has(x.tech))groups.set(x.tech,[]);groups.get(x.tech).push(x)});
@@ -6512,7 +6524,22 @@ $('daily-owners').innerHTML=owners.map(([label,n])=>`<button type="button" data-
 const hist=typeof delaySplitRows==='function'?delaySplitRows().historicos.length:0;text('daily-historical',hist+' pendientes históricos (antes de 25/09/2026) se administran por Área de Captura, fuera del ranking del flujo nuevo.');fillTable();if(chosenReport)showEvolution();
 }
 window.renderDailyDashboard=render;
-window.dailySetPeriod=n=>{daysBack=n;$('daily-date').value=today();render();};
+window.dailyRangeChanged=()=>{
+  const from=$('daily-date-from'),to=$('daily-date-to');
+  if(from?.value&&to?.value&&from.value>to.value){
+    // Ajustar la otra fecha para evitar un intervalo invertido.
+    if(document.activeElement===from)to.value=from.value;else from.value=to.value;
+  }
+  render();
+};
+window.dailySetPeriod=n=>{
+  const end=new Date();
+  const start=new Date(end);
+  start.setDate(start.getDate()-(n>0?n-1:0));
+  $('daily-date-from').value=dateKey(start);
+  $('daily-date-to').value=dateKey(end);
+  render();
+};
 function readyPdf(){if(!picked){alert('Selecciona primero un técnico.');return false;}window.delaySelectedTech=picked;const el=$('delay-filter-tech');if(el)el.value=picked;window.delayOwnerGroup='tech';window.delayShowAllRows=true;renderMonitorPendientes();return true;}
 window.dailyPrintSelected=()=>{if(readyPdf())printDelayPdf($('daily-pdf-status')?.value||'all')};
 window.dailyExportSelected=()=>{if(readyPdf())exportDelayCsv()};
