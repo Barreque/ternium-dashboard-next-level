@@ -2357,6 +2357,13 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 #view-remisiones .rem-note{margin-top:12px;line-height:1.5}#view-remisiones .rem-message{margin:0 0 14px;padding:12px;background:#513126;border:1px solid #b45309;border-radius:8px;font-size:12px}
 @media(max-width:1150px){#view-remisiones .rem-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:750px){#view-remisiones .rem-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}#view-remisiones .rem-overview{grid-template-columns:1fr}#view-remisiones .rem-filters label{flex:1 1 40%}}
 
+
+/* AVISOS M8 · Resumen gerencial */
+.m8-heading,.m8-table-head{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px}.m8-heading h2{font-size:21px;font-weight:750;color:#f3f7ff}.m8-heading p,.m8-panel p,.m8-table-head p{font-size:12px;color:#94a9c5;margin-top:4px}
+.m8-switch{display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap}.m8-switch button,.m8-table-foot button{border:1px solid #324463;background:#192a45;color:#dce9f9;border-radius:8px;padding:10px 15px;cursor:pointer;font-weight:600}.m8-switch button.m8-active{background:#ff7900;color:white;border-color:#ff7900}.m8-switch span{margin-left:auto;color:#a9b9d2;font-size:12px}.m8-message{padding:12px 14px;border:1px solid #9f6d26;background:#362a1f;color:#ffd291;border-radius:10px;margin-bottom:12px}
+.m8-kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin:14px 0}.m8-kpi,.m8-panel{background:#17263e;border:1px solid #314766;border-radius:12px;padding:16px}.m8-kpi{display:flex;flex-direction:column;gap:10px;min-width:0}.m8-kpi small{color:#afc0da;font-size:10px;font-weight:750;text-transform:uppercase}.m8-kpi b{font-size:29px;line-height:1.1;color:white}.m8-kpi span{font-size:11px;color:#9bafcb}.m8-kpi:nth-child(2) b,.m8-kpi:nth-child(5) b{color:#12c990}.m8-kpi:nth-child(4) b{color:#ff6173}.m8-panels{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}.m8-panel h3{font-size:16px;color:white;margin-bottom:3px}.m8-bars{display:grid;gap:10px;margin-top:17px}.m8-bar-row{display:grid;grid-template-columns:minmax(90px,130px) 1fr 70px;gap:10px;align-items:center;font-size:12px;color:#dce6f7}.m8-track{height:12px;border-radius:20px;background:#2a3d59;overflow:hidden}.m8-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,#ff9400,#ff4664)}.m8-fill.closed{background:#13c998}.m8-legend{display:flex;gap:15px;font-size:11px;color:#aebdd1;margin-top:8px}.m8-legend i{display:inline-block;width:8px;height:8px;border-radius:50%;background:#ff8b18;margin-right:5px}.m8-legend i.closed{background:#13c998}.m8-controls{display:flex;gap:8px;flex-wrap:wrap}.m8-controls select,.m8-controls input{background:#182941;color:#dce7f9;border:1px solid #344b6e;border-radius:7px;padding:9px 10px;max-width:235px}.m8-table-panel .table-responsive{max-height:600px;overflow:auto}.m8-table-panel td{font-size:12px}.m8-table-foot{display:flex;justify-content:space-between;align-items:center;margin-top:12px;color:#afc0da;font-size:12px}.m8-table-foot>div{display:flex;gap:8px}.m8-pill{padding:4px 9px;border-radius:8px;font-size:11px;font-weight:700;white-space:nowrap}.m8-pill.norm{color:#36e5ad;background:#125c4b}.m8-pill.alarm{color:#ffc57d;background:#60411e}.m8-pill.peli{color:#ff9fa9;background:#632933}.m8-plant-row{cursor:pointer}.m8-plant-row:hover{color:#fff}.m8-paired{margin-top:6px}
+@media(max-width:1300px){.m8-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:850px){.m8-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.m8-panels{grid-template-columns:1fr}.m8-switch span{margin-left:0}}
+
 </style>
 <style id="delay-followup-styles">.delay-followup-tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px}.delay-followup-tools input{background:#192a47;border:1px solid #324563;border-radius:7px;padding:10px;color:white;min-width:205px}.delay-followup-tools>span:first-child{width:100%;font-weight:600;color:#e2e8f0}.delay-followup-tools .delay-note{width:100%;font-size:12px}.delay-rank-click{width:100%;border:1px solid transparent;background:transparent;color:inherit;text-align:left;cursor:pointer;font:inherit}.delay-rank-click:hover,.delay-selected-rank{background:rgba(250,133,13,.12);border-color:#ed8b30;border-radius:8px}.delay-rank-click:focus-visible{outline:2px solid orange}</style>
 
@@ -2443,7 +2450,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
             </div>
             <div class="menu-item" onclick="switchTab('alerts', this)">
                 <i data-lucide="bell"></i>
-                <span>Avisos de Alarma</span>
+                <span>Avisos M8</span>
             </div>
             <div class="menu-item" onclick="switchTab('reportes', this)">
                 <i data-lucide="clipboard-list"></i>
@@ -2682,157 +2689,32 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         </div>
 
 
-        <!-- TAB 2: ACTIVE ALARMS VIEW -->
+        <!-- AVISOS M8 · Histórico anual y mes actual desde AVISOS M8 GENERAL -->
         <div id="view-alerts" class="view-section">
-            <!-- KPIs Row -->
-            <div class="kpi-grid">
-                <!-- KPI 1 -->
-                <div class="kpi-card">
-                    <div class="kpi-card-header">
-                        <span class="kpi-title">Total de Avisos</span>
-                        <div class="kpi-icon orange"><i data-lucide="alert-octagon"></i></div>
-                    </div>
-                    <div class="kpi-value" id="kpi-a-total">0</div>
-                    <div class="kpi-trend neutral" id="kpi-a-total-sub">Avisos activos y pendientes</div>
-                    <div class="kpi-sparkline" id="spark-a-total"></div>
-                </div>
-                <!-- KPI 2 -->
-                <div class="kpi-card">
-                    <div class="kpi-card-header">
-                        <span class="kpi-title">Nivel de Peligro (Crítico)</span>
-                        <div class="kpi-icon red"><i data-lucide="radiation"></i></div>
-                    </div>
-                    <div class="kpi-value" id="kpi-a-danger">0</div>
-                    <div class="kpi-trend down" id="kpi-a-danger-sub">Requiere atención inmediata</div>
-                    <div class="kpi-sparkline" id="spark-a-danger"></div>
-                </div>
-                <!-- KPI 3 -->
-                <div class="kpi-card">
-                    <div class="kpi-card-header">
-                        <span class="kpi-title">Promedio de Días Abierto</span>
-                        <div class="kpi-icon yellow"><i data-lucide="history"></i></div>
-                    </div>
-                    <div class="kpi-value" id="kpi-a-days">0</div>
-                    <div class="kpi-trend neutral" id="kpi-a-days-sub">Tiempo promedio sin resolver</div>
-                    <div class="kpi-sparkline" id="spark-a-days"></div>
-                </div>
-                <!-- KPI 4 -->
-                <div class="kpi-card">
-                    <div class="kpi-card-header">
-                        <span class="kpi-title">Requiere Remonitoreo</span>
-                        <div class="kpi-icon blue"><i data-lucide="refresh-cw"></i></div>
-                    </div>
-                    <div class="kpi-value" id="kpi-a-remonitor">0</div>
-                    <div class="kpi-trend up" id="kpi-a-remonitor-sub">Avisos en seguimiento continuo</div>
-                    <div class="kpi-sparkline" id="spark-a-remonitor"></div>
-                </div>
-            </div>
-
-            <!-- Map Card Section (High Importance) -->
-            <div class="map-card">
-                <div class="chart-card-header" style="margin-bottom: 16px;">
-                    <div>
-                        <span class="chart-title">Geolocalización Industrial de Avisos - Plantas Ternium</span>
-                        <p class="chart-subtitle">Distribución geográfica en Monterrey y Coahuila. El tamaño y color de los pulsos reflejan la carga de alertas activas.</p>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <span class="api-info" style="margin-top:0;"><span class="api-dot"></span> Pulsos: Críticos / Alarmados</span>
-                    </div>
-                </div>
-                <div class="map-container" id="map-libre-container"></div>
-            </div>
-
-            <!-- Charts Row 1 -->
-            <div class="charts-grid-3">
-                <!-- Severity Distribution -->
-                <div class="chart-card">
-                    <div class="chart-card-header">
-                        <div>
-                            <span class="chart-title">Severidad / Estatus de Alarmas</span>
-                            <p class="chart-subtitle">PELIGRO vs ALARMADO</p>
-                        </div>
-                        <i data-lucide="activity" class="text-muted" style="width: 20px;"></i>
-                    </div>
-                    <div class="chart-wrapper">
-                        <canvas id="chart-alerts-donut"></canvas>
-                    </div>
-                </div>
-
-                <!-- Alarms by Plant -->
-                <div class="chart-card">
-                    <div class="chart-card-header">
-                        <div>
-                            <span class="chart-title">Avisos Activos por Planta</span>
-                            <p class="chart-subtitle">Acumulado de alarmas por ubicación</p>
-                        </div>
-                        <i data-lucide="bar-chart" class="text-muted" style="width: 20px;"></i>
-                    </div>
-                    <div class="chart-wrapper">
-                        <canvas id="chart-alerts-plant-bar"></canvas>
-                    </div>
-                </div>
-
-                <!-- Custom Heatmap Widget -->
-                <div class="chart-card">
-                    <div class="chart-card-header">
-                        <div>
-                            <span class="chart-title">Cruce Planta vs Severidad</span>
-                            <p class="chart-subtitle">Mapa de densidad para detección rápida</p>
-                        </div>
-                        <i data-lucide="grid" class="text-muted" style="width: 20px;"></i>
-                    </div>
-                    <div class="chart-wrapper" style="min-height: auto;">
-                        <div class="heatmap-grid" id="alerts-heatmap-grid">
-                            <!-- Populated dynamically via JS -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Detailed Table -->
-            <div class="table-card">
-                <div class="table-card-header">
-                    <div>
-                        <span class="chart-title">Listado de Alarmas y Monitoreo PND</span>
-                        <p class="chart-subtitle" style="margin-top: 2px;">Visualización de los avisos de planta, días acumulados abiertos y notas de inspección técnica.</p>
-                    </div>
-                    <div class="table-controls">
-                        <button class="export-btn" onclick="exportToCSV('alerts')">
-                            <i data-lucide="download"></i>
-                            <span>Exportar CSV</span>
-                        </button>
-                    </div>
-                </div>
-                <div class="table-responsive">
-                    <table class="data-table" id="alerts-table">
-                        <thead>
-                            <tr>
-                                <th>Nº Aviso</th>
-                                <th>Relación Orden</th>
-                                <th>Severidad</th>
-                                <th>Planta</th>
-                                <th>Descripción del Aviso</th>
-                                <th>Días Abierto</th>
-                                <th>Notas Inspección (Estatus)</th>
-                                <th>Ubicación Técnica</th>
-                                <th>Remonitoreo</th>
-                                <th>Última Insp.</th>
-                            </tr>
-                        </thead>
-                        <tbody id="alerts-table-body">
-                            <!-- Populated dynamically -->
-                        </tbody>
-                    </table>
-                </div>
-                <div class="pagination-container">
-                    <div class="pagination-info" id="alerts-pagination-info">Mostrando 0 de 0 registros</div>
-                    <div class="pagination-buttons" id="alerts-pagination-buttons">
-                        <!-- Buttons populated dynamically -->
-                    </div>
-                </div>
-            </div>
+          <div class="m8-heading">
+            <div><h2>Avisos M8 · Control anual y mensual</h2><p>Fuente: AVISOS M8 GENERAL · Planta identificada por ubicación técnica</p></div>
+            <button class="export-btn" onclick="m8Load(true)">↻ Actualizar avisos</button>
+          </div>
+          <div class="m8-switch"><button id="m8-year-btn" class="m8-active" onclick="m8SetPeriod('year')">Lo que va del año</button><button id="m8-month-btn" onclick="m8SetPeriod('month')">Mes en curso</button><span id="m8-period-label"></span></div>
+          <div id="m8-warning" class="m8-message" style="display:none"></div>
+          <div class="m8-kpis">
+            <div class="m8-kpi"><small>Creados en el periodo</small><b id="m8-created">—</b><span>Según fecha de creación</span></div>
+            <div class="m8-kpi"><small>Normalizados en el periodo</small><b id="m8-closed">—</b><span>Según fecha de cierre</span></div>
+            <div class="m8-kpi"><small>Siguen alarmados</small><b id="m8-alarmed">—</b><span>Entre los creados en el periodo</span></div>
+            <div class="m8-kpi"><small>En peligro</small><b id="m8-danger">—</b><span>Entre los creados en el periodo</span></div>
+            <div class="m8-kpi"><small>Normalizados de los creados</small><b id="m8-cohort-closed">—</b><span>Estado actual de esa generación</span></div>
+            <div class="m8-kpi"><small>Porcentaje normalizado</small><b id="m8-rate">—</b><span>De los creados en el periodo</span></div>
+          </div>
+          <div class="m8-panels">
+            <div class="m8-panel"><h3>Creación vs normalización por mes</h3><p>Mes de creación frente a mes de cierre; no deben coincidir necesariamente.</p><div id="m8-month-bars"></div></div>
+            <div class="m8-panel"><h3>Situación por planta</h3><p>Selecciona una planta para consultar sus avisos.</p><div id="m8-plant-bars"></div></div>
+          </div>
+          <div class="m8-panel m8-table-panel">
+            <div class="m8-table-head"><div><h3>Detalle de avisos</h3><p id="m8-count">Pendiente de carga</p></div><div class="m8-controls"><select id="m8-list-scope" onchange="m8State.page=1;m8Render()"><option value="created">Creados en el periodo</option><option value="closed">Normalizados en el periodo</option></select><select id="m8-plant-filter" onchange="m8Render()"><option value="ALL">Todas las plantas</option></select><select id="m8-status-filter" onchange="m8Render()"><option value="ALL">Todos los estatus</option><option value="ALARM">Alarmados</option><option value="PELI">En peligro</option><option value="NORM">Normalizados</option></select><input id="m8-search" placeholder="Buscar aviso, orden o equipo..." oninput="m8Render()"><button class="export-btn" onclick="m8Export()">Exportar CSV</button></div></div>
+            <div class="table-responsive"><table class="data-table"><thead><tr><th>Aviso</th><th>Planta</th><th>Estatus</th><th>Descripción</th><th>Orden</th><th>Creado</th><th>Normalizado</th><th>Días abierto</th><th>Ubicación técnica</th></tr></thead><tbody id="m8-body"><tr><td colspan="9">Cargando avisos...</td></tr></tbody></table></div>
+            <div class="m8-table-foot"><span id="m8-pagination-label"></span><div><button id="m8-prev" onclick="m8Page(-1)">Anterior</button><button id="m8-next" onclick="m8Page(1)">Siguiente</button></div></div>
+          </div>
         </div>
-
 
         <!-- TAB 3: REPORTES PND VIEW -->
         <div id="view-reportes" class="view-section">
@@ -3376,6 +3258,16 @@ input[type="date"]::-webkit-calendar-picker-indicator {
             const filterTecnicoGroup = document.getElementById("filter-tecnico-group");
             const filtersBar = document.getElementById("filters-bar");
 
+            if (tabId === "alerts") {
+                if (title) title.innerText = "Avisos M8";
+                if (subtitle) subtitle.innerText = "Estadística anual y del mes en curso · AVISOS M8 GENERAL";
+                if (filtersBar) filtersBar.style.display = "none";
+                stopMonitorAutoRefresh();
+                m8Load();
+                if (window.lucide) lucide.createIcons();
+                return;
+            }
+
             if (tabId === "remisiones") {
                 if (title) title.innerText = "Remisiones";
                 if (subtitle) subtitle.innerText = "Control de remisiones · Detalle de remision (AVISOS M8)";
@@ -3661,12 +3553,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
                 );
                 const errors = [];
                 if (ordersResult.status === 'rejected') errors.push('Órdenes: ' + ordersResult.reason?.message);
-                if (alertsResult.status === 'rejected') errors.push('Avisos M8: ' + alertsResult.reason?.message);
+                if (alertsResult.status === 'rejected') console.warn('Avisos históricos no cargados; se usará AVISOS M8 GENERAL desde su sección:', alertsResult.reason?.message);
                 if (errors.length) {
                     throw new Error('No fue posible cargar: ' + errors.join(' | '));
                 }
                 const resOrders = ordersResult.value;
-                const resAlerts = alertsResult.value;
+                const resAlerts = alertsResult.status === 'fulfilled' ? alertsResult.value : {success:true,data:[]};
 
                 // Reportes PND desde CAPTURA. No bloquea el dashboard si falla.
                 let resReportes = { success: false, data: [] };
@@ -5015,6 +4907,8 @@ if (fo.endDate && order.dueDate) {
           <div class="kpis"><div class="kpi"><strong>${rows.length}</strong><span>Reportes pendientes</span></div><div class="kpi alert"><strong>${crit}</strong><span>Críticos: más de 7 días</span></div><div class="kpi"><strong>${attention}</strong><span>En atención: de 3 a 7 días</span></div><div class="kpi"><strong>${maxDays}</strong><span>Mayor espera en etapa (días)</span></div></div>
           <div class="section">Detalle por atender · ordenado por mayor atraso</div><table><colgroup><col style="width:10%"><col style="width:13%"><col style="width:22%"><col style="width:15%"><col style="width:18%"><col style="width:8%"><col style="width:14%"></colgroup><thead><tr><th>N° reporte</th><th>Planta</th><th>Equipo</th><th>Etapa actual</th><th>Acción requerida</th><th>Días</th><th>Fecha compromiso / avance</th></tr></thead><tbody>${rows.map(x=>`<tr><td class="num">${escapeHtmlMonitor(x.reporte)}</td><td>${escapeHtmlMonitor(x.plant)}</td><td>${escapeHtmlMonitor(x.equipment)}</td><td>${escapeHtmlMonitor(x.name)}</td><td>${escapeHtmlMonitor(delayRequiredAction(x))}</td><td class="${x.stageDays===null?'':x.stageDays>7?'danger':x.stageDays>=3?'warn':''}">${x.stageDays===null?'S/F':x.stageDays}</td><td>_____________________</td></tr>`).join('')}</tbody></table>
           <div class="actions"><b>Solicitud de seguimiento:</b> Dar prioridad a los casos críticos, completar la acción requerida y confirmar avance y fecha compromiso. Los casos S/F requieren validar la fecha de inicio de etapa.</div><div class="footer">Este reporte se genera con la información disponible en el monitor al corte indicado. No incluye pendientes actualmente a cargo de César Jiménez, Selene Martínez o Área de Captura. Verificar registros en AppSheet antes de atribuir atrasos. El documento no acredita envío por WhatsApp.</div>
+
+
 </body></html>`;
           const w=window.open('','_blank');if(!w){alert('Permite ventanas emergentes para abrir el formato de impresión');return;}
           w.document.open();w.document.write(html);w.document.close();w.focus();
@@ -6628,5 +6522,61 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 })();
 </script>
 
+<script>
+/* AVISOS M8: panel independiente. El resto del dashboard permanece intacto. */
+const m8State={records:[],loaded:false,loading:false,period:'year',page:1,pageSize:50,selectedPlant:'ALL'};
+const m8$=id=>document.getElementById(id);
+const m8Escape=v=>String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+function m8Date(s){if(!s)return null;const v=String(s).trim();let m=v.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);if(m)return new Date(+m[3],+m[2]-1,+m[1]);m=v.match(/^(\d{4})-(\d\d)-(\d\d)/);if(m)return new Date(+m[1],+m[2]-1,+m[3]);return null;}
+function m8Fmt(s){const d=m8Date(s);return d?d.toLocaleDateString('es-MX',{day:'2-digit',month:'2-digit',year:'numeric'}):'—';}
+function m8Bounds(){const now=new Date();return {start:new Date(now.getFullYear(),m8State.period==='month'?now.getMonth():0,1),end:new Date(now.getFullYear(),now.getMonth(),now.getDate(),23,59,59,999),year:now.getFullYear(),month:now.getMonth()};}
+function m8Between(value,b){const d=m8Date(value);return !!d&&d>=b.start&&d<=b.end;}
+function m8Status(s){const t=String(s||'').trim().toUpperCase();return t==='NORM'?'Normalizado':t==='ALARM'?'Alarmado':t==='PELI'?'Peligro':(t||'Sin estatus');}
+async function m8Load(force=false){
+ if(m8State.loading)return;
+ if(m8State.loaded&&!force){m8Render();return;}
+ m8State.loading=true;m8$('m8-body').innerHTML='<tr><td colspan="9">Consultando AVISOS M8 GENERAL...</td></tr>';
+ try{
+  const url=API_URL+'?action=avisos_m8_general'+(force?'&t='+Date.now():'');
+  const ctl=new AbortController();const timer=setTimeout(()=>ctl.abort(),120000);
+  let response;try{response=await fetch(url,{signal:ctl.signal,cache:'no-store'});}finally{clearTimeout(timer);}
+  if(!response.ok)throw new Error('HTTP '+response.status);
+  const payload=await response.json();if(!payload.success)throw new Error(payload.error||'Consulta no disponible');
+  m8State.records=payload.data||[];m8State.loaded=true;
+  const plants=[...new Set(m8State.records.map(r=>r.Planta||'Sin identificar'))].sort((a,b)=>a.localeCompare(b,'es'));
+  m8$('m8-plant-filter').innerHTML='<option value="ALL">Todas las plantas</option>'+plants.map(p=>'<option value="'+m8Escape(p)+'">'+m8Escape(p)+'</option>').join('');
+  m8$('m8-warning').style.display=payload.unmatched? 'block':'none';
+  if(payload.unmatched)m8$('m8-warning').textContent=payload.unmatched+' avisos tienen código de planta sin correspondencia; aparecen como "Sin identificar".';
+  m8Render();
+ }catch(e){m8$('m8-body').innerHTML='<tr><td colspan="9">No fue posible consultar Avisos M8: '+m8Escape(e.message)+'. Verifica que publicaste el nuevo Apps Script.</td></tr>';m8$('m8-warning').style.display='block';m8$('m8-warning').textContent='El endpoint avisos_m8_general aún no está disponible o no responde.';}
+ finally{m8State.loading=false;}
+}
+function m8SetPeriod(v){m8State.period=v;m8State.page=1;m8$('m8-year-btn').classList.toggle('m8-active',v==='year');m8$('m8-month-btn').classList.toggle('m8-active',v==='month');m8Render();}
+function m8SetPlant(v){m8$('m8-plant-filter').value=v;m8State.page=1;m8Render();}
+function m8Page(change){m8State.page=Math.max(1,m8State.page+change);m8Render();}
+function m8ReportData(){const b=m8Bounds();const plant=m8$('m8-plant-filter')?.value||'ALL';const status=m8$('m8-status-filter')?.value||'ALL';const query=(m8$('m8-search')?.value||'').trim().toLowerCase();
+ const base=m8State.records.filter(r=>plant==='ALL'||r.Planta===plant);
+ const created=base.filter(r=>m8Between(r.Creado,b));const closed=base.filter(r=>r.Estatus==='NORM'&&m8Between(r.Cierre,b));
+ const scope=m8$('m8-list-scope')?.value||'created';const visible=(scope==='closed'?closed:created).filter(r=>(status==='ALL'||r.Estatus===status)&&(!query||[r.Aviso,r.Orden,r.Descripcion,r.Ubicacion,r.Planta].join(' ').toLowerCase().includes(query)));
+ return {b,base,created,closed,visible};}
+function m8Render(){if(!m8State.loaded)return;const {b,base,created,closed,visible}=m8ReportData();const now=new Date();
+ m8$('m8-period-label').textContent=m8State.period==='month'?now.toLocaleDateString('es-MX',{month:'long',year:'numeric'}):'Enero – '+now.toLocaleDateString('es-MX',{month:'long',year:'numeric'});
+ const alarm=created.filter(r=>r.Estatus==='ALARM').length,danger=created.filter(r=>r.Estatus==='PELI').length,cohort=created.filter(r=>r.Estatus==='NORM').length;
+ for(const [id,v] of Object.entries({'m8-created':created.length,'m8-closed':closed.length,'m8-alarmed':alarm,'m8-danger':danger,'m8-cohort-closed':cohort,'m8-rate':created.length?Math.round(cohort/created.length*100)+'%':'0%'}))m8$(id).textContent=typeof v==='number'?v.toLocaleString('es-MX'):v;
+ const months=Array.from({length:m8State.period==='month'?1:b.month+1},(_,i)=>m8State.period==='month'?b.month:i);
+ const grouped=months.map(m=>{const match=s=>{const d=m8Date(s);return d&&d.getFullYear()===b.year&&d.getMonth()===m&&d<=b.end;};return {month:new Date(b.year,m,1).toLocaleString('es-MX',{month:'short'}),created:base.filter(x=>match(x.Creado)).length,closed:base.filter(x=>x.Estatus==='NORM'&&match(x.Cierre)).length};});
+ const max=Math.max(1,...grouped.flatMap(x=>[x.created,x.closed]));
+ m8$('m8-month-bars').innerHTML='<div class="m8-legend"><span><i></i>Creados</span><span><i class="closed"></i>Normalizados</span></div><div class="m8-bars">'+grouped.map(x=>'<div><div class="m8-bar-row"><span>'+m8Escape(x.month)+'</span><div class="m8-track"><div class="m8-fill" style="width:'+(x.created/max*100)+'%"></div></div><strong>'+x.created+'</strong></div><div class="m8-bar-row m8-paired"><span>Normalizados</span><div class="m8-track"><div class="m8-fill closed" style="width:'+(x.closed/max*100)+'%"></div></div><strong>'+x.closed+'</strong></div></div>').join('')+'</div>';
+ const byPlant=new Map();created.forEach(r=>{const p=r.Planta||'Sin identificar';if(!byPlant.has(p))byPlant.set(p,{name:p,count:0,danger:0});const q=byPlant.get(p);q.count++;if(r.Estatus==='PELI')q.danger++;});const ranked=[...byPlant.values()].sort((a,b)=>b.count-a.count);const high=Math.max(1,...ranked.map(x=>x.count));
+ m8$('m8-plant-bars').innerHTML='<div class="m8-bars">'+(ranked.map(x=>'<div class="m8-bar-row m8-plant-row" title="Filtrar por esta planta" data-m8plant="'+m8Escape(x.name)+'"><span>'+m8Escape(x.name)+'</span><div class="m8-track"><div class="m8-fill" style="width:'+(x.count/high*100)+'%"></div></div><strong>'+x.count+'</strong></div>').join('')||'<p>Sin avisos creados en este periodo.</p>')+'</div>';
+ m8$('m8-plant-bars').querySelectorAll('[data-m8plant]').forEach(el=>el.addEventListener('click',()=>m8SetPlant(el.dataset.m8plant)));
+ m8$('m8-count').textContent=visible.length+' avisos en la tabla · '+created.length+' creados y '+closed.length+' normalizados en el periodo (por fecha de cierre)';
+ const pages=Math.max(1,Math.ceil(visible.length/m8State.pageSize));m8State.page=Math.min(m8State.page,pages);const offset=(m8State.page-1)*m8State.pageSize;
+ m8$('m8-body').innerHTML=visible.slice(offset,offset+m8State.pageSize).map(r=>{const code=String(r.Estatus||'').toLowerCase();let age='—';const d=m8Date(r.Creado),c=m8Date(r.Cierre);if(d){const finish=r.Estatus==='NORM'&&c?c:new Date();age=Math.max(0,Math.floor((finish-d)/86400000)).toLocaleString('es-MX');}return '<tr><td><strong>'+m8Escape(r.Aviso)+'</strong></td><td>'+m8Escape(r.Planta)+'</td><td><span class="m8-pill '+m8Escape(code)+'">'+m8Escape(m8Status(r.Estatus))+'</span></td><td>'+m8Escape(r.Descripcion)+'</td><td>'+m8Escape(r.Orden)+'</td><td>'+m8Fmt(r.Creado)+'</td><td>'+m8Fmt(r.Cierre)+'</td><td>'+age+'</td><td>'+m8Escape(r.Ubicacion)+'</td></tr>';}).join('')||'<tr><td colspan="9">Sin avisos para los filtros seleccionados.</td></tr>';
+ m8$('m8-pagination-label').textContent=(visible.length?offset+1:0)+'–'+Math.min(offset+m8State.pageSize,visible.length)+' de '+visible.length;
+ m8$('m8-prev').disabled=m8State.page<=1;m8$('m8-next').disabled=m8State.page>=pages;
+}
+function m8Export(){if(!m8State.loaded)return;const r=m8ReportData().visible;const cols=['Aviso','Planta','Estatus','Descripcion','Orden','Creado','Cierre','Ubicacion'];const csv='\uFEFF'+[cols.join(','),...r.map(x=>cols.map(k=>'"'+String(x[k]??'').replace(/"/g,'""')+'"').join(','))].join('\r\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='Avisos_M8_'+m8State.period+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);}
+</script>
 </body>
 </html>
