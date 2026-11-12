@@ -2733,7 +2733,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
             </div>
             <div class="m8-insights" id="m8-insights"><div class="m8-insights-head">LECTURA PARA DIRECCIÓN</div><p>Los indicadores se mostrarán al cargar los datos.</p></div>
             <div class="m8-exec-graphs">
-              <div class="m8-panel m8-exec-chart"><div class="m8-section-header"><div><h3>Tendencia de creación y cierre</h3><p>Se agrupan por fechas distintas: creación y normalización.</p></div><span class="m8-mini-tag">Evolución</span></div><div id="m8-month-bars"></div></div>
+              <div class="m8-panel m8-exec-chart"><div class="m8-section-header"><div><h3>Evolución: creados, normalizados y riesgos</h3><p>Alarmados y peligro: avisos del mes que siguen abiertos.</p></div><span class="m8-mini-tag">Evolución</span></div><div id="m8-month-bars"></div></div>
               <div class="m8-panel m8-exec-chart"><div class="m8-section-header"><div><h3>Plantas con mayor actividad</h3><p>Las 5 con más avisos creados durante el periodo.</p></div><span class="m8-mini-tag">Top 5</span></div><div id="m8-plant-bars"></div><button class="m8-link" onclick="m8SetMode('operations')">Consultar todas las plantas y avisos →</button></div>
             </div>
             <div class="m8-panel m8-plant-eff"><div class="m8-section-header"><div><h3>Eficiencia por planta</h3><p>De los avisos creados durante el periodo, cuántos siguen abiertos y cuántos están normalizados.</p></div></div><div id="m8-plant-efficiency"></div></div>
@@ -6650,7 +6650,7 @@ function m8BarsSvg(items,opts={}){
  const width=1000,height=330,left=54,right=18,top=33,bottom=60,plotW=width-left-right,plotH=height-top-bottom;
  const largest=Math.max(1,...items.flatMap(d=>keys.map(k=>Number(d[k]||0))));
  const scaleMax=Math.ceil(largest/10)*10 || 10;
- const step=plotW/Math.max(1,items.length),groupWidth=Math.min(step*.76,items.length<4?145:74),gap=Math.min(7,groupWidth*.06),barW=(groupWidth-(keys.length-1)*gap)/keys.length;
+ const step=plotW/Math.max(1,items.length),groupWidth=Math.min(step*.86,items.length<4?145:78),gap=Math.min(7,groupWidth*.06),barW=(groupWidth-(keys.length-1)*gap)/keys.length;
  let parts=[];
  for(let t=0;t<=4;t++){
  const y=top+plotH*t/4,v=Math.round(scaleMax*(4-t)/4);
@@ -6668,7 +6668,7 @@ function m8BarsSvg(items,opts={}){
  return '<svg class="m8-svg-visual" viewBox="0 0 '+width+' '+height+'" role="img" aria-label="Gráfica de columnas agrupadas por mes" preserveAspectRatio="xMidYMid meet">'+parts.join('')+'</svg>';
 }
 function m8CompactChart(grouped){
- return '<div class="m8-ref-legend"><span><i style="background:#fa8c42"></i>Creados</span><span><i style="background:#2dd4bf"></i>Normalizados</span></div>'+m8BarsSvg(grouped.map(g=>({label:g.month,created:g.created,closed:g.closed})),{keys:['created','closed'],labels:['Creados','Normalizados'],colors:['#fa8c42','#2dd4bf'],showNumbers:grouped.length<=3})+'<p class="m8-chart-footnote">Creación y cierre se contabilizan por sus fechas correspondientes; no deben restarse como pendientes.</p>';
+ return '<div class="m8-ref-legend"><span><i style="background:#fa8c42"></i>Creados</span><span><i style="background:#2dd4bf"></i>Normalizados</span><span><i style="background:#fbbf58"></i>Alarmados</span><span><i style="background:#fb657c"></i>En peligro</span></div>'+m8BarsSvg(grouped.map(g=>({label:g.month,created:g.created,closed:g.closed,alarm:g.alarm,danger:g.danger})),{keys:['created','closed','alarm','danger'],labels:['Creados','Normalizados','Alarmados','En peligro'],colors:['#fa8c42','#2dd4bf','#fbbf58','#fb657c'],showNumbers:grouped.length<=3})+'<p class="m8-chart-footnote">Creados: fecha de creación · Normalizados: fecha de cierre · Alarmados y peligro: creados en el mes, actualmente sin cierre.</p>';
 }
 function m8Render(){
  if(!m8State.loaded)return;
@@ -6682,7 +6682,7 @@ function m8Render(){
  const cohort=created.filter(r=>r.Estatus==='NORM').length,rate=created.length?Math.round(cohort/created.length*100):0;
  for(const [id,v] of Object.entries({'m8-created':created.length,'m8-closed':closed.length,'m8-alarmed':alarm,'m8-danger':danger,'m8-cohort-closed':cohort,'m8-rate':rate+'%','m8-ops-created':created.length,'m8-ops-closed':closed.length,'m8-ops-open':open.length,'m8-ops-unknown':unknown.length}))m8$(id).textContent=typeof v==='number'?fmt(v):v;
  const months=Array.from({length:m8State.period==='month'?1:b.month+1},(_,i)=>m8State.period==='month'?b.month:i);
- const grouped=months.map(m=>{const match=s=>{const d=m8Date(s);return d&&d.getFullYear()===b.year&&d.getMonth()===m&&d<=b.end;};return {month:new Date(b.year,m,1).toLocaleString('es-MX',{month:'short'}),created:base.filter(x=>match(x.Creado)).length,closed:base.filter(x=>x.Estatus==='NORM'&&match(x.Cierre)).length};});
+ const grouped=months.map(m=>{const match=s=>{const d=m8Date(s);return d&&d.getFullYear()===b.year&&d.getMonth()===m&&d<=b.end;};return {month:new Date(b.year,m,1).toLocaleString('es-MX',{month:'short'}),created:base.filter(x=>match(x.Creado)).length,closed:base.filter(x=>x.Estatus==='NORM'&&match(x.Cierre)).length,alarm:base.filter(x=>x.Estatus==='ALARM'&&match(x.Creado)).length,danger:base.filter(x=>x.Estatus==='PELI'&&match(x.Creado)).length};});
  const max=Math.max(1,...grouped.flatMap(x=>[x.created,x.closed]));
  m8$('m8-month-bars').innerHTML=m8CompactChart(grouped);
  const byPlant=new Map();
@@ -6744,13 +6744,13 @@ function m8PresentRender(){
   '<div class="m8-slide-summary"><span class="m8-slide-summary-kicker">INDICADOR CLAVE</span><strong>'+percent+'<small>%</small></strong><h3>de los avisos creados ya están normalizados</h3><p>'+cohort+' de '+created.length+' avisos del periodo cuentan con fecha de cierre.</p><div class="m8-slide-meter"><span style="width:'+percent+'%"></span></div><p class="m8-slide-note">Los '+normalized.length+' cierres del periodo pueden incluir avisos creados anteriormente.</p></div></div>';
  }else if(m8PresentSlide===1){
   const lastMonth=bounds.month;
-  const months=Array.from({length:lastMonth+1},(_,m)=>{const within=s=>{const v=m8Date(s);return v&&v.getFullYear()===bounds.year&&v.getMonth()===m&&v<=bounds.end;};const byCreated=rows.filter(r=>within(r.Creado));return {label:new Date(bounds.year,m,1).toLocaleDateString('es-MX',{month:'short'}),created:byCreated.length,closed:rows.filter(r=>r.Estatus==='NORM'&&within(r.Cierre)).length,alarm:byCreated.filter(r=>r.Estatus==='ALARM').length};});
+  const months=Array.from({length:lastMonth+1},(_,m)=>{const within=s=>{const v=m8Date(s);return v&&v.getFullYear()===bounds.year&&v.getMonth()===m&&v<=bounds.end;};const byCreated=rows.filter(r=>within(r.Creado));return {label:new Date(bounds.year,m,1).toLocaleDateString('es-MX',{month:'short'}),created:byCreated.length,closed:rows.filter(r=>r.Estatus==='NORM'&&within(r.Cierre)).length,alarm:byCreated.filter(r=>r.Estatus==='ALARM').length,danger:byCreated.filter(r=>r.Estatus==='PELI').length};});
   const peak=months.reduce((a,b)=>b.created>a.created?b:a,months[0]);
   const totalC=months.reduce((a,b)=>a+b.created,0),totalN=months.reduce((a,b)=>a+b.closed,0);
   content=title('Evolución '+bounds.year,'La actividad a lo largo del año, mes por mes.','02 / TENDENCIA Y DESEMPEÑO')+
-  '<div class="m8-present-chartcard m8-showcase-evolution"><div class="m8-slide-card-head"><div><h3>Creación, cierre y alarmados</h3><p>Alarmados = avisos creados ese mes que actualmente siguen sin cierre.</p></div><div class="m8-ref-legend"><span><i style="background:#fa8c42"></i>Creados</span><span><i style="background:#2dd4bf"></i>Normalizados</span><span><i style="background:#fbbf58"></i>Alarmados</span></div></div>'+m8BarsSvg(months,{keys:['created','closed','alarm'],labels:['Creados','Normalizados','Alarmados'],colors:['#fa8c42','#2dd4bf','#fbbf58'],showNumbers:false})+'</div>'+
+  '<div class="m8-present-chartcard m8-showcase-evolution"><div class="m8-slide-card-head"><div><h3>Evolución de creados, normalizados y riesgos abiertos</h3><p>Alarmados y peligro = creados en cada mes que siguen sin fecha de cierre.</p></div><div class="m8-ref-legend"><span><i style="background:#fa8c42"></i>Creados</span><span><i style="background:#2dd4bf"></i>Normalizados</span><span><i style="background:#fbbf58"></i>Alarmados</span><span><i style="background:#fb657c"></i>En peligro</span></div></div>'+m8BarsSvg(months,{keys:['created','closed','alarm','danger'],labels:['Creados','Normalizados','Alarmados','En peligro'],colors:['#fa8c42','#2dd4bf','#fbbf58','#fb657c'],showNumbers:false})+'</div>'+
   '<div class="m8-slide-stories"><div><small>MAYOR ACTIVIDAD</small><b>'+label(peak.label)+' · '+peak.created+'</b><span>Mayor creación mensual</span></div><div><small>CREADOS EN EL AÑO</small><b>'+totalC.toLocaleString('es-MX')+'</b><span>Hasta el mes seleccionado</span></div><div><small>CIERRES REGISTRADOS</small><b>'+totalN.toLocaleString('es-MX')+'</b><span>Hasta el mes seleccionado</span></div></div>'+
-  '<p class="m8-showcase-fineprint">Los cierres y las creaciones corresponden a conjuntos distintos. Los alarmados reflejan su estado actual, no el saldo que tenían al terminar cada mes.</p>';
+  '<p class="m8-showcase-fineprint">Los cierres y las creaciones corresponden a conjuntos distintos. Los alarmados y avisos en peligro reflejan su estado actual, no el saldo que tenían al terminar cada mes.</p>';
  }else{
   const stocks=rows.filter(r=>r.Estatus==='ALARM'||r.Estatus==='PELI');
   const counts=new Map();stocks.forEach(r=>{const p=r.Planta||'Sin identificar';counts.set(p,(counts.get(p)||0)+1)});
