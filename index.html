@@ -4804,6 +4804,13 @@ if (fo.endDate && order.dueDate) {
           if(stage==='Físico / Captura')return 'Área de Captura';
           return 'Finalizado';
         }
+        // Clasificación por flujo: hasta el 24/09/2026 (inclusive) o Firma en R
+        // siempre corresponden al flujo anterior / Área de Captura.
+        function perteneceFlujoAnteriorPND(r,fecha){
+          const firmaR=delayField(r,['Firma']);
+          const tieneFirmaR=firmaR!==null&&firmaR!==undefined&&String(firmaR).trim()!=='';
+          return tieneFirmaR || (fecha instanceof Date && !isNaN(fecha.getTime()) && fecha < new Date(2026,8,25));
+        }
         // Separación explícita: el historial anterior al 25/09/2026 NO entra al ranking individual.
         const MONITOR_FECHA_NUEVO_FLUJO = new Date(2026, 8, 25);
         function delaySplitRows(){
@@ -4828,13 +4835,10 @@ if (fo.endDate && order.dueDate) {
               if(!isReporteFinalEnviado(r))sinFecha.push({...base,name:'Fecha por validar',owner:'Área de Captura',stageDays:null,totalDays:null});
               return;
             }
-            if(normalizeText(delayField(r,['EstadoFormulario']))==='FISICO'){
-              historicos.push({...base,name:'Físico / Captura',owner:'Área de Captura',stageDays:null,totalDays:delayDays(item.fecha,new Date())});
-              return;
-            }
-            if(item.fecha<MONITOR_FECHA_NUEVO_FLUJO){
-              // Histórico: sólo se considera pendiente si no está marcado como enviado.
-              if(!isReporteFinalEnviado(r))historicos.push({...base,name:'Área de Captura',owner:'Área de Captura',stageDays:delayDays(item.fecha,new Date()),totalDays:delayDays(item.fecha,new Date())});
+            // Los reportes con firma en columna R son físicos/históricos
+            // incluso si la fecha de servicio es posterior al 24/09.
+            if(perteneceFlujoAnteriorPND(r,item.fecha)||normalizeText(delayField(r,['EstadoFormulario']))==='FISICO'){
+              if(!isReporteFinalEnviado(r))historicos.push({...base,name:'Físico / Captura',owner:'Área de Captura',stageDays:null,totalDays:delayDays(item.fecha,new Date())});
               return;
             }
             const st=delayStage(item);
@@ -6395,7 +6399,7 @@ const seen=new Map();
 raw.forEach(r=>{
 const num=String(val(r,['N° Reporte','No Reporte','Reporte'])||'').trim();
 const dt=parseReportDate(getFechaServicioCAPTURAJ(r));
-if(!num||!dt||dt<NEW_DATE||normalizeText(val(r,['EstadoFormulario']))==='CANCELADO')return;
+if(!num||!dt||dt<NEW_DATE||perteneceFlujoAnteriorPND(r,dt)||['CANCELADO','CANCELACION','FISICO'].includes(normalizeText(val(r,['EstadoFormulario']))) )return;
 const id=String(val(r,['ID'])||num);
 const item={id,reporte:num,fecha:dt,row:r};
 const status=delayAppStatus(r), stage=delayStage(item);
@@ -6460,14 +6464,14 @@ $('daily-evolution').innerHTML=`<strong>Reporte ${escapeHtmlMonitor(x.reporte)}<
 }
 function render(){if(!$('daily-dashboard'))return;const items=allRows(), period=periodItems(items);
 const count=(arr,fn)=>arr.filter(fn).length;
-text('daily-total',period.length);text('daily-signed',count(period,x=>x.signed));text('daily-unsigned',count(period,x=>!x.signed));text('daily-unsubmitted',count(period,isFirmadoSinEnviar));text('daily-review',count(period,x=>!x.finished&&x.owner==='César Jiménez'));text('daily-next',count(period,x=>!x.finished&&x.owner==='Selene Martínez'));text('daily-closed',count(period,x=>x.finished));
+text('daily-total',period.length);text('daily-signed',count(period,x=>x.signed));text('daily-unsigned',count(period,x=>!x.signed));text('daily-unsubmitted',count(period,isFirmadoSinEnviar));text('daily-review',count(period,x=>!x.finished&&x.status==='PENDIENTE DE REVISIÓN'));text('daily-next',count(period,x=>!x.finished&&x.owner==='Selene Martínez'));text('daily-closed',count(period,x=>x.finished));
 const groups=new Map();period.forEach(x=>{if(!groups.has(x.tech))groups.set(x.tech,[]);groups.get(x.tech).push(x)});
-$('daily-technicians').innerHTML=[...groups].sort((a,b)=>b[1].length-a[1].length).map(([name,arr])=>{const signed=count(arr,x=>x.signed);const pct=Math.round(100*signed/arr.length);return `<tr class="${name===picked?'picked':''}" data-tech="${escapeHtmlMonitor(name)}"><td><strong>${escapeHtmlMonitor(name)}</strong></td><td>${arr.length}</td><td class="daily-green">${signed}</td><td class="daily-red">${arr.length-signed}</td><td class="daily-orange"><b>${count(arr,isFirmadoSinEnviar)}</b></td><td class="daily-blue">${count(arr,x=>!x.finished&&x.owner==='César Jiménez')}</td><td class="daily-orange">${count(arr,x=>!x.finished&&x.owner==='Selene Martínez')}</td><td>${count(arr,x=>x.finished)}</td><td><span>${pct}%</span><div class="daily-progress"><div style="width:${pct}%"></div></div></td></tr>`}).join('')||'<tr><td colspan="9" class="daily-empty">No hay servicios en el periodo elegido</td></tr>';
+$('daily-technicians').innerHTML=[...groups].sort((a,b)=>b[1].length-a[1].length).map(([name,arr])=>{const signed=count(arr,x=>x.signed);const pct=Math.round(100*signed/arr.length);return `<tr class="${name===picked?'picked':''}" data-tech="${escapeHtmlMonitor(name)}"><td><strong>${escapeHtmlMonitor(name)}</strong></td><td>${arr.length}</td><td class="daily-green">${signed}</td><td class="daily-red">${arr.length-signed}</td><td class="daily-orange"><b>${count(arr,isFirmadoSinEnviar)}</b></td><td class="daily-blue">${count(arr,x=>!x.finished&&x.status==='PENDIENTE DE REVISIÓN')}</td><td class="daily-orange">${count(arr,x=>!x.finished&&x.owner==='Selene Martínez')}</td><td>${count(arr,x=>x.finished)}</td><td><span>${pct}%</span><div class="daily-progress"><div style="width:${pct}%"></div></div></td></tr>`}).join('')||'<tr><td colspan="9" class="daily-empty">No hay servicios en el periodo elegido</td></tr>';
 $('daily-technicians').querySelectorAll('[data-tech]').forEach(row=>row.onclick=()=>{picked=row.dataset.tech;window.delaySelectedTech=picked;window.delayOwnerGroup='tech';const dropdown=$('delay-filter-tech');if(dropdown)dropdown.value=picked;render();});
-syncDailyPhone();const person=$('daily-person');if(picked){const mine=period.filter(x=>x.tech===picked),open=items.filter(x=>x.tech===picked&&!x.finished);const signed=count(mine,x=>x.signed);person.innerHTML=`<div class="daily-selected">${escapeHtmlMonitor(picked)}</div><div class="daily-muted">${mine.length} servicios en el periodo · ${open.length} pendientes acumulados</div><div class="daily-selected-grid"><div><b>${mine.length}</b><small>Servicios</small></div><div><b class="daily-green">${signed}</b><small>Con constancia</small></div><div><b class="daily-red">${mine.length-signed}</b><small>Sin constancia</small></div><div><b class="daily-orange">${count(mine,isFirmadoSinEnviar)}</b><small>Firmados sin enviar</small></div><div><b class="daily-blue">${count(mine,x=>!x.finished&&x.owner==='César Jiménez')}</b><small>En revisión · César</small></div><div><b>${open.length}</b><small>Abiertos</small></div></div>`;}else person.innerHTML='<h3>Selecciona un técnico</h3><p class="daily-muted">Haz clic en su nombre para revisar sus servicios del periodo y sus pendientes acumulados.</p>';
+syncDailyPhone();const person=$('daily-person');if(picked){const mine=period.filter(x=>x.tech===picked),open=items.filter(x=>x.tech===picked&&!x.finished);const signed=count(mine,x=>x.signed);person.innerHTML=`<div class="daily-selected">${escapeHtmlMonitor(picked)}</div><div class="daily-muted">${mine.length} servicios en el periodo · ${open.length} pendientes acumulados</div><div class="daily-selected-grid"><div><b>${mine.length}</b><small>Servicios</small></div><div><b class="daily-green">${signed}</b><small>Con constancia</small></div><div><b class="daily-red">${mine.length-signed}</b><small>Sin constancia</small></div><div><b class="daily-orange">${count(mine,isFirmadoSinEnviar)}</b><small>Firmados sin enviar</small></div><div><b class="daily-blue">${count(mine,x=>!x.finished&&x.status==='PENDIENTE DE REVISIÓN')}</b><small>En revisión · César</small></div><div><b>${open.length}</b><small>Abiertos</small></div></div>`;}else person.innerHTML='<h3>Selecciona un técnico</h3><p class="daily-muted">Haz clic en su nombre para revisar sus servicios del periodo y sus pendientes acumulados.</p>';
 const open=items.filter(x=>!x.finished), owners=[['Técnicos',count(open,isTechOpen)],['César Jiménez',count(open,x=>x.owner==='César Jiménez')],['Selene Martínez',count(open,x=>x.owner==='Selene Martínez')],['Área de Captura',count(open,x=>x.owner==='Área de Captura')]];
 $('daily-owners').innerHTML=owners.map(([label,n])=>`<button type="button" data-owner="${escapeHtmlMonitor(label)}"><b>${n}</b><small>${escapeHtmlMonitor(label)}</small></button>`).join('');$('daily-owners').querySelectorAll('[data-owner]').forEach(b=>b.onclick=()=>{picked='';window.delaySelectedTech='';$('daily-table-mode').value='open';render();const legacy=$('delay-filter-owner');if(legacy){legacy.value=b.dataset.owner==='Técnicos'?'':b.dataset.owner;} });
-const hist=typeof delaySplitRows==='function'?delaySplitRows().historicos.length:0;text('daily-historical',hist+' pendientes históricos (antes de 25/09/2026) se administran por Área de Captura, fuera del ranking del flujo nuevo.');fillTable();if(chosenReport)showEvolution();
+const hist=typeof delaySplitRows==='function'?delaySplitRows().historicos.length:0;text('daily-historical',hist+' pendientes del flujo anterior (hasta 24/09 o con firma en R) se administran por Área de Captura, fuera del ranking nuevo.');fillTable();if(chosenReport)showEvolution();
 }
 window.renderDailyDashboard=render;
 window.dailyRangeChanged=()=>{
@@ -6545,7 +6549,7 @@ window.dailyExportGeneralExcel=()=>{
   const origenFirma=x=>firmaColumnaR(x)?'Firma columna R':x.signed?'Constancia / firma flujo nuevo':'Sin firma registrada';
   const groups=new Map();rows.forEach(x=>{if(!groups.has(x.tech))groups.set(x.tech,[]);groups.get(x.tech).push(x);});
   const entries=[...groups.entries()].sort((a,b)=>b[1].length-a[1].length||a[0].localeCompare(b[0],'es'));
-  const summary=arr=>[arr.length,count(arr,tieneFirmaGeneral),count(arr,x=>!tieneFirmaGeneral(x)),count(arr,isFirmadoSinEnviar),count(arr,x=>!x.finished&&x.owner==='César Jiménez'),count(arr,x=>!x.finished&&x.owner==='Selene Martínez'),count(arr,x=>x.finished),arr.length?Math.round(count(arr,tieneFirmaGeneral)/arr.length*10000)/100:0];
+  const summary=arr=>[arr.length,count(arr,tieneFirmaGeneral),count(arr,x=>!tieneFirmaGeneral(x)),count(arr,isFirmadoSinEnviar),count(arr,x=>!x.finished&&x.status==='PENDIENTE DE REVISIÓN'),count(arr,x=>!x.finished&&x.owner==='Selene Martínez'),count(arr,x=>x.finished),arr.length?Math.round(count(arr,tieneFirmaGeneral)/arr.length*10000)/100:0];
   const totals=summary(rows);
   const resumeRows=entries.map(([name,arr])=>[name,...summary(arr)]);
   resumeRows.push(['TOTAL GENERAL',...totals]);
@@ -6556,7 +6560,7 @@ window.dailyExportGeneralExcel=()=>{
    {name:'Resumen técnicos',headers:['Técnico','Total','Con firma','Sin firma','Firmados sin enviar','En revisión · César','Posteriores · Selene','Cerrados','% con firma'],rows:resumeRows,totalRow:resumeRows.length,widths:[35,12,19,19,22,24,25,14,21]},
    {name:'Estatus por técnico',headers:['Técnico','Estatus actual','Cantidad'],rows:statusRows,widths:[35,46,14]},
    {name:'Detalle reportes',headers:['Técnico','N° Reporte','Fecha servicio (columna J)','Planta','Equipo','Estatus actual','Firma registrada','Firma columna R','Origen de firma','Responsable actual','Cerrado','Días en etapa'],rows:details,widths:[35,17,27,20,41,42,19,17,30,30,14,18]},
-   {name:'Información',headers:['Campo','Valor'],rows:[['Tipo de reporte','Monitor de reportes pendientes · General'],['Fecha de inicio',from],['Fecha de fin',to],['Fecha de generación',new Date().toLocaleString('es-MX')],['Origen de fecha','CAPTURA · Columna J · Fecha de servicio'],['Técnicos incluidos',entries.length],['Servicios incluidos',rows.length],['Criterio de firma','Columna R (Firma) con valor = firmada, incluso del flujo anterior. También se consideran firma digital y constancia física registrada del flujo nuevo'],['Estatus','Estado actual al generar el Excel'],['Pendientes históricos','No sumados si su fecha de servicio está fuera del periodo'],['Alcance','Todos los técnicos, sin depender de la selección individual']],widths:[37,79]}
+   {name:'Información',headers:['Campo','Valor'],rows:[['Tipo de reporte','Monitor de reportes pendientes · General'],['Fecha de inicio',from],['Fecha de fin',to],['Fecha de generación',new Date().toLocaleString('es-MX')],['Origen de fecha','CAPTURA · Columna J · Fecha de servicio'],['Técnicos incluidos',entries.length],['Servicios incluidos',rows.length],['Criterio de firma','Columna R (Firma) con valor = firmada, incluso del flujo anterior. También se consideran firma digital y constancia física registrada del flujo nuevo'],['Estatus','Estado actual al generar el Excel'],['Flujo anterior / Físico','Excluido del ranking nuevo: servicios hasta 24/09/2026 inclusive o Firma (columna R) con valor, aunque fecha posterior. Se controlan en Área de Captura'],['En revisión César','Solamente Estado 05 PENDIENTE DE REVISIÓN; envío de correo se contabiliza aparte del indicador de revisión'],['Alcance','Todos los técnicos del flujo nuevo en las fechas seleccionadas, sin depender de selección individual']],widths:[37,79]}
   ];
   const blob=dailyBuildXlsx(sheets),url=URL.createObjectURL(blob),a=document.createElement('a');
   a.href=url;a.download='Monitor_General_Firmas_Tecnicos_'+from+'_al_'+to+'.xlsx';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2500);
@@ -6574,8 +6578,8 @@ window.dailyPrintGeneral=()=>{
   rows.forEach(x=>{if(!groups.has(x.tech))groups.set(x.tech,[]);groups.get(x.tech).push(x)});
   const entries=[...groups.entries()].sort((a,b)=>b[1].length-a[1].length||a[0].localeCompare(b[0],'es'));
   const fmt=n=>Number(n).toLocaleString('es-MX');
-  const kpi={total:rows.length,signed:cnt(rows,x=>x.signed),unsigned:cnt(rows,x=>!x.signed),sent:cnt(rows,isFirmadoSinEnviar),review:cnt(rows,x=>!x.finished&&x.owner==='César Jiménez'),next:cnt(rows,x=>!x.finished&&x.owner==='Selene Martínez'),closed:cnt(rows,x=>x.finished)};
-  const tally=arr=>[arr.length,cnt(arr,x=>x.signed),cnt(arr,x=>!x.signed),cnt(arr,isFirmadoSinEnviar),cnt(arr,x=>!x.finished&&x.owner==='César Jiménez'),cnt(arr,x=>!x.finished&&x.owner==='Selene Martínez'),cnt(arr,x=>x.finished)];
+  const kpi={total:rows.length,signed:cnt(rows,x=>x.signed),unsigned:cnt(rows,x=>!x.signed),sent:cnt(rows,isFirmadoSinEnviar),review:cnt(rows,x=>!x.finished&&x.status==='PENDIENTE DE REVISIÓN'),next:cnt(rows,x=>!x.finished&&x.owner==='Selene Martínez'),closed:cnt(rows,x=>x.finished)};
+  const tally=arr=>[arr.length,cnt(arr,x=>x.signed),cnt(arr,x=>!x.signed),cnt(arr,isFirmadoSinEnviar),cnt(arr,x=>!x.finished&&x.status==='PENDIENTE DE REVISIÓN'),cnt(arr,x=>!x.finished&&x.owner==='Selene Martínez'),cnt(arr,x=>x.finished)];
   const cells=a=>a.map((n,i)=>`<td class="${i===2&&n?'warn':i===6?'good':''}">${fmt(n)}</td>`).join('');
   const mainRows=entries.map(([name,arr])=>`<tr><td class="who">${safe(name)}</td>${cells(tally(arr))}<td>${Math.round(100*cnt(arr,x=>x.signed)/arr.length)}%</td></tr>`).join('');
   const totalRow=`<tr class="total"><td>TOTAL GENERAL</td>${cells(tally(rows))}<td>${Math.round(100*kpi.signed/kpi.total)}%</td></tr>`;
