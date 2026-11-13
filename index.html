@@ -6538,23 +6538,28 @@ window.dailyExportGeneralExcel=()=>{
   if(!rows.length){alert('No hay reportes en las fechas seleccionadas.');return;}
   const from=$('daily-date-from')?.value||'',to=$('daily-date-to')?.value||'';
   const count=(items,fn)=>items.filter(fn).length;
+  // En CAPTURA la columna R corresponde a Firma (flujo anterior).
+  // Su presencia acredita firma aunque no existan campos de constancia nueva.
+  const firmaColumnaR=x=>String(val(x.row,['Firma'])??'').trim()!=='';
+  const tieneFirmaGeneral=x=>firmaColumnaR(x)||x.signed;
+  const origenFirma=x=>firmaColumnaR(x)?'Firma columna R':x.signed?'Constancia / firma flujo nuevo':'Sin firma registrada';
   const groups=new Map();rows.forEach(x=>{if(!groups.has(x.tech))groups.set(x.tech,[]);groups.get(x.tech).push(x);});
   const entries=[...groups.entries()].sort((a,b)=>b[1].length-a[1].length||a[0].localeCompare(b[0],'es'));
-  const summary=arr=>[arr.length,count(arr,x=>x.signed),count(arr,x=>!x.signed),count(arr,isFirmadoSinEnviar),count(arr,x=>!x.finished&&x.owner==='César Jiménez'),count(arr,x=>!x.finished&&x.owner==='Selene Martínez'),count(arr,x=>x.finished),arr.length?Math.round(count(arr,x=>x.signed)/arr.length*10000)/100:0];
+  const summary=arr=>[arr.length,count(arr,tieneFirmaGeneral),count(arr,x=>!tieneFirmaGeneral(x)),count(arr,isFirmadoSinEnviar),count(arr,x=>!x.finished&&x.owner==='César Jiménez'),count(arr,x=>!x.finished&&x.owner==='Selene Martínez'),count(arr,x=>x.finished),arr.length?Math.round(count(arr,tieneFirmaGeneral)/arr.length*10000)/100:0];
   const totals=summary(rows);
   const resumeRows=entries.map(([name,arr])=>[name,...summary(arr)]);
   resumeRows.push(['TOTAL GENERAL',...totals]);
   const statusRows=[];
   entries.forEach(([name,arr])=>{const st=new Map();arr.forEach(x=>st.set(x.status||'SIN ESTATUS',(st.get(x.status||'SIN ESTATUS')||0)+1));[...st].sort((a,b)=>b[1]-a[1]).forEach(([status,n])=>statusRows.push([name,status,n]));});
-  const details=rows.slice().sort((a,b)=>a.tech.localeCompare(b.tech,'es')||a.fecha-b.fecha||String(a.reporte).localeCompare(String(b.reporte),'es')).map(x=>[x.tech,String(x.reporte),dateKey(x.fecha),x.plant,x.equipment,x.status,x.signed?'Sí':'No',x.finished?'Finalizado':x.owner,x.finished?'Sí':'No',x.stage.stageDays??'S/F']);
+  const details=rows.slice().sort((a,b)=>a.tech.localeCompare(b.tech,'es')||a.fecha-b.fecha||String(a.reporte).localeCompare(String(b.reporte),'es')).map(x=>[x.tech,String(x.reporte),dateKey(x.fecha),x.plant,x.equipment,x.status,tieneFirmaGeneral(x)?'Sí':'No',firmaColumnaR(x)?'Sí':'No',origenFirma(x),x.finished?'Finalizado':x.owner,x.finished?'Sí':'No',x.stage.stageDays??'S/F']);
   const sheets=[
-   {name:'Resumen técnicos',headers:['Técnico','Total','Con constancia','Sin constancia','Firmados sin enviar','En revisión · César','Posteriores · Selene','Cerrados','% con constancia'],rows:resumeRows,totalRow:resumeRows.length,widths:[35,12,19,19,22,24,25,14,21]},
+   {name:'Resumen técnicos',headers:['Técnico','Total','Con firma','Sin firma','Firmados sin enviar','En revisión · César','Posteriores · Selene','Cerrados','% con firma'],rows:resumeRows,totalRow:resumeRows.length,widths:[35,12,19,19,22,24,25,14,21]},
    {name:'Estatus por técnico',headers:['Técnico','Estatus actual','Cantidad'],rows:statusRows,widths:[35,46,14]},
-   {name:'Detalle reportes',headers:['Técnico','N° Reporte','Fecha servicio (columna J)','Planta','Equipo','Estatus actual','Constancia registrada','Responsable actual','Cerrado','Días en etapa'],rows:details,widths:[35,17,27,20,41,42,24,30,14,18]},
-   {name:'Información',headers:['Campo','Valor'],rows:[['Tipo de reporte','Monitor de reportes pendientes · General'],['Fecha de inicio',from],['Fecha de fin',to],['Fecha de generación',new Date().toLocaleString('es-MX')],['Origen de fecha','CAPTURA · Columna J · Fecha de servicio'],['Técnicos incluidos',entries.length],['Servicios incluidos',rows.length],['Criterio de constancia','Firma digital o constancia física registrada'],['Estatus','Estado actual al generar el Excel'],['Pendientes históricos','No sumados si su fecha de servicio está fuera del periodo'],['Alcance','Todos los técnicos, sin depender de la selección individual']],widths:[37,79]}
+   {name:'Detalle reportes',headers:['Técnico','N° Reporte','Fecha servicio (columna J)','Planta','Equipo','Estatus actual','Firma registrada','Firma columna R','Origen de firma','Responsable actual','Cerrado','Días en etapa'],rows:details,widths:[35,17,27,20,41,42,19,17,30,30,14,18]},
+   {name:'Información',headers:['Campo','Valor'],rows:[['Tipo de reporte','Monitor de reportes pendientes · General'],['Fecha de inicio',from],['Fecha de fin',to],['Fecha de generación',new Date().toLocaleString('es-MX')],['Origen de fecha','CAPTURA · Columna J · Fecha de servicio'],['Técnicos incluidos',entries.length],['Servicios incluidos',rows.length],['Criterio de firma','Columna R (Firma) con valor = firmada, incluso del flujo anterior. También se consideran firma digital y constancia física registrada del flujo nuevo'],['Estatus','Estado actual al generar el Excel'],['Pendientes históricos','No sumados si su fecha de servicio está fuera del periodo'],['Alcance','Todos los técnicos, sin depender de la selección individual']],widths:[37,79]}
   ];
   const blob=dailyBuildXlsx(sheets),url=URL.createObjectURL(blob),a=document.createElement('a');
-  a.href=url;a.download='Monitor_General_Tecnicos_'+from+'_al_'+to+'.xlsx';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2500);
+  a.href=url;a.download='Monitor_General_Firmas_Tecnicos_'+from+'_al_'+to+'.xlsx';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2500);
 };
 
 // PDF GENERAL: MISMA FUENTE Y MISMO PERIODO QUE EL RANKING DE PRODUCCIÓN.
