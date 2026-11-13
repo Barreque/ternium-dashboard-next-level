@@ -2916,9 +2916,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         <div id="view-monitor" class="view-section">
           <section class="delay-shell">
 <div id="daily-dashboard">
-<div class="daily-header"><div><h2>Monitor de Reportes Pendientes</h2><div class="daily-muted">Producción por fecha de servicio (columna J de CAPTURA) y seguimiento hasta Enviado / Finalizado · Flujo desde 25/09/2026</div></div><div class="daily-controls"><label>Desde<input id="daily-date-from" type="date" onchange="dailyRangeChanged()" aria-label="Fecha inicial de servicio"></label><label>Hasta<input id="daily-date-to" type="date" onchange="dailyRangeChanged()" aria-label="Fecha final de servicio"></label><button type="button" class="daily-btn" onclick="dailySetPeriod(0)">Hoy</button><button type="button" class="daily-btn" onclick="dailySetPeriod(7)">Últimos 7 días</button><button type="button" class="daily-btn" onclick="dailySetPeriod(30)">Últimos 30 días</button><button type="button" class="daily-btn orange" onclick="refreshMonitorData(true)">↻ Actualizar</button></div></div>
+<div class="daily-header"><div><h2>Monitor de Reportes Pendientes</h2><div class="daily-muted">Producción por fecha de servicio (columna J de CAPTURA) y seguimiento hasta Enviado / Finalizado · Flujo desde 25/09/2026</div></div><div class="daily-controls"><label>Desde<input id="daily-date-from" type="date" onchange="dailyRangeChanged()" aria-label="Fecha inicial de servicio"></label><label>Hasta<input id="daily-date-to" type="date" onchange="dailyRangeChanged()" aria-label="Fecha final de servicio"></label><button type="button" class="daily-btn" onclick="dailySetPeriod(0)">Hoy</button><button type="button" class="daily-btn" onclick="dailySetPeriod(7)">Últimos 7 días</button><button type="button" class="daily-btn" onclick="dailySetPeriod(30)">Últimos 30 días</button><button type="button" class="daily-btn" id="daily-general-pdf" onclick="dailyPrintGeneral()" title="Reporte general de todos los técnicos y sus estatus dentro de las fechas seleccionadas">▤ PDF general</button><button type="button" class="daily-btn orange" onclick="refreshMonitorData(true)">↻ Actualizar</button></div></div>
 <div class="daily-kpis"><div class="daily-card"><small>Reportes del periodo</small><b id="daily-total">—</b><span>Por fecha de servicio</span></div><div class="daily-card"><small>Constancia firmada</small><b class="daily-green" id="daily-signed">—</b><span>Firma registrada</span></div><div class="daily-card"><small>Sin constancia firmada</small><b class="daily-red" id="daily-unsigned">—</b><span>Acción del técnico</span></div><div class="daily-card"><small>Firmados sin enviar a revisión</small><b class="daily-orange" id="daily-unsubmitted">—</b><span>Pendientes con el técnico</span></div><div class="daily-card"><small>En revisión</small><b class="daily-blue" id="daily-review">—</b><span>Actualmente con César</span></div><div class="daily-card"><small>En etapa posterior</small><b class="daily-orange" id="daily-next">—</b><span>Aviso / correo / carga</span></div><div class="daily-card"><small>Enviados / finalizados</small><b id="daily-closed">—</b><span>Fuera de pendientes</span></div></div>
-<div class="daily-main"><div class="daily-panel"><h3>Producción por técnico</h3><p class="daily-muted">Servicios según fecha de servicio (columna J de CAPTURA) y su estado actual. «Firmados sin enviar» siguen con el técnico; «En revisión» ya están con César. Selecciona un técnico para ver el detalle.</p><div class="daily-table-wrap"><table class="daily-table"><thead><tr><th>TÉCNICO</th><th>TOTAL</th><th>CON FIRMA</th><th>SIN FIRMA</th><th title="Firmados pero aún no enviados a revisión. Responsabilidad del técnico">FIRMADOS SIN ENVIAR</th><th title="Ya enviados a revisión; responsabilidad de César">EN REVISIÓN · CÉSAR</th><th>POSTERIORES</th><th>CERRADOS</th><th>% FIRMA</th></tr></thead><tbody id="daily-technicians"></tbody></table></div></div><div class="daily-panel"><div id="daily-person"><h3>Selecciona un técnico</h3><p class="daily-muted">Aquí aparecerá su producción y sus reportes pendientes acumulados.</p></div><div class="daily-pdf-filter" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:14px 0 10px"><label for="daily-pdf-status" style="font-size:12px;font-weight:700;color:#b8cbe2">Incluir en el PDF:</label><select id="daily-pdf-status" aria-label="Filtrar estatus del PDF individual" style="background:#12213a;color:#f8fafc;border:1px solid #405474;border-radius:7px;padding:9px 12px;min-width:235px;max-width:100%"><option value="all">Todos los pendientes del técnico</option><option value="firma">Solo pendiente de firma (03)</option><option value="sin_firma">Todos los pendientes sin firma</option><option value="firmado">Firmados sin enviar a revisión (04)</option></select></div><div class="daily-phone-row" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 12px"><label for="daily-phone" style="font-size:12px;font-weight:700;color:#b8cbe2">WhatsApp del técnico:</label><input id="daily-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="10 dígitos · ej. 8112345678" maxlength="18" aria-label="Número de WhatsApp del técnico seleccionado" style="background:#12213a;color:#f8fafc;border:1px solid #405474;border-radius:7px;padding:9px 12px;width:235px;max-width:100%"/><span id="daily-phone-note" class="daily-muted" style="font-size:11px">Se guarda en este navegador por técnico.</span></div><div class="daily-actions"><button class="daily-btn orange" onclick="dailyPrintSelected()">PDF individual</button><button class="daily-btn" onclick="dailyExportSelected()">Excel / CSV</button><button class="daily-btn" onclick="dailyWhatsappSelected()">WhatsApp + PDF</button></div><div class="daily-muted">El PDF se adjunta manualmente en WhatsApp normal. No se envía automáticamente.</div></div></div>
+<div class="daily-main"><div class="daily-panel"><h3>Producción por técnico</h3><p class="daily-muted">Servicios según fecha de servicio (columna J de CAPTURA) y su estado actual. «Firmados sin enviar» siguen con el técnico; «En revisión» ya están con César. Selecciona un técnico para ver el detalle.</p><div class="daily-table-wrap"><table class="daily-table"><thead><tr><th>TÉCNICO</th><th>TOTAL</th><th>CON CONSTANCIA</th><th>SIN CONSTANCIA</th><th title="Firmados pero aún no enviados a revisión. Responsabilidad del técnico">FIRMADOS SIN ENVIAR</th><th title="Ya enviados a revisión; responsabilidad de César">EN REVISIÓN · CÉSAR</th><th>POSTERIORES</th><th>CERRADOS</th><th>% CONSTANCIA</th></tr></thead><tbody id="daily-technicians"></tbody></table></div></div><div class="daily-panel"><div id="daily-person"><h3>Selecciona un técnico</h3><p class="daily-muted">Aquí aparecerá su producción y sus reportes pendientes acumulados.</p></div><div class="daily-pdf-filter" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:14px 0 10px"><label for="daily-pdf-status" style="font-size:12px;font-weight:700;color:#b8cbe2">Incluir en el PDF:</label><select id="daily-pdf-status" aria-label="Filtrar estatus del PDF individual" style="background:#12213a;color:#f8fafc;border:1px solid #405474;border-radius:7px;padding:9px 12px;min-width:235px;max-width:100%"><option value="all">Todos los pendientes del técnico</option><option value="period_unsigned">Sin constancia del periodo (igual al contador)</option><option value="firma">Solo estado 03 · pendiente de firma</option><option value="sin_firma">Todos los pendientes sin constancia</option><option value="firmado">Firmados sin enviar a revisión (04)</option></select></div><div class="daily-phone-row" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 12px"><label for="daily-phone" style="font-size:12px;font-weight:700;color:#b8cbe2">WhatsApp del técnico:</label><input id="daily-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="10 dígitos · ej. 8112345678" maxlength="18" aria-label="Número de WhatsApp del técnico seleccionado" style="background:#12213a;color:#f8fafc;border:1px solid #405474;border-radius:7px;padding:9px 12px;width:235px;max-width:100%"/><span id="daily-phone-note" class="daily-muted" style="font-size:11px">Se guarda en este navegador por técnico.</span></div><div class="daily-actions"><button class="daily-btn orange" onclick="dailyPrintSelected()">PDF individual</button><button class="daily-btn" onclick="dailyExportSelected()">Excel / CSV</button><button class="daily-btn" onclick="dailyWhatsappSelected()">WhatsApp + PDF</button></div><div class="daily-muted">El PDF se adjunta manualmente en WhatsApp normal. No se envía automáticamente.</div></div></div>
 <div class="daily-panel daily-section"><div class="daily-section-heading"><div><h3 id="daily-report-title">Reportes del técnico seleccionado</h3><div class="daily-muted">Reporte individual: producción del periodo; pendientes abiertos: cualquier fecha desde 25/09/2026.</div></div><div class="daily-controls"><select id="daily-table-mode" onchange="renderDailyDashboard()"><option value="open">Pendientes acumulados</option><option value="period">Producción del periodo</option></select><input id="daily-search" placeholder="Buscar reporte / equipo" oninput="renderDailyDashboard()"></div></div><div class="daily-table-wrap"><table class="daily-table"><thead><tr><th>REPORTE</th><th>FECHA SERVICIO</th><th>PLANTA</th><th>EQUIPO</th><th>ESTATUS ACTUAL</th><th>RESPONSABLE ACTUAL</th><th>DÍAS EN ETAPA</th><th>PRÓXIMA ACCIÓN</th><th>SEGUIMIENTO</th></tr></thead><tbody id="daily-reports"></tbody></table></div><p class="daily-note" id="daily-count-note"></p></div>
 <div class="daily-split"><div class="daily-panel"><h3>Pendientes acumulados por responsable</h3><p class="daily-muted">Solo reportes abiertos, de todas las fechas. No incluye enviados o finalizados.</p><div class="daily-responsible" id="daily-owners"></div><p class="daily-note" id="daily-historical"></p></div><div class="daily-panel"><h3>Evolución de un reporte</h3><p class="daily-muted">Selecciona un número de reporte en la tabla para consultar sus fechas y próximas acciones.</p><div id="daily-evolution" class="daily-empty">Sin reporte seleccionado</div></div></div>
 </div>
@@ -4624,6 +4624,19 @@ if (fo.endDate && order.dueDate) {
             return ["TRUE", "VERDADERO", "SI", "YES", "1"].includes(valor);
         }
 
+        // Considerar constancias físicas adjuntas y firmas digitales en el monitor.
+        // Una constancia física con imagen NO es un pendiente de firma digital;
+        // su revisión/carga permanece en el flujo de Área de Captura.
+        function tieneConstanciaRegistradaPND(r) {
+            const firma = getReportField(r, ["Firma"]);
+            const estadoFirma = normalizeText(getReportField(r, ["FIRMA_ESTADO"]));
+            const tipo = normalizeText(getReportField(r, ["TIPO_CONSTANCIA"]));
+            const fotoFisica = getReportField(r, ["CONSTANCIA_FISICA"]);
+            const tieneDigital = (firma !== null && firma !== undefined && String(firma).trim() !== "") || estadoFirma === "FIRMADO";
+            const tieneFisica = ["FISICA", "FISICO"].includes(tipo) && fotoFisica !== null && fotoFisica !== undefined && String(fotoFisica).trim() !== "";
+            return tieneDigital || tieneFisica;
+        }
+
         function getEstatusReportePND(r) {
             return isReporteFinalEnviado(r) ? "ENVIADO" : "PENDIENTE";
         }
@@ -4891,21 +4904,18 @@ if (fo.endDate && order.dueDate) {
             if(pdfStatusFilter==='firma')return x.status==='PENDIENTE FIRMA CONSTANCIA';
             if(pdfStatusFilter==='firmado')return x.status==='FIRMADO' && x.owner===x.tech;
             if(pdfStatusFilter==='sin_firma'){
-              const r=x.row||{};
-              const firma=delayField(r,['Firma']);
-              const estado=normalizeText(delayField(r,['FIRMA_ESTADO']));
-              return !String(firma??'').trim() && estado!=='FIRMADO';
+              return !tieneConstanciaRegistradaPND(x.row||{});
             }
             return true;
           });
         }
-        function printDelayPdf(pdfStatusFilter='all'){
-          const payload=delayIndividualTechRows();if(!payload)return;
+        function printDelayPdf(pdfStatusFilter='all', overridePayload=null){
+          const payload=overridePayload||delayIndividualTechRows();if(!payload)return;
           const tech=payload.tech;
-          // El filtro afecta exclusivamente las exportaciones individuales, no los indicadores.
-          const rows=delayFilterIndividualRows(payload.rows,pdfStatusFilter);
+          // En el modo 'sin constancia del periodo' se usa el mismo conjunto de datos que el contador.
+          const rows=overridePayload?payload.rows:delayFilterIndividualRows(payload.rows,pdfStatusFilter);
           if(!rows.length){alert('El técnico no tiene reportes para el filtro seleccionado.');return;}
-          const pdfFilterLabel=pdfStatusFilter==='firma'?'Solo pendientes de firma (03)':pdfStatusFilter==='firmado'?'Firmados sin enviar a revisión (04)':pdfStatusFilter==='sin_firma'?'Sin constancia firmada':'Todos los pendientes';
+          const pdfFilterLabel=pdfStatusFilter==='period_unsigned'?'Servicios sin constancia del periodo seleccionado':pdfStatusFilter==='firma'?'Solo pendientes de firma (03)':pdfStatusFilter==='firmado'?'Firmados sin enviar a revisión (04)':pdfStatusFilter==='sin_firma'?'Sin constancia firmada':'Todos los pendientes';
           const now=new Date().toLocaleString('es-MX');
           const crit=rows.filter(x=>x.stageDays!==null&&x.stageDays>7).length;
           const attention=rows.filter(x=>x.stageDays!==null&&x.stageDays>=3&&x.stageDays<=7).length;
@@ -4913,10 +4923,10 @@ if (fo.endDate && order.dueDate) {
           const html=`<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Seguimiento - ${escapeHtmlMonitor(tech)}</title><style>
           @page{size:letter landscape;margin:12mm 13mm}*{box-sizing:border-box}body{font-family:Arial,Helvetica,sans-serif;color:#172539;background:#fff;margin:0;font-size:10px;line-height:1.45}
           header{display:flex;justify-content:space-between;align-items:start;border-bottom:3px solid #ee7900;padding-bottom:10px;margin-bottom:12px}.brand{color:#eb7900;font-weight:800;letter-spacing:1.2px;font-size:12px}.title{font-size:21px;line-height:1.1;font-weight:800;color:#13243e;margin:4px 0}.meta{text-align:right;color:#5c6a7c;font-size:10px}.name{font-size:15px;font-weight:700;margin-bottom:3px}.muted{color:#627187}.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:13px 0}.kpi{background:#edf2f8;padding:10px 12px;border-radius:5px;border-left:3px solid #233957}.kpi.alert{background:#fff0ed;border-left-color:#bf2525}.kpi strong{display:block;font-size:20px;color:#152a45}.kpi.alert strong{color:#ad2020}.kpi span{font-size:9px;color:#5f6d80}.section{font-weight:700;color:#162b47;font-size:13px;margin:15px 0 7px}table{width:100%;border-collapse:collapse;table-layout:fixed}thead{display:table-header-group}th{background:#172b49;color:white;text-transform:uppercase;letter-spacing:.2px;font-size:8.5px;padding:8px 6px;text-align:left}td{border-bottom:1px solid #dae2eb;padding:7px 6px;vertical-align:top;overflow-wrap:anywhere}tbody tr:nth-child(even){background:#f4f7fa}tr{break-inside:avoid}.num{font-weight:700}.danger{color:#b91c1c;font-weight:700}.warn{color:#a35c00;font-weight:700}.actions{background:#f3f6f9;padding:10px 13px;margin-top:13px;border-radius:5px}.actions b{color:#1b3452}.footer{margin-top:14px;border-top:1px solid #d7e0e9;padding-top:8px;color:#64748b;font-size:8.5px}.tools{display:flex;gap:8px;margin:12px 0}.tools button{background:#eb7900;color:#fff;border:0;padding:10px 15px;border-radius:5px;font-weight:700;cursor:pointer}.tools button.alt{background:#203b59} @media print{.tools{display:none}body{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
-          </style></head><body><div class="tools"><button onclick="window.print()">Imprimir / Guardar como PDF</button><button class="alt" onclick="window.close()">Cerrar</button></div><header><div><div class="brand">CONTROL DE CALIDAD Y CONSULTORÍA PND</div><div class="title">Seguimiento de reportes pendientes</div><div class="name">${escapeHtmlMonitor(tech)}</div><div class="muted">${escapeHtmlMonitor(pdfFilterLabel)} · Solo reportes a cargo del técnico · Flujo desde el 25/09/2026</div></div><div class="meta"><b>Fecha de corte</b><br>${escapeHtmlMonitor(now)}<br><br>Documento de seguimiento interno</div></header>
-          <div class="kpis"><div class="kpi"><strong>${rows.length}</strong><span>Reportes pendientes</span></div><div class="kpi alert"><strong>${crit}</strong><span>Críticos: más de 7 días</span></div><div class="kpi"><strong>${attention}</strong><span>En atención: de 3 a 7 días</span></div><div class="kpi"><strong>${maxDays}</strong><span>Mayor espera en etapa (días)</span></div></div>
+          </style></head><body><div class="tools"><button onclick="window.print()">Imprimir / Guardar como PDF</button><button class="alt" onclick="window.close()">Cerrar</button></div><header><div><div class="brand">CONTROL DE CALIDAD Y CONSULTORÍA PND</div><div class="title">Seguimiento de reportes pendientes</div><div class="name">${escapeHtmlMonitor(tech)}</div><div class="muted">${escapeHtmlMonitor(pdfFilterLabel)} · ${overridePayload?'Por fecha del servicio (columna J de CAPTURA)':'Solo reportes a cargo del técnico'} · Flujo desde el 25/09/2026</div></div><div class="meta"><b>Fecha de corte</b><br>${escapeHtmlMonitor(now)}<br><br>Documento de seguimiento interno</div></header>
+          <div class="kpis"><div class="kpi"><strong>${rows.length}</strong><span>${overridePayload?'Servicios sin constancia del periodo':'Reportes pendientes'}</span></div><div class="kpi alert"><strong>${crit}</strong><span>Críticos: más de 7 días</span></div><div class="kpi"><strong>${attention}</strong><span>En atención: de 3 a 7 días</span></div><div class="kpi"><strong>${maxDays}</strong><span>Mayor espera en etapa (días)</span></div></div>
           <div class="section">Detalle por atender · ordenado por mayor atraso</div><table><colgroup><col style="width:10%"><col style="width:13%"><col style="width:22%"><col style="width:15%"><col style="width:18%"><col style="width:8%"><col style="width:14%"></colgroup><thead><tr><th>N° reporte</th><th>Planta</th><th>Equipo</th><th>Etapa actual</th><th>Acción requerida</th><th>Días</th><th>Fecha compromiso / avance</th></tr></thead><tbody>${rows.map(x=>`<tr><td class="num">${escapeHtmlMonitor(x.reporte)}</td><td>${escapeHtmlMonitor(x.plant)}</td><td>${escapeHtmlMonitor(x.equipment)}</td><td>${escapeHtmlMonitor(x.name)}</td><td>${escapeHtmlMonitor(delayRequiredAction(x))}</td><td class="${x.stageDays===null?'':x.stageDays>7?'danger':x.stageDays>=3?'warn':''}">${x.stageDays===null?'S/F':x.stageDays}</td><td>_____________________</td></tr>`).join('')}</tbody></table>
-          <div class="actions"><b>Solicitud de seguimiento:</b> Dar prioridad a los casos críticos, completar la acción requerida y confirmar avance y fecha compromiso. Los casos S/F requieren validar la fecha de inicio de etapa.</div><div class="footer">Este reporte se genera con la información disponible en el monitor al corte indicado. No incluye pendientes actualmente a cargo de César Jiménez, Selene Martínez o Área de Captura. Verificar registros en AppSheet antes de atribuir atrasos. El documento no acredita envío por WhatsApp.</div>
+          <div class="actions"><b>Solicitud de seguimiento:</b> Dar prioridad a los casos críticos, completar la acción requerida y confirmar avance y fecha compromiso. Los casos S/F requieren validar la fecha de inicio de etapa.</div><div class="footer">${overridePayload?'Se incluyen los servicios sin firma con fecha del servicio dentro del periodo elegido, sin limitarse al estatus 03 ni excluir servicios por su responsable actual.':'No incluye pendientes actualmente a cargo de César Jiménez, Selene Martínez o Área de Captura.'} Verificar registros en AppSheet antes de atribuir atrasos. El documento no acredita envío por WhatsApp.</div>
 
 
 </body></html>`;
@@ -6391,7 +6401,7 @@ const item={id,reporte:num,fecha:dt,row:r};
 const status=delayAppStatus(r), stage=delayStage(item);
 const finished=status==='FINALIZADO'||isReporteFinalEnviado(r);
 const tech=String(val(r,['Tecnico','Técnico'])||'Sin técnico');
-seen.set(id,{...item,tech,plant:String(val(r,['Planta'])||''),equipment:String(val(r,['Equipo'])||''),status,stage,finished,signed:!!val(r,['Firma'])||normalizeText(val(r,['FIRMA_ESTADO']))==='FIRMADO',owner:delayStageOwner(stage.name,tech)});
+seen.set(id,{...item,tech,plant:String(val(r,['Planta'])||''),equipment:String(val(r,['Equipo'])||''),status,stage,finished,signed:tieneConstanciaRegistradaPND(r),owner:delayStageOwner(stage.name,tech)});
 });return [...seen.values()];
 }
 function initDailyDates(){
@@ -6407,6 +6417,32 @@ function periodItems(items){
   const start=$('daily-date-from')?.value||today(),end=$('daily-date-to')?.value||today();
   if(start>end)return [];
   return items.filter(x=>{const v=dateKey(x.fecha);return v>=start&&v<=end;});
+}
+function dailyUnsignedPeriodPayload(){
+  if(!picked){alert('Selecciona primero un técnico.');return null;}
+  const rows=periodItems(allRows()).filter(x=>x.tech===picked&&!x.signed).map(x=>({
+    reporte:x.reporte,plant:x.plant,equipment:x.equipment,tech:x.tech,owner:x.owner,
+    status:x.status,name:x.stage.name,stageDays:x.stage.stageDays??null,
+    row:x.row,fecha:x.fecha
+  }));
+  if(!rows.length){alert('No hay servicios sin constancia para este técnico en el periodo seleccionado.');return null;}
+  return {tech:picked,rows:rows.sort((a,b)=>(b.stageDays??-1)-(a.stageDays??-1))};
+}
+function dailyUnsignedCsv(payload){
+  const cols=['N° Reporte','Fecha del servicio','Planta','Equipo','Técnico','Estatus actual','Responsable actual','Días en etapa'];
+  const escape=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
+  const data=payload.rows.map(x=>[x.reporte,dateKey(x.fecha),x.plant,x.equipment,x.tech,x.status,x.owner,x.stageDays??'S/F']);
+  const csv='\uFEFF'+[cols,...data].map(row=>row.map(escape).join(',')).join('\r\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download='Sin_constancia_periodo_'+payload.tech.replace(/[^a-z0-9_-]/gi,'_')+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);
+}
+function dailyUnsignedWhatsApp(payload){
+  const phone=$('daily-phone'),digits=String(phone?.value||window.pndPhoneForTech?.(payload.tech)||'').replace(/\D/g,'');
+  if(digits.length!==10&&!(digits.length===12&&digits.startsWith('52'))){alert('Captura un WhatsApp válido de 10 dígitos o 52 + 10 dígitos.');phone?.focus();return;}
+  const from=$('daily-date-from')?.value,to=$('daily-date-to')?.value;
+  const detail=payload.rows.slice(0,30).map(x=>'• '+x.reporte+' · '+x.plant+' · '+x.status).join('\n');
+  const text='Buen día, '+payload.tech+'.\n\nEn el periodo '+from+' al '+to+' aparecen '+payload.rows.length+' servicios sin constancia registrada.\n\n'+detail+(payload.rows.length>30?'\nY '+(payload.rows.length-30)+' adicionales.':'')+'\n\nFavor de revisar y regularizar los reportes que correspondan. Adjuntaré el PDF de seguimiento por separado.\n\nControl de Calidad y Consultoría PND.';
+  window.open('https://wa.me/'+(digits.length===10?'52'+digits:digits)+'?text='+encodeURIComponent(text),'_blank','noopener,noreferrer');
 }
 function isTechOpen(x){return !x.finished&&techStages.has(x.stage.name)&&x.owner===x.tech}
 // El estado 04 FIRMADO es responsabilidad del técnico. Solo cambia a César
@@ -6428,7 +6464,7 @@ text('daily-total',period.length);text('daily-signed',count(period,x=>x.signed))
 const groups=new Map();period.forEach(x=>{if(!groups.has(x.tech))groups.set(x.tech,[]);groups.get(x.tech).push(x)});
 $('daily-technicians').innerHTML=[...groups].sort((a,b)=>b[1].length-a[1].length).map(([name,arr])=>{const signed=count(arr,x=>x.signed);const pct=Math.round(100*signed/arr.length);return `<tr class="${name===picked?'picked':''}" data-tech="${escapeHtmlMonitor(name)}"><td><strong>${escapeHtmlMonitor(name)}</strong></td><td>${arr.length}</td><td class="daily-green">${signed}</td><td class="daily-red">${arr.length-signed}</td><td class="daily-orange"><b>${count(arr,isFirmadoSinEnviar)}</b></td><td class="daily-blue">${count(arr,x=>!x.finished&&x.owner==='César Jiménez')}</td><td class="daily-orange">${count(arr,x=>!x.finished&&x.owner==='Selene Martínez')}</td><td>${count(arr,x=>x.finished)}</td><td><span>${pct}%</span><div class="daily-progress"><div style="width:${pct}%"></div></div></td></tr>`}).join('')||'<tr><td colspan="9" class="daily-empty">No hay servicios en el periodo elegido</td></tr>';
 $('daily-technicians').querySelectorAll('[data-tech]').forEach(row=>row.onclick=()=>{picked=row.dataset.tech;window.delaySelectedTech=picked;window.delayOwnerGroup='tech';const dropdown=$('delay-filter-tech');if(dropdown)dropdown.value=picked;render();});
-syncDailyPhone();const person=$('daily-person');if(picked){const mine=period.filter(x=>x.tech===picked),open=items.filter(x=>x.tech===picked&&!x.finished);const signed=count(mine,x=>x.signed);person.innerHTML=`<div class="daily-selected">${escapeHtmlMonitor(picked)}</div><div class="daily-muted">${mine.length} servicios en el periodo · ${open.length} pendientes acumulados</div><div class="daily-selected-grid"><div><b>${mine.length}</b><small>Servicios</small></div><div><b class="daily-green">${signed}</b><small>Con firma</small></div><div><b class="daily-red">${mine.length-signed}</b><small>Sin firma</small></div><div><b class="daily-orange">${count(mine,isFirmadoSinEnviar)}</b><small>Firmados sin enviar</small></div><div><b class="daily-blue">${count(mine,x=>!x.finished&&x.owner==='César Jiménez')}</b><small>En revisión · César</small></div><div><b>${open.length}</b><small>Abiertos</small></div></div>`;}else person.innerHTML='<h3>Selecciona un técnico</h3><p class="daily-muted">Haz clic en su nombre para revisar sus servicios del periodo y sus pendientes acumulados.</p>';
+syncDailyPhone();const person=$('daily-person');if(picked){const mine=period.filter(x=>x.tech===picked),open=items.filter(x=>x.tech===picked&&!x.finished);const signed=count(mine,x=>x.signed);person.innerHTML=`<div class="daily-selected">${escapeHtmlMonitor(picked)}</div><div class="daily-muted">${mine.length} servicios en el periodo · ${open.length} pendientes acumulados</div><div class="daily-selected-grid"><div><b>${mine.length}</b><small>Servicios</small></div><div><b class="daily-green">${signed}</b><small>Con constancia</small></div><div><b class="daily-red">${mine.length-signed}</b><small>Sin constancia</small></div><div><b class="daily-orange">${count(mine,isFirmadoSinEnviar)}</b><small>Firmados sin enviar</small></div><div><b class="daily-blue">${count(mine,x=>!x.finished&&x.owner==='César Jiménez')}</b><small>En revisión · César</small></div><div><b>${open.length}</b><small>Abiertos</small></div></div>`;}else person.innerHTML='<h3>Selecciona un técnico</h3><p class="daily-muted">Haz clic en su nombre para revisar sus servicios del periodo y sus pendientes acumulados.</p>';
 const open=items.filter(x=>!x.finished), owners=[['Técnicos',count(open,isTechOpen)],['César Jiménez',count(open,x=>x.owner==='César Jiménez')],['Selene Martínez',count(open,x=>x.owner==='Selene Martínez')],['Área de Captura',count(open,x=>x.owner==='Área de Captura')]];
 $('daily-owners').innerHTML=owners.map(([label,n])=>`<button type="button" data-owner="${escapeHtmlMonitor(label)}"><b>${n}</b><small>${escapeHtmlMonitor(label)}</small></button>`).join('');$('daily-owners').querySelectorAll('[data-owner]').forEach(b=>b.onclick=()=>{picked='';window.delaySelectedTech='';$('daily-table-mode').value='open';render();const legacy=$('delay-filter-owner');if(legacy){legacy.value=b.dataset.owner==='Técnicos'?'':b.dataset.owner;} });
 const hist=typeof delaySplitRows==='function'?delaySplitRows().historicos.length:0;text('daily-historical',hist+' pendientes históricos (antes de 25/09/2026) se administran por Área de Captura, fuera del ranking del flujo nuevo.');fillTable();if(chosenReport)showEvolution();
@@ -6451,11 +6487,74 @@ window.dailySetPeriod=n=>{
   render();
 };
 function readyPdf(){if(!picked){alert('Selecciona primero un técnico.');return false;}window.delaySelectedTech=picked;const el=$('delay-filter-tech');if(el)el.value=picked;window.delayOwnerGroup='tech';window.delayShowAllRows=true;renderMonitorPendientes();return true;}
-window.dailyPrintSelected=()=>{if(readyPdf())printDelayPdf($('daily-pdf-status')?.value||'all')};
-window.dailyExportSelected=()=>{if(readyPdf())exportDelayCsv()};
-window.dailyWhatsappSelected=()=>{if(readyPdf())prepareDelayWhatsApp()};
+// PDF GENERAL: MISMA FUENTE Y MISMO PERIODO QUE EL RANKING DE PRODUCCIÓN.
+// No utiliza el técnico seleccionado ni los filtros del PDF individual.
+window.dailyPrintGeneral=()=>{
+  const all=allRows(), rows=periodItems(all);
+  if(!rows.length){alert('No hay reportes en las fechas seleccionadas.');return;}
+  const from=$('daily-date-from')?.value||'', to=$('daily-date-to')?.value||'';
+  const safe=v=>escapeHtmlMonitor(String(v??''));
+  const cnt=(arr,fn)=>arr.filter(fn).length;
+  const groups=new Map();
+  rows.forEach(x=>{if(!groups.has(x.tech))groups.set(x.tech,[]);groups.get(x.tech).push(x)});
+  const entries=[...groups.entries()].sort((a,b)=>b[1].length-a[1].length||a[0].localeCompare(b[0],'es'));
+  const fmt=n=>Number(n).toLocaleString('es-MX');
+  const kpi={total:rows.length,signed:cnt(rows,x=>x.signed),unsigned:cnt(rows,x=>!x.signed),sent:cnt(rows,isFirmadoSinEnviar),review:cnt(rows,x=>!x.finished&&x.owner==='César Jiménez'),next:cnt(rows,x=>!x.finished&&x.owner==='Selene Martínez'),closed:cnt(rows,x=>x.finished)};
+  const tally=arr=>[arr.length,cnt(arr,x=>x.signed),cnt(arr,x=>!x.signed),cnt(arr,isFirmadoSinEnviar),cnt(arr,x=>!x.finished&&x.owner==='César Jiménez'),cnt(arr,x=>!x.finished&&x.owner==='Selene Martínez'),cnt(arr,x=>x.finished)];
+  const cells=a=>a.map((n,i)=>`<td class="${i===2&&n?'warn':i===6?'good':''}">${fmt(n)}</td>`).join('');
+  const mainRows=entries.map(([name,arr])=>`<tr><td class="who">${safe(name)}</td>${cells(tally(arr))}<td>${Math.round(100*cnt(arr,x=>x.signed)/arr.length)}%</td></tr>`).join('');
+  const totalRow=`<tr class="total"><td>TOTAL GENERAL</td>${cells(tally(rows))}<td>${Math.round(100*kpi.signed/kpi.total)}%</td></tr>`;
+  // Desglose exacto de cada estado, sin mezclar el estado de firma con la etapa actual.
+  const statusRows=entries.flatMap(([name,arr])=>{
+    const counts=new Map();arr.forEach(x=>counts.set(x.status||'SIN ESTATUS',(counts.get(x.status||'SIN ESTATUS')||0)+1));
+    return [...counts.entries()].sort((a,b)=>b[1]-a[1]).map(([status,n],i)=>`<tr><td>${i===0?safe(name):''}</td><td>${safe(status)}</td><td class="center">${fmt(n)}</td></tr>`);
+  }).join('');
+  const detailRows=entries.map(([name,arr])=>{
+    const body=arr.slice().sort((a,b)=>a.fecha-b.fecha||String(a.reporte).localeCompare(String(b.reporte))).map(x=>
+      `<tr><td>${safe(x.reporte)}</td><td>${safe(dateKey(x.fecha))}</td><td>${safe(x.plant)}</td><td>${safe(x.equipment)}</td><td>${safe(x.status)}</td><td>${x.signed?'Sí':'No'}</td><td>${safe(x.finished?'Finalizado':x.owner)}</td></tr>`).join('');
+    return `<section class="tech-section"><h3>${safe(name)} <span>· ${arr.length} servicios · ${cnt(arr,x=>!x.signed)} sin constancia</span></h3><table class="detail"><thead><tr><th>Reporte</th><th>Fecha servicio</th><th>Planta</th><th>Equipo</th><th>Estatus actual</th><th>Constancia</th><th>Responsable actual</th></tr></thead><tbody>${body}</tbody></table></section>`;
+  }).join('');
+  const now=new Date().toLocaleString('es-MX');
+  const html=`<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Reporte general de técnicos · ${safe(from)} a ${safe(to)}</title>
+<style>
+@page{size:letter landscape;margin:11mm}*{box-sizing:border-box}body{font-family:Arial,Helvetica,sans-serif;color:#18283d;margin:0;font-size:10px;background:#fff;line-height:1.35}
+.toolbar{display:flex;gap:9px;align-items:center;margin:0 0 15px}.toolbar button{background:#ed7900;color:#fff;border:0;border-radius:5px;padding:10px 15px;font-weight:bold;cursor:pointer}.toolbar button.alt{background:#233c60}
+header{display:flex;justify-content:space-between;gap:15px;border-bottom:3px solid #ed7900;padding-bottom:12px;margin-bottom:13px}.brand{font-weight:800;letter-spacing:1px;color:#d76e00;font-size:12px}.title{font-size:22px;font-weight:800;color:#18304f;margin:5px 0}.sub{font-size:12px;color:#485c76}.stamp{font-size:10px;text-align:right;color:#57677e;white-space:nowrap}
+.kpis{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;margin:12px 0 18px}.kpi{background:#edf2f7;padding:10px 6px;border-top:3px solid #2b4c76;text-align:center}.kpi b{display:block;font-size:21px;color:#172d48}.kpi small{font-size:9px;color:#50647b}.kpi.negative{border-top-color:#e78e28}.kpi.negative b{color:#a85b00}.kpi.positive{border-top-color:#16a37c}.kpi.positive b{color:#0c785a}
+h2{font-size:15px;color:#172f4c;margin:17px 0 8px}h3{color:#1d3657;font-size:12px;margin:18px 0 7px}h3 span{font-weight:400;color:#63768d}.note{color:#57677c;font-size:9px;margin:8px 0}
+table{border-collapse:collapse;width:100%;table-layout:fixed}thead{display:table-header-group}th{background:#193252;color:#fff;text-align:left;font-size:8px;padding:7px 5px}td{border-bottom:1px solid #e0e6ed;padding:6px 5px;vertical-align:top;overflow-wrap:anywhere}tr{break-inside:avoid;page-break-inside:avoid}tbody tr:nth-child(even){background:#f4f7fa}.who{font-weight:bold}.total td{font-weight:800;background:#dfeaf5;border-top:2px solid #203c5d}.warn{color:#aa5800;font-weight:bold}.good{color:#0a846a;font-weight:bold}.center{text-align:center}.summary th:first-child{width:23%}.status th:first-child{width:35%}.status th:nth-child(2){width:50%}.status th:last-child{width:15%}.detail th:nth-child(1){width:9%}.detail th:nth-child(2){width:11%}.detail th:nth-child(3){width:13%}.detail th:nth-child(4){width:21%}.detail th:nth-child(5){width:22%}.detail th:nth-child(6){width:8%}.detail th:nth-child(7){width:16%}.tech-section{break-inside:auto}.newpage{break-before:page;page-break-before:always}.footer{font-size:9px;color:#63748b;border-top:1px solid #dce3eb;padding-top:8px;margin-top:18px}
+@media print{.toolbar{display:none}body{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
+</style></head><body>
+<div class="toolbar"><button onclick="window.print()">Imprimir / Guardar como PDF</button><button class="alt" onclick="window.close()">Cerrar</button></div>
+<header><div><div class="brand">CONTROL DE CALIDAD Y CONSULTORÍA PND</div><div class="title">Monitor de Reportes Pendientes · General</div><div class="sub">Producción y estatus de todos los técnicos · Periodo: ${safe(from)} al ${safe(to)}</div></div><div class="stamp"><b>Fecha de generación</b><br>${safe(now)}<br>Reporte interno de seguimiento</div></header>
+<div class="kpis"><div class="kpi"><b>${fmt(kpi.total)}</b><small>Servicios</small></div><div class="kpi positive"><b>${fmt(kpi.signed)}</b><small>Con constancia</small></div><div class="kpi negative"><b>${fmt(kpi.unsigned)}</b><small>Sin constancia</small></div><div class="kpi"><b>${fmt(kpi.sent)}</b><small>Firmados sin enviar</small></div><div class="kpi"><b>${fmt(kpi.review)}</b><small>En revisión · César</small></div><div class="kpi"><b>${fmt(kpi.next)}</b><small>Etapa posterior</small></div><div class="kpi positive"><b>${fmt(kpi.closed)}</b><small>Enviados / finalizados</small></div></div>
+<h2>1. Resumen por técnico</h2><table class="summary"><thead><tr><th>Técnico</th><th>Total</th><th>Con constancia</th><th>Sin constancia</th><th>Firmados sin enviar</th><th>En revisión · César</th><th>Posteriores</th><th>Cerrados</th><th>% constancia</th></tr></thead><tbody>${mainRows}${totalRow}</tbody></table>
+<p class="note">Fuente: fecha del servicio en columna J de CAPTURA. «Con constancia» incluye firma digital o constancia física registrada. Los estatus son los actuales al momento de generar el reporte.</p>
+<section class="newpage"><h2>2. Desglose de estatus actual por técnico</h2><p class="note">Cada reporte se cuenta una sola vez dentro de su estatus actual. Los totales por técnico coinciden con los servicios del periodo.</p><table class="status"><thead><tr><th>Técnico</th><th>Estatus actual</th><th>Cantidad</th></tr></thead><tbody>${statusRows}</tbody></table></section>
+<section class="newpage"><h2>3. Detalle de los reportes del periodo</h2><p class="note">Todos los reportes de cada técnico; incluye enviados/finalizados. La columna «Responsable actual» se conserva para asignar el seguimiento sin atribuir a un técnico tareas de César, Selene o Captura.</p>${detailRows}</section>
+<div class="footer">Documento generado con los filtros Desde/Hasta del Monitor. El reporte general no se limita al técnico seleccionado. Pendientes acumulados de fechas anteriores no se suman a esta producción; pueden consultarse en el Monitor.</div></body></html>`;
+  const w=window.open('','_blank');
+  if(!w){alert('Permite ventanas emergentes para abrir el PDF general.');return;}
+  w.document.open();w.document.write(html);w.document.close();w.focus();
+};
+
+window.dailyPrintSelected=()=>{
+  const f=$('daily-pdf-status')?.value||'all';
+  if(f==='period_unsigned'){const p=dailyUnsignedPeriodPayload();if(p)printDelayPdf(f,p);return;}
+  if(readyPdf())printDelayPdf(f);
+};
+window.dailyExportSelected=()=>{
+  const f=$('daily-pdf-status')?.value||'all';
+  if(f==='period_unsigned'){const p=dailyUnsignedPeriodPayload();if(p)dailyUnsignedCsv(p);return;}
+  if(readyPdf())exportDelayCsv();
+};
+window.dailyWhatsappSelected=()=>{
+  const f=$('daily-pdf-status')?.value||'all';
+  if(f==='period_unsigned'){const p=dailyUnsignedPeriodPayload();if(p)dailyUnsignedWhatsApp(p);return;}
+  if(readyPdf())prepareDelayWhatsApp();
+};
 $('daily-phone')?.addEventListener('input',()=>{if(!picked)return;const digits=$('daily-phone').value.replace(/\D/g,'').slice(0,12);try{localStorage.setItem('delay_phone_'+picked,digits);}catch(e){};});
-$('daily-pdf-status')?.addEventListener('change',()=>{const v=$('daily-pdf-status').value;const note=$('daily-phone-note');if(note&&picked)note.textContent=(v==='firma'?'WhatsApp y PDF: solo estado 03':v==='firmado'?'WhatsApp y PDF: firmados sin enviar (04)':'WhatsApp y PDF: '+(v==='sin_firma'?'sin constancia firmada':'todos los pendientes'))+' · '+picked;});
+$('daily-pdf-status')?.addEventListener('change',()=>{const v=$('daily-pdf-status').value;const note=$('daily-phone-note');if(note&&picked)note.textContent=(v==='period_unsigned'?'WhatsApp y PDF: sin firma del periodo':v==='firma'?'WhatsApp y PDF: solo estado 03':v==='firmado'?'WhatsApp y PDF: firmados sin enviar (04)':'WhatsApp y PDF: '+(v==='sin_firma'?'sin constancia registrada':'todos los pendientes'))+' · '+picked;});
 const base=window.renderMonitorPendientes;
 window.renderMonitorPendientes=function(...args){const res=base.apply(this,args);render();return res;};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',render);else render();
